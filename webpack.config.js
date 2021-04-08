@@ -9,6 +9,7 @@ module.exports = {
       template: "./web/src/index.html"
     }),
   ],
+  devtool: 'inline-source-map',
   entry: {
     index: './web/src/index.js',
     print: './web/src/print.js',
