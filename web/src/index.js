@@ -1,12 +1,18 @@
-import * as Vue from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus';
+import 'element-plus/lib/theme-chalk/index.css';
+import App from './admin/App.vue'
+import Login from './Login.vue'
+import Landing from './Landing.vue'
 import * as VueRouter from 'vue-router'
 
-const About = { template: '<div>Provided by the Nuts comunity for demo purposes.</div>' }
+const About = { template: '<div>Provided by the Nuts community for demo purposes.</div>' }
 
 const routes = [
-  { path: '/', component: App },
-  { path: '/about', component: About }
+  { path: '/', component: Landing },
+  { path: '/about', component: About },
+  { path: '/login', component: Login },
+  { path: '/admin', component: App }
 ]
 
 const router = VueRouter.createRouter({
@@ -15,6 +21,7 @@ const router = VueRouter.createRouter({
   routes // short for `routes: routes`
 })
 
-const app = Vue.createApp({})
+const app = createApp({})
+app.use(ElementPlus)
 app.use(router)
 app.mount('#app')
