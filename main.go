@@ -43,5 +43,5 @@ func main() {
 	assetHandler := http.FileServer(getFileSystem(useFS))
 	e.GET("/*", echo.WrapHandler(assetHandler))
 
-	e.Logger.Fatal(e.Start(":1323"))
+	e.Logger.Fatal(e.Start(":1303"))
 }

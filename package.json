@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
-    "watch": "webpack --watch"
+    "watch": "webpack --watch",
+    "lint": "eslint --ext .js,.vue web/src --fix"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,12 @@
   "devDependencies": {
     "@vue/compiler-sfc": "^3.0.11",
     "css-loader": "^5.2.0",
+    "eslint": "^7.23.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "eslint-plugin-vue": "^7.8.0",
     "html-webpack-plugin": "^5.3.1",
     "vue-loader": "^16.2.0",
     "vue-style-loader": "^4.1.3",
