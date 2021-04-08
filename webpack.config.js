@@ -15,7 +15,6 @@ module.exports = {
   devtool: 'inline-source-map',
   entry: {
     index: './web/src/index.js',
-    print: './web/src/print.js',
   },
   output: {
     filename: '[name].bundle.js',
