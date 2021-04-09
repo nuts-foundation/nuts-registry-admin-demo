@@ -1,9 +1,12 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { VueLoaderPlugin } = require('vue-loader')
+
 
 module.exports = {
   mode: "development",
   plugins: [
+    new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
       title: "Nuts Demo registry admin",
       template: "./web/src/index.html"
@@ -12,11 +15,35 @@ module.exports = {
   devtool: 'inline-source-map',
   entry: {
     index: './web/src/index.js',
-    print: './web/src/print.js',
   },
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'web/dist'),
     clean: true,
   },
+  resolve: {
+    alias: {
+      'vue': 'vue/dist/vue.esm-bundler.js'
+    }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'style-loader',
+          'css-loader'
+        ]
+      }
+    ]
+  }
 };
