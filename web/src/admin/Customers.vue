@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     fetchData() {
-      fetch("/api/customers")
+      fetch("api/customers")
           .then(response => response.json())
           .then(data => this.customers = data)
     }
