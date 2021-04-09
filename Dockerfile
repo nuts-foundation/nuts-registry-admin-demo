@@ -36,6 +36,6 @@ RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-w -s" -o
 FROM alpine:3.13
 COPY --from=backend-builder /app/nuts-registry-admin-demo /usr/bin/nuts-registry-admin-demo
 HEALTHCHECK --start-period=5s --timeout=5s --interval=5s \
-    CMD wget --no-verbose --tries=1 --spider http://localhost:1323/ || exit 1
-EXPOSE 1323
+    CMD wget --no-verbose --tries=1 --spider http://localhost:1303/ || exit 1
+EXPOSE 1303
 ENTRYPOINT ["/usr/bin/nuts-registry-admin-demo"]
