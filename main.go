@@ -42,6 +42,13 @@ func main() {
 
 	assetHandler := http.FileServer(getFileSystem(useFS))
 	e.GET("/*", echo.WrapHandler(assetHandler))
+	e.GET("/api/customers", func(ctx echo.Context) error {
+		customers := []map[string]string{
+			{"name":"Zorginstelling de notenboom", "did":"did:nuts:123"},
+			{"name":"Verpleehuis de nootjes", "did":"did:nuts:456"},
+		}
+		return ctx.JSON(200, customers)
+	})
 
 	e.Logger.Fatal(e.Start(":1303"))
 }
