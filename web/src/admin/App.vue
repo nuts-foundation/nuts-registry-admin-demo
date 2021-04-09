@@ -1,10 +1,13 @@
 <template>
   <el-container>
-    <el-header>Header</el-header>
+    <el-header>
+      <router-link to="customers">Customers</router-link>
+      <router-link to="/login">logout</router-link>
+    </el-header>
     <el-container>
       <el-aside width="200px">Aside</el-aside>
       <el-main>
-        <p>{{greeting}} Nuts!</p>
+        <router-view></router-view>
       </el-main>
     </el-container>
   </el-container>
