@@ -27,7 +27,7 @@ jobs:
           echo "::set-output name=git_branch::$(echo ${GITHUB_REF#refs/heads/})"
           echo "::set-output name=git_version::$(git name-rev --tags --name-only $(git rev-parse HEAD))"
 
-      - name: Another step
+      - name: Print version information
         run: |
           echo "Commit: ${{ steps.version.outputs.git_commit }}"
           echo "Branch: ${{ steps.version.outputs.git_branch }}"
