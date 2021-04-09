@@ -21,6 +21,7 @@ ENV GO111MODULE on
 ENV GOPATH /
 
 RUN mkdir /app && cd /app
+WORKDIR /app
 COPY go.mod .
 COPY go.sum .
 RUN go mod download && go mod verify
