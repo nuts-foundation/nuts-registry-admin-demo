@@ -1,10 +1,5 @@
 <template>
-  <el-table :data="customers">
-    <el-table-column prop="name" label="Name">
-    </el-table-column>
-    <el-table-column prop="did" label="DID">
-    </el-table-column>
-  </el-table>
+  <h1>customer</h1>
 </template>
 
 <script>

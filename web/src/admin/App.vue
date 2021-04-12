@@ -1,16 +1,16 @@
 <template>
-  <el-container>
-    <el-header>
+  <container>
+    <header>
       <router-link to="customers">Customers</router-link>
       <router-link to="/login">logout</router-link>
-    </el-header>
-    <el-container>
-      <el-aside width="200px">Aside</el-aside>
-      <el-main>
+    </header>
+    <container>
+      <aside width="200px">Aside</aside>
+      <main>
         <router-view></router-view>
-      </el-main>
-    </el-container>
-  </el-container>
+      </main>
+    </container>
+  </container>
 </template>
 
 <script>

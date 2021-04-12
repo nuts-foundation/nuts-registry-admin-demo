@@ -1,3 +1,3 @@
 <template>
-  <router-link to="/login">Login</router-link>
+  <h1>Welcome!</h1>
 </template>

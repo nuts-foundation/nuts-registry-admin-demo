@@ -1,16 +1,22 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require("webpack");
 const { VueLoaderPlugin } = require('vue-loader')
 
 
 module.exports = {
-  mode: "development",
+  // mode: "development",
+  // mode: "production",
   plugins: [
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
       title: "Nuts Demo registry admin",
       template: "./web/src/index.html"
     }),
+    new webpack.DefinePlugin({
+      __VUE_OPTIONS_API__: false,
+      __VUE_PROD_DEVTOOLS__: false,
+    })
   ],
   devtool: 'inline-source-map',
   entry: {
@@ -23,7 +29,9 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'vue': 'vue/dist/vue.esm-bundler.js'
+      // Use the runtime here since it is smaller and we use precompiled .vue components
+      'vue': 'vue/dist/vue.runtime.esm-bundler.js'
+      // 'vue': 'vue/dist/vue.esm-bundler.js'
     }
   },
   module: {
