@@ -18,10 +18,33 @@ module.exports = {
     }),
     // Purging unused CSS styles from tailwind
     new PurgeCSSPlugin({
-      paths: glob.sync('./web/src/**/*', {nodir: true}),
+      paths: glob.sync("./web/src/**/*"),
+      extractors: [
+        {
+          extractor: class TailwindExtractor {
+            static extract(content) {
+              return content.match(/[A-z0-9-_:\/]+/g) || [];
+            }
+          },
+          styleExtensions: ['.css'],
+          extensions: ['html', 'vue', 'js'],
+        },
+      ],
     }),
   ],
-  devtool: 'inline-source-map',
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        styles: {
+          name: 'styles',
+          test: /\.css$/,
+          chunks: 'all',
+          enforce: true
+        }
+      }
+    }
+  },
+  // devtool: 'inline-source-map',
   entry: {
     index: './web/src/index.js',
   },
