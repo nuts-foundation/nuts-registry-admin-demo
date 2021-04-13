@@ -1,36 +1,37 @@
-import { createApp } from 'vue'
-import ElementPlus from 'element-plus';
-import 'element-plus/lib/theme-chalk/index.css';
-import App from './admin/App.vue'
-import Customers from './admin/Customers.vue'
-import Login from './Login.vue'
+import {createApp, h} from 'vue'
+import {createRouter, createWebHashHistory} from 'vue-router'
+import './style.css'
+import App from './App.vue'
+import AdminApp from './admin/AdminApp.vue'
+import AdminMenu from './admin/AdminMenu.vue'
 import Landing from './Landing.vue'
-import * as VueRouter from 'vue-router'
-
-const About = { template: '<div>Provided by the Nuts community for demo purposes.</div>' }
+import PublicMenu from './layout/PublicMenu.vue'
+import Login from './Login.vue'
+import Customers from './admin/Customers.vue'
 
 const routes = [
-  { path: '/', component: Landing },
-  { path: '/about', component: About },
-  { path: '/login', component: Login },
-  { path: '/admin',
-    component: App,
+  {path: '/', components: {default: Landing, menu: PublicMenu}},
+  {path: '/login', components: {default: Login, menu: PublicMenu}},
+  {
+    path: '/admin',
+    components: {default: AdminApp, menu: AdminMenu},
     children: [
       {
-        path: 'customers',
+        path: '',
         component: Customers
       }
     ]
   }
 ]
 
-const router = VueRouter.createRouter({
+const router = createRouter({
   // We are using the hash history for simplicity here.
-  history: VueRouter.createWebHashHistory(),
+  history: createWebHashHistory(),
   routes // short for `routes: routes`
 })
 
-const app = createApp({})
-app.use(ElementPlus)
+// const app = createApp({})
+const app = createApp(App)
+
 app.use(router)
 app.mount('#app')
