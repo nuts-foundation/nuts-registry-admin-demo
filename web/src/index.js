@@ -1,23 +1,24 @@
 import { createApp, h } from 'vue'
 import { createRouter, createWebHashHistory } from 'vue-router'
-// import App from './admin/App.vue'
-// import Customers from './admin/Customers.vue'
-import Login from './Login.vue'
+import './style.css'
 import App from './App.vue'
+import AdminApp from './admin/AdminApp.vue'
 import Landing from './Landing.vue'
+import Login from './Login.vue'
+import Customers from './admin/Customers.vue'
 
 const routes = [
   { path: '/', component: Landing },
   { path: '/login', component: Login },
-//   { path: '/admin',
-//     component: App,
-//     children: [
-//       {
-//         path: 'customers',
-//         component: Customers
-//       }
-//     ]
-//   }
+  { path: '/admin',
+    component: AdminApp,
+    children: [
+      {
+        path: '',
+        component: Customers
+      }
+    ]
+  }
 ]
 
 const router = createRouter({

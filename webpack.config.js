@@ -1,12 +1,11 @@
 const path = require('path');
+const glob = require('glob')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require("webpack");
-const { VueLoaderPlugin } = require('vue-loader')
-
+const {VueLoaderPlugin} = require('vue-loader')
+const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 
 module.exports = {
-  // mode: "development",
-  // mode: "production",
   plugins: [
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
@@ -14,9 +13,13 @@ module.exports = {
       template: "./web/src/index.html"
     }),
     new webpack.DefinePlugin({
-      __VUE_OPTIONS_API__: false,
+      __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: false,
-    })
+    }),
+    // Purging unused CSS styles from tailwind
+    new PurgeCSSPlugin({
+      paths: glob.sync('./web/src/**/*', {nodir: true}),
+    }),
   ],
   devtool: 'inline-source-map',
   entry: {
@@ -49,7 +52,8 @@ module.exports = {
         use: [
           'vue-style-loader',
           'style-loader',
-          'css-loader'
+          'css-loader',
+          'postcss-loader'
         ]
       }
     ]
