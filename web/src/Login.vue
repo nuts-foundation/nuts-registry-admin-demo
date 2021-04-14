@@ -41,6 +41,7 @@ export default {
   },
   methods: {
     onSubmit() {
+      localStorage.setItem("session", "true")
       this.$router.push("/admin/")
     }
   }
