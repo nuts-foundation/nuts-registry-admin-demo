@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY ./web ./web
-COPY ./webpack.config.js .
+COPY ./*.config.js .
 RUN npm run build
 
 #
