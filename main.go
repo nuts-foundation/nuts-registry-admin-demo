@@ -12,6 +12,7 @@ import (
 )
 
 const assetPath = "web/dist"
+
 //go:embed web/dist/*
 var embeddedFiles embed.FS
 
@@ -30,7 +31,6 @@ func getFileSystem(useFS bool) http.FileSystem {
 	return http.FS(fsys)
 }
 
-
 func main() {
 	e := echo.New()
 	e.HideBanner = true
@@ -42,10 +42,24 @@ func main() {
 
 	assetHandler := http.FileServer(getFileSystem(useFS))
 	e.GET("/*", echo.WrapHandler(assetHandler))
+	e.POST("/api/auth", func(ctx echo.Context) error {
+		credentials := struct {
+			Username string
+			Password string
+		}{}
+		err := ctx.Bind(&credentials)
+		if err != nil {
+			return err
+		}
+		if credentials.Username != "demo@nuts.nl" || credentials.Password != "123" {
+			return echo.NewHTTPError(http.StatusForbidden, "invalid credentials")
+		}
+		return ctx.JSON(200, map[string]string{"token": "123"})
+	})
 	e.GET("/api/customers", func(ctx echo.Context) error {
 		customers := []map[string]string{
-			{"name":"Zorginstelling de notenboom", "did":"did:nuts:123"},
-			{"name":"Verpleehuis de nootjes", "did":"did:nuts:456"},
+			{"name": "Zorginstelling de notenboom", "did": "did:nuts:123"},
+			{"name": "Verpleehuis de nootjes", "did": "did:nuts:456"},
 		}
 		return ctx.JSON(200, customers)
 	})
