@@ -2,11 +2,15 @@ package main
 
 import (
 	"embed"
+	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
 
+	"github.com/knadh/koanf"
+	"github.com/knadh/koanf/parsers/yaml"
+	"github.com/knadh/koanf/providers/file"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -31,7 +35,36 @@ func getFileSystem(useFS bool) http.FileSystem {
 	return http.FS(fsys)
 }
 
+func defaultConfig() Config {
+	return Config{
+		HTTPPort: 1303,
+	}
+}
+
+type Config struct {
+	Credentials struct {
+		Username string `koanf:"username"`
+		Password string `koanf:"password"`
+	}
+	HTTPPort int `koanf:"port"`
+}
+
+func loadConfig() Config {
+	var k = koanf.New(".")
+
+	if err := k.Load(file.Provider("server.config.yaml"), yaml.Parser()); err != nil {
+		log.Fatalf("error while loading config from file: %v", err)
+	}
+	config := defaultConfig()
+	if err := k.Unmarshal("", &config); err != nil {
+		log.Fatalf("error while unmarshalling config: %v", err)
+	}
+	return config
+}
+
 func main() {
+	config := loadConfig()
+
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger())
@@ -51,7 +84,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		if credentials.Username != "demo@nuts.nl" || credentials.Password != "123" {
+		if credentials.Username != config.Credentials.Username|| credentials.Password != config.Credentials.Password {
 			return echo.NewHTTPError(http.StatusForbidden, "invalid credentials")
 		}
 		return ctx.JSON(200, map[string]string{"token": "123"})
@@ -64,5 +97,5 @@ func main() {
 		return ctx.JSON(200, customers)
 	})
 
-	e.Logger.Fatal(e.Start(":1303"))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.HTTPPort)))
 }
