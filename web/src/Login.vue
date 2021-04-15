@@ -22,7 +22,7 @@
             class="flex-1 py-2 px-4 block border border-gray-300 rounded-md"
         />
       </div>
-      <p>{{loginError}}</p>
+      <p>{{ loginError }}</p>
       <button
           @click="onSubmit"
           class="w-full btn-submit"
@@ -69,14 +69,13 @@ export default {
         }
         return response.json()
       }).then(responseData => {
-            console.log("success!")
-            localStorage.setItem("session", responseData.token)
-            this.$router.push("/admin/")
-          })
-          .catch(reason => {
-            console.error("failure", reason)
-            this.loginError = reason
-          })
+        console.log("success!")
+        localStorage.setItem("session", responseData.token)
+        this.$router.push("/admin/")
+      }).catch(reason => {
+        console.error("failure", reason)
+        this.loginError = reason
+      })
     }
   }
 }

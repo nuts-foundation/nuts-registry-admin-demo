@@ -36,7 +36,7 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   if (to.meta.requiresAuth) {
-    if (localStorage.key("session")) {
+    if (localStorage.getItem("session")) {
       return true
     }
     return '/login'
