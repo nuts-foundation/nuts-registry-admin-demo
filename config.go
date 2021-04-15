@@ -76,7 +76,6 @@ func resolveConfigFile(flagset *pflag.FlagSet) string {
 	_ = k.Load(e, nil)
 
 	// load cmd flags, without a parser, no error can be returned
-	// this also loads the default flag value of nuts.yaml. So we need a way to know if it's overiden.
 	_ = k.Load(posflag.Provider(flagset, defaultDelimiter, k), nil)
 
 	configFile := k.String(configFileFlag)
