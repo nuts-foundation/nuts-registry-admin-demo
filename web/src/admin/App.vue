@@ -1,15 +1,35 @@
 <template>
   <el-container>
-    <el-header>
-      <router-link to="customers">Customers</router-link>
-      <router-link to="/login">logout</router-link>
-    </el-header>
-    <el-container>
-      <el-aside width="200px">Aside</el-aside>
-      <el-main>
-        <router-view></router-view>
-      </el-main>
-    </el-container>
+    <el-aside>
+      <h1>
+        <i class="nuts-logo">Nuts</i><br/>
+        registry admin
+      </h1>
+      <el-menu default-active="1">
+        <router-link to="customers">
+          <el-menu-item index="1">
+            <i class="el-icon-office-building"></i>
+            <span>Care organisations</span>
+          </el-menu-item>
+        </router-link>
+        <router-link to="vendor">
+          <el-menu-item index="2">
+            <i class="el-icon-school"></i>
+            <span>You as a vendor</span>
+          </el-menu-item>
+        </router-link>
+        <router-link to="vendors">
+          <el-menu-item index="3">
+            <i class="el-icon-lock"></i>
+            <span>Trusted vendors</span>
+          </el-menu-item>
+        </router-link>
+      </el-menu>
+      <p><router-link to="/">Log out</router-link></p>
+    </el-aside>
+    <el-main>
+      <router-view></router-view>
+    </el-main>
   </el-container>
 </template>
 
@@ -24,38 +44,36 @@ module.exports = {
 </script>
 
 <style>
-body {
-  margin: 0;
-}
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-.el-header, .el-footer {
-  background-color: #B3C0D1;
-  color: #333;
-  text-align: center;
-  line-height: 60px;
+.el-container {
+  min-height: 100vh;
 }
 
 .el-aside {
-  background-color: #D3DCE6;
-  color: #333;
   text-align: center;
-  line-height: 200px;
+  border-right: solid 1px #e6e6e6;
+}
+.el-aside a {
+  text-decoration: none;
+  color: #2c3e50;
+  font-size: 14px;
+}
+.el-aside a:hover {
+  color: navy;
 }
 
-.el-main {
-  background-color: #E9EEF3;
-  color: #333;
-  text-align: center;
-  line-height: 160px;
+.el-menu {
+  border-right: 0;
+  text-align: left;
+  margin: 4em 0;
 }
-p {
-  font-size: 2em;
-  text-align: center;
+.el-menu a {
+  text-decoration: none;
+}
+
+.el-container .el-aside h1 {
+  font-size: 1.5em;
+  margin: 3em 0;
+  line-height: 2em;
+  font-weight: normal;
 }
 </style>

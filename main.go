@@ -44,8 +44,20 @@ func main() {
 	e.GET("/*", echo.WrapHandler(assetHandler))
 	e.GET("/api/customers", func(ctx echo.Context) error {
 		customers := []map[string]string{
-			{"name":"Zorginstelling de notenboom", "did":"did:nuts:123"},
-			{"name":"Verpleehuis de nootjes", "did":"did:nuts:456"},
+			{
+        "identifier":"notenboom.vendor.com",
+        "name":"Zorginstelling de notenboom",
+        "town":"Amsterdam",
+        "did":"did:nuts:123",
+        "active":"1",
+      },
+			{
+        "identifier":"nootjes.vendor.com",
+        "name":"Verpleeghuis de nootjes",
+        "town":"Maastricht",
+        "did":"did:nuts:456",
+        "active":"",
+      },
 		}
 		return ctx.JSON(200, customers)
 	})
