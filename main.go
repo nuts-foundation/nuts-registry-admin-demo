@@ -2,8 +2,9 @@ package main
 
 import (
 	"crypto"
+	"crypto/ecdsa"
+	"crypto/elliptic"
 	"crypto/rand"
-	"crypto/rsa"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -77,8 +78,7 @@ func createJWT(email string) ([]byte, error) {
 	t.Set(jwt.ExpirationKey, time.Now().Add(20*time.Minute))
 	t.Set(openid.EmailKey, email)
 
-	// Signing a token (using raw rsa.PrivateKey)
-	signed, err := jwt.Sign(t, jwa.RS256, sessionKey)
+	signed, err := jwt.Sign(t, jwa.ES256, sessionKey)
 	if err != nil {
 		log.Printf("failed to sign token: %s", err)
 		return nil, err
@@ -87,8 +87,8 @@ func createJWT(email string) ([]byte, error) {
 }
 
 func validateJWT(token []byte) (jwt.Token, error) {
-	pubKey := sessionKey.(*rsa.PrivateKey).PublicKey
-	t, err := jwt.Parse(token, jwt.WithVerify(jwa.RS256, pubKey), jwt.WithValidate(true))
+	pubKey := sessionKey.(*ecdsa.PrivateKey).PublicKey
+	t, err := jwt.Parse(token, jwt.WithVerify(jwa.ES256, pubKey), jwt.WithValidate(true))
 	if err != nil {
 		log.Printf("unable to parse token: %s", err)
 		return nil, err
@@ -99,7 +99,7 @@ func validateJWT(token []byte) (jwt.Token, error) {
 var sessionKey crypto.PrivateKey
 
 func generateSessionKey() (crypto.PrivateKey, error) {
-	key, err := rsa.GenerateKey(rand.Reader, 2048)
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		log.Printf("failed to generate private key: %s", err)
 		return nil, err
