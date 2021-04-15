@@ -8,4 +8,5 @@ require (
 	github.com/lestrrat-go/jwx v1.1.7
 	github.com/mitchellh/copystructure v1.1.2 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
+	github.com/spf13/pflag v1.0.5
 )
