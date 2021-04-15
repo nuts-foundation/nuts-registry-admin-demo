@@ -9,7 +9,7 @@
         <router-link to="customers">
           <el-menu-item index="1">
             <i class="el-icon-office-building"></i>
-            <span>Care organisations</span>
+            <span>Your care organisations</span>
           </el-menu-item>
         </router-link>
         <router-link to="vendor">
@@ -75,5 +75,10 @@ module.exports = {
   margin: 3em 0;
   line-height: 2em;
   font-weight: normal;
+}
+
+.narrow-page {
+  margin: 2em auto;
+  max-width: 800px;
 }
 </style>
