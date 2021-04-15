@@ -14,9 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/knadh/koanf"
-	"github.com/knadh/koanf/parsers/yaml"
-	"github.com/knadh/koanf/providers/file"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwa"
@@ -42,33 +39,6 @@ func getFileSystem(useFS bool) http.FileSystem {
 	}
 
 	return http.FS(fsys)
-}
-
-func defaultConfig() Config {
-	return Config{
-		HTTPPort: 1303,
-	}
-}
-
-type Config struct {
-	Credentials struct {
-		Username string `koanf:"username"`
-		Password string `koanf:"password"`
-	}
-	HTTPPort int `koanf:"port"`
-}
-
-func loadConfig() Config {
-	var k = koanf.New(".")
-
-	if err := k.Load(file.Provider("server.config.yaml"), yaml.Parser()); err != nil {
-		log.Fatalf("error while loading config from file: %v", err)
-	}
-	config := defaultConfig()
-	if err := k.Unmarshal("", &config); err != nil {
-		log.Fatalf("error while unmarshalling config: %v", err)
-	}
-	return config
 }
 
 func createJWT(email string) ([]byte, error) {
