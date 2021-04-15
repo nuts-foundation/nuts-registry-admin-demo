@@ -1,0 +1,74 @@
+openapi: 3.0.0
+info:
+  title: Nuts Registry Admin API
+  version: 1.0.0
+
+paths:
+  /web/auth:
+    post:
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        '200':
+          description: A session was succesfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSessionResponse"
+        '403':
+          description: Invalid credentials
+
+  /web/customers:
+    get:
+      operationId: getCustomers
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomersResponse"
+
+components:
+  schemas:
+    CreateSessionRequest:
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: demo@nuts.nl
+        password:
+          type: string
+    CreateSessionResponse:
+      required:
+        - token
+      properties:
+        token:
+          type: string
+
+    CustomersResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/Customer"
+    Customer:
+      type: object
+      description: A customer object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: The customer DID
+          example:
+            "did:nuts:123"
+        name:
+          type: string
+          description: Internal name for this customer

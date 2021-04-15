@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     onSubmit() {
-      fetch("api/auth", {
+      fetch("web/auth", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'

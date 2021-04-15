@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     fetchData() {
-      fetch("api/customers", {
+      fetch("web/customers", {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("session")}`
         }
