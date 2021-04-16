@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/lestrrat-go/jwx/jwt/openid"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 )
@@ -13,6 +14,19 @@ import (
 type Wrapper struct {
 	Auth auth
 	SPRepo domain.ServiceProviderRepository
+}
+
+func (w Wrapper) checkAuthorization(ctx echo.Context) (jwt.Token, error) {
+	authHeader := ctx.Request().Header.Get("Authorization")
+	if !strings.HasPrefix(authHeader, "Bearer ") {
+		return nil, echo.NewHTTPError(http.StatusForbidden, "Authorization header must contain 'Bearer <token>'")
+	}
+	tokenStr := strings.Split(authHeader, " ")[1]
+	token, err := w.Auth.ValidateJWT([]byte(tokenStr))
+	if err != nil {
+		return nil, echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("invalid token: %s", err))
+	}
+	return token, nil
 }
 
 func (w Wrapper) CreateSession(ctx echo.Context) error {
@@ -34,14 +48,9 @@ func (w Wrapper) CreateSession(ctx echo.Context) error {
 }
 
 func (w Wrapper) GetCustomers(ctx echo.Context) error {
-	authHeader := ctx.Request().Header.Get("Authorization")
-	if !strings.HasPrefix(authHeader, "Bearer ") {
-		return echo.NewHTTPError(http.StatusForbidden, "Authorization header must contain 'Bearer <token>'")
-	}
-	tokenStr := strings.Split(authHeader, " ")[1]
-	token, err := w.Auth.ValidateJWT([]byte(tokenStr))
+	token, err := w.checkAuthorization(ctx)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("invalid token: %s", err))
+		return err
 	}
 	if user, ok := token.Get(openid.EmailKey); ok {
 		ctx.Logger().Print("Customers requested by: %s", user)
@@ -57,6 +66,10 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 }
 
 func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
+	_, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
 	sp, err := w.SPRepo.Get()
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
@@ -74,6 +87,10 @@ func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
 }
 
 func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
+	_, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
 	spRequest := ServiceProvider{}
 	if err := ctx.Bind(&spRequest); err != nil {
 		return err
@@ -91,6 +108,10 @@ func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
 }
 
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
+	_, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
 	spRequest := ServiceProvider{}
 	if err := ctx.Bind(&spRequest); err != nil {
 		return err
