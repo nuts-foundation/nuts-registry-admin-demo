@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Nuts Registry Admin API
+  version: 1.0.0
+
+paths:
+  /web/auth:
+    post:
+      operationId: createSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        '200':
+          description: A session was succesfully created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSessionResponse"
+        '403':
+          description: Invalid credentials
+
+  /web/customers:
+    get:
+      operationId: getCustomers
+      responses:
+        '200':
+          description: List of customers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CustomersResponse"
+
+  /web/service-provider:
+    get:
+      operationId: getServiceProvider
+      description: Get the information of the current service provider of the Nuts node
+      responses:
+        200:
+          description: All the information of the current service provider.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceProvider"
+    post:
+      operationId: createServiceProvider
+      description: Create a new service provider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceProvider"
+      responses:
+        201:
+          description: The resulting created Service Provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceProvider"
+    put:
+      operationId: updateServiceProvider
+      description: Update a new service provider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceProvider"
+      responses:
+        200:
+          description: The resulting created Service Provider
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceProvider"
+
+
+components:
+  schemas:
+    CreateSessionRequest:
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: demo@nuts.nl
+        password:
+          type: string
+    CreateSessionResponse:
+      required:
+        - token
+      properties:
+        token:
+          type: string
+
+    CustomersResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/Customer"
+    Customer:
+      type: object
+      description: A customer object
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          description: The customer DID
+          example:
+            "did:nuts:123"
+        name:
+          type: string
+          description: Internal name for this customer
+
+    ServiceProvider:
+      type: object
+      description: A Service Provider is a controller of other DID documents
+      required:
+        - id
+        - name
+        - phone
+        - email
+      properties:
+        id:
+          description: The DID of the service provider
+          type: string
+          example: did:nuts:123
+        name:
+          description: The name of the service provider
+          type: string
+        phone:
+          description: Number available for other service providers in the network to call in case of emergency
+          type: string
+        email:
+          description: Email addres available for other service providers in the network for getting support
+          type: string

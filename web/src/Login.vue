@@ -1,4 +1,5 @@
 <template>
+  <h1 class="page-header">Login</h1>
   <form class="my-4 flex justify-center">
     <div class="space-y-4">
 
@@ -54,7 +55,7 @@ export default {
   },
   methods: {
     onSubmit() {
-      fetch("api/auth", {
+      fetch("web/auth", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'

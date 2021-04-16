@@ -1,5 +1,5 @@
 <template>
-  <h1 class="py-4 font-medium text-xl">Customers</h1>
+  <h1 class="page-header">Customers</h1>
   <div class="customer-container">
     <p v-if="fetchError" class="m-4">Could not fetch customers: {{ fetchError }}</p>
     <table v-if="customers.length > 0" class="min-w-full divide-y divide-gray-200">
@@ -46,7 +46,7 @@ export default {
   },
   methods: {
     fetchData() {
-      fetch("api/customers", {
+      fetch("web/customers", {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("session")}`
         }

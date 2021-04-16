@@ -1,24 +1,18 @@
 package main
 
 import (
-	"crypto"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
 	"embed"
 	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
-	"strings"
-	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/lestrrat-go/jwx/jwa"
-	"github.com/lestrrat-go/jwx/jwt"
-	"github.com/lestrrat-go/jwx/jwt/openid"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/api"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	bolt "go.etcd.io/bbolt"
 )
 
 const assetPath = "web/dist"
@@ -41,100 +35,31 @@ func getFileSystem(useFS bool) http.FileSystem {
 	return http.FS(fsys)
 }
 
-func createJWT(email string) ([]byte, error) {
-	t := openid.New()
-	t.Set(jwt.IssuedAtKey, time.Now())
-	// session is valid for 20 minutes
-	t.Set(jwt.ExpirationKey, time.Now().Add(20*time.Minute))
-	t.Set(openid.EmailKey, email)
-
-	signed, err := jwt.Sign(t, jwa.ES256, sessionKey)
-	if err != nil {
-		log.Printf("failed to sign token: %s", err)
-		return nil, err
-	}
-	return signed, nil
-}
-
-func validateJWT(token []byte) (jwt.Token, error) {
-	pubKey := sessionKey.(*ecdsa.PrivateKey).PublicKey
-	t, err := jwt.Parse(token, jwt.WithVerify(jwa.ES256, pubKey), jwt.WithValidate(true))
-	if err != nil {
-		log.Printf("unable to parse token: %s", err)
-		return nil, err
-	}
-	return t, nil
-}
-
-var sessionKey crypto.PrivateKey
-
-func generateSessionKey() (crypto.PrivateKey, error) {
-	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		log.Printf("failed to generate private key: %s", err)
-		return nil, err
-	}
-	return key, nil
-}
-
 func main() {
 	config := loadConfig()
-	var err error
-	sessionKey, err = generateSessionKey()
+	// load bbolt db
+	db, err := bolt.Open(config.DBFile, 0600, nil)
 	if err != nil {
-		log.Fatalf("unable to generate session key: %v", err)
+		log.Fatal(err)
 	}
+	defer db.Close()
 
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	//e.Use(middleware.Recover())
+
+	auth := api.NewAuth(config.SessionKey, []api.UserAccount{{Username: config.Credentials.Username, Password: config.Credentials.Password}})
+	spRepo := domain.ServiceProviderRepository{DB: db}
+	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo}
+
+	api.RegisterHandlers(e, apiWrapper)
 
 	// Check if we use live mode from the file system or using embedded files
 	useFS := len(os.Args) > 1 && os.Args[1] == "live"
 
 	assetHandler := http.FileServer(getFileSystem(useFS))
 	e.GET("/*", echo.WrapHandler(assetHandler))
-	e.POST("/api/auth", func(ctx echo.Context) error {
-		credentials := struct {
-			Username string
-			Password string
-		}{}
-		err := ctx.Bind(&credentials)
-		if err != nil {
-			return err
-		}
-		if credentials.Username != config.Credentials.Username || credentials.Password != config.Credentials.Password {
-			return echo.NewHTTPError(http.StatusForbidden, "invalid credentials")
-		}
-		token, err := createJWT(credentials.Username)
-		if err != nil {
-			return echo.NewHTTPError(http.StatusInternalServerError, err)
-		}
-		return ctx.JSON(200, map[string]string{"token": string(token)})
-	})
-	e.GET("/api/customers", func(ctx echo.Context) error {
-		authHeader := ctx.Request().Header.Get("Authorization")
-		if !strings.HasPrefix(authHeader, "Bearer ") {
-			return echo.NewHTTPError(http.StatusForbidden, "Authorization header must contain 'Bearer <token>'")
-		}
-		tokenStr := strings.Split(authHeader, " ")[1]
-		token, err := validateJWT([]byte(tokenStr))
-		if err != nil {
-			return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("invalid token: %s", err))
-		}
-		if user, ok := token.Get(openid.EmailKey); ok {
-			log.Printf("Customers requested by: %s", user)
-		} else {
-			return echo.NewHTTPError(http.StatusForbidden, "unknown user")
-		}
-
-		customers := []map[string]string{
-			{"name": "Zorginstelling de notenboom", "did": "did:nuts:123"},
-			{"name": "Verpleehuis de nootjes", "did": "did:nuts:456"},
-		}
-		return ctx.JSON(200, customers)
-	})
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.HTTPPort)))
 }

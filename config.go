@@ -1,6 +1,9 @@
 package main
 
 import (
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
 	"fmt"
 	"log"
 	"os"
@@ -18,10 +21,13 @@ const defaultPrefix = "NUTS_"
 const defaultDelimiter = "."
 const configFileFlag = "configfile"
 const defaultConfigFile = "default.config.yaml"
+const defaultDBFile = "registry-admin.db"
+const defaultHTTPPort = 1303
 
 func defaultConfig() Config {
 	return Config{
-		HTTPPort: 1303,
+		HTTPPort: defaultHTTPPort,
+		DBFile: defaultDBFile,
 	}
 }
 
@@ -30,7 +36,18 @@ type Config struct {
 		Username string `koanf:"username"`
 		Password string `koanf:"password"`
 	}
-	HTTPPort int `koanf:"port"`
+	DBFile     string `koanf:"dbfile"`
+	HTTPPort   int    `koanf:"port"`
+	SessionKey *ecdsa.PrivateKey
+}
+
+func generateSessionKey() (*ecdsa.PrivateKey, error) {
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		log.Printf("failed to generate private key: %s", err)
+		return nil, err
+	}
+	return key, nil
 }
 
 func loadConfig() Config {
@@ -41,10 +58,19 @@ func loadConfig() Config {
 	if err := k.Load(file.Provider(resolveConfigFile(flagset)), yaml.Parser()); err != nil {
 		log.Fatalf("error while loading config from file: %v", err)
 	}
+
 	config := defaultConfig()
+	var err error
+	sessionKey, err := generateSessionKey()
+	if err != nil {
+		log.Fatalf("unable to generate session key: %v", err)
+	}
+	config.SessionKey = sessionKey
+
 	if err := k.Unmarshal("", &config); err != nil {
 		log.Fatalf("error while unmarshalling config: %v", err)
 	}
+
 	return config
 }
 
