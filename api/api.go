@@ -7,10 +7,12 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/lestrrat-go/jwx/jwt/openid"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 )
 
 type Wrapper struct {
 	Auth auth
+	SPRepo domain.ServiceProviderRepository
 }
 
 func (w Wrapper) CreateSession(ctx echo.Context) error {
@@ -53,3 +55,55 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 	}
 	return ctx.JSON(200, customers)
 }
+
+func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
+	sp, err := w.SPRepo.Get()
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	}
+	if sp == nil {
+		return ctx.NoContent(404)
+	}
+	response := ServiceProvider{
+		Email: sp.Email,
+		Id:    sp.ID,
+		Name:  sp.Name,
+		Phone: sp.Phone,
+	}
+	return ctx.JSON(200, response)
+}
+
+func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
+	spRequest := ServiceProvider{}
+	if err := ctx.Bind(&spRequest); err != nil {
+		return err
+	}
+	sp := domain.ServiceProvider{
+		ID:    spRequest.Id,
+		Name:  spRequest.Name,
+		Email: spRequest.Email,
+		Phone: spRequest.Phone,
+	}
+	if err := w.SPRepo.CreateOrUpdate(sp); err != nil {
+		return err
+	}
+	return ctx.JSON(201, spRequest)
+}
+
+func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
+	spRequest := ServiceProvider{}
+	if err := ctx.Bind(&spRequest); err != nil {
+		return err
+	}
+	sp := domain.ServiceProvider{
+		ID:    spRequest.Id,
+		Name:  spRequest.Name,
+		Email: spRequest.Email,
+		Phone: spRequest.Phone,
+	}
+	if err := w.SPRepo.CreateOrUpdate(sp); err != nil {
+		return err
+	}
+	return ctx.JSON(200, spRequest)
+}
+

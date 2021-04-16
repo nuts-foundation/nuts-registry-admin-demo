@@ -1,9 +1,6 @@
 package main
 
 import (
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
 	"embed"
 	"fmt"
 	"io/fs"
@@ -14,6 +11,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/api"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	bolt "go.etcd.io/bbolt"
 )
 
 const assetPath = "web/dist"
@@ -36,29 +35,23 @@ func getFileSystem(useFS bool) http.FileSystem {
 	return http.FS(fsys)
 }
 
-func generateSessionKey() (*ecdsa.PrivateKey, error) {
-	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	if err != nil {
-		log.Printf("failed to generate private key: %s", err)
-		return nil, err
-	}
-	return key, nil
-}
-
 func main() {
 	config := loadConfig()
-	var err error
-	sessionKey, err := generateSessionKey()
+	// load bbolt db
+	db, err := bolt.Open(config.DBFile, 0600, nil)
 	if err != nil {
-		log.Fatalf("unable to generate session key: %v", err)
+		log.Fatal(err)
 	}
+	defer db.Close()
 
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger())
 	//e.Use(middleware.Recover())
-	auth := api.NewAuth(sessionKey, []api.UserAccount{{Username: config.Credentials.Username, Password: config.Credentials.Password}})
-	apiWrapper := api.Wrapper{Auth: auth}
+
+	auth := api.NewAuth(config.SessionKey, []api.UserAccount{{Username: config.Credentials.Username, Password: config.Credentials.Password}})
+	spRepo := domain.ServiceProviderRepository{DB: db}
+	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo}
 
 	api.RegisterHandlers(e, apiWrapper)
 
@@ -67,8 +60,6 @@ func main() {
 
 	assetHandler := http.FileServer(getFileSystem(useFS))
 	e.GET("/*", echo.WrapHandler(assetHandler))
-	//e.GET("/api/customers", func(ctx echo.Context) error {
-	//})
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.HTTPPort)))
 }

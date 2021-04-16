@@ -1,4 +1,5 @@
 <template>
+  <h1 class="page-header">Login</h1>
   <form class="my-4 flex justify-center">
     <div class="space-y-4">
 

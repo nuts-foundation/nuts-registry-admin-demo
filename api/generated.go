@@ -31,11 +31,39 @@ type Customer struct {
 // CustomersResponse defines model for CustomersResponse.
 type CustomersResponse []Customer
 
+// A Service Provider is a controller of other DID documents
+type ServiceProvider struct {
+
+	// Email addres available for other service providers in the network for getting support
+	Email string `json:"email"`
+
+	// The DID of the service provider
+	Id string `json:"id"`
+
+	// The name of the service provider
+	Name string `json:"name"`
+
+	// Number available for other service providers in the network to call in case of emergency
+	Phone string `json:"phone"`
+}
+
 // CreateSessionJSONBody defines parameters for CreateSession.
 type CreateSessionJSONBody CreateSessionRequest
 
+// CreateServiceProviderJSONBody defines parameters for CreateServiceProvider.
+type CreateServiceProviderJSONBody ServiceProvider
+
+// UpdateServiceProviderJSONBody defines parameters for UpdateServiceProvider.
+type UpdateServiceProviderJSONBody ServiceProvider
+
 // CreateSessionJSONRequestBody defines body for CreateSession for application/json ContentType.
 type CreateSessionJSONRequestBody CreateSessionJSONBody
+
+// CreateServiceProviderJSONRequestBody defines body for CreateServiceProvider for application/json ContentType.
+type CreateServiceProviderJSONRequestBody CreateServiceProviderJSONBody
+
+// UpdateServiceProviderJSONRequestBody defines body for UpdateServiceProvider for application/json ContentType.
+type UpdateServiceProviderJSONRequestBody UpdateServiceProviderJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -45,6 +73,15 @@ type ServerInterface interface {
 
 	// (GET /web/customers)
 	GetCustomers(ctx echo.Context) error
+
+	// (GET /web/service-provider)
+	GetServiceProvider(ctx echo.Context) error
+
+	// (POST /web/service-provider)
+	CreateServiceProvider(ctx echo.Context) error
+
+	// (PUT /web/service-provider)
+	UpdateServiceProvider(ctx echo.Context) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -67,6 +104,33 @@ func (w *ServerInterfaceWrapper) GetCustomers(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.GetCustomers(ctx)
+	return err
+}
+
+// GetServiceProvider converts echo context to params.
+func (w *ServerInterfaceWrapper) GetServiceProvider(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetServiceProvider(ctx)
+	return err
+}
+
+// CreateServiceProvider converts echo context to params.
+func (w *ServerInterfaceWrapper) CreateServiceProvider(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CreateServiceProvider(ctx)
+	return err
+}
+
+// UpdateServiceProvider converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateServiceProvider(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.UpdateServiceProvider(ctx)
 	return err
 }
 
@@ -100,6 +164,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
 	router.GET(baseURL+"/web/customers", wrapper.GetCustomers)
+	router.GET(baseURL+"/web/service-provider", wrapper.GetServiceProvider)
+	router.POST(baseURL+"/web/service-provider", wrapper.CreateServiceProvider)
+	router.PUT(baseURL+"/web/service-provider", wrapper.UpdateServiceProvider)
 
 }
 
