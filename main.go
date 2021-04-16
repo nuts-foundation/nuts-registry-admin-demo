@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/elliptic"
+	"crypto/sha1"
 	"embed"
+	"encoding/hex"
 	"fmt"
 	"io/fs"
 	"log"
@@ -49,8 +52,18 @@ func main() {
 	e.Use(middleware.Logger())
 	//e.Use(middleware.Recover())
 
-	auth := api.NewAuth(config.SessionKey, []api.UserAccount{{Username: config.Credentials.Username, Password: config.Credentials.Password}})
+	// Initialize Auth
+	var account api.UserAccount
+	if config.Credentials.Empty() {
+		account = generateDefaultAccount(config)
+		log.Printf("Authentication credentials not configured, so they were generated (user=%s, password=%s)", account.Username, account.Password)
+	} else {
+		account = api.UserAccount{Username: config.Credentials.Username, Password: config.Credentials.Password}
+	}
+	auth := api.NewAuth(config.sessionKey, []api.UserAccount{account})
+	// Initialize repos
 	spRepo := domain.ServiceProviderRepository{DB: db}
+	// Initialize wrapper
 	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo}
 
 	api.RegisterHandlers(e, apiWrapper)
@@ -62,4 +75,9 @@ func main() {
 	e.GET("/*", echo.WrapHandler(assetHandler))
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.HTTPPort)))
+}
+
+func generateDefaultAccount(config Config) api.UserAccount {
+	pkHashBytes := sha1.Sum(elliptic.Marshal(config.sessionKey.Curve, config.sessionKey.X, config.sessionKey.Y))
+	return api.UserAccount{Username: "demo@nuts.nl", Password: hex.EncodeToString(pkHashBytes[:])}
 }
