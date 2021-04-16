@@ -7,7 +7,8 @@
       <div class="grid grid-cols-1">
         <router-link
             to="customers"
-            class="px-5 h-14 inline-flex items-center text-sm">
+            active-class="text-blue-400"
+            class="menu-link">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
                stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -17,7 +18,8 @@
         </router-link>
         <router-link
             to="service-provider"
-            class="px-5 h-14 inline-flex items-center text-sm">
+            active-class="text-blue-400"
+            class="menu-link">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
                stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -27,7 +29,7 @@
         </router-link>
         <router-link
             to=""
-            class="px-5 h-14 inline-flex items-center text-sm">
+            class="menu-link">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
                stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -37,7 +39,8 @@
         </router-link>
         <router-link
             to="/logout"
-            class="px-5 h-14 inline-flex items-center text-sm">
+            active-class="text-blue-400"
+            class="menu-link">
           Logout
         </router-link>
       </div>
@@ -58,4 +61,7 @@ export default {}
 </script>
 
 <style>
+.menu-link {
+  @apply px-5 h-14 inline-flex items-center text-sm hover:bg-blue-50;
+}
 </style>

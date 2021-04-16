@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-    @apply text-gray-700;
+    @apply text-gray-600;
 }
 
 .btn-submit {
