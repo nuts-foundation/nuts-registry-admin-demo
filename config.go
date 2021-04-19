@@ -20,7 +20,7 @@ import (
 const defaultPrefix = "NUTS_"
 const defaultDelimiter = "."
 const configFileFlag = "configfile"
-const defaultConfigFile = "default.config.yaml"
+const defaultConfigFile = "server.config.yaml"
 const defaultDBFile = "registry-admin.db"
 const defaultHTTPPort = 1303
 
