@@ -33,8 +33,5 @@ $ docker run -p 1303:1303 nutsfoundation/nuts-registry-admin-demo
 ```
 
 ## Configuration
-You can configure the application by changing the values in `server.config.yaml`.
-
-The Default http port is `1303`.
-
-Credentials to get a session: user:`demo@nuts.nl` password:`demo`.
+When running in Docker without a config file mounted at `/app/server.config.yaml` it will use the default configuration.
+In this case the default username will be `demo@nuts.nl`. The password is generated and printed in the log on startup.
