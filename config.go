@@ -23,11 +23,13 @@ const configFileFlag = "configfile"
 const defaultConfigFile = "server.config.yaml"
 const defaultDBFile = "registry-admin.db"
 const defaultHTTPPort = 1303
+const defaultNodeAddress = "http://localhost:1323"
 
 func defaultConfig() Config {
 	return Config{
-		HTTPPort: defaultHTTPPort,
-		DBFile: defaultDBFile,
+		HTTPPort:    defaultHTTPPort,
+		DBFile:      defaultDBFile,
+		NodeAddress: defaultNodeAddress,
 	}
 }
 
@@ -36,9 +38,10 @@ type Config struct {
 		Username string `koanf:"username"`
 		Password string `koanf:"password"`
 	}
-	DBFile     string `koanf:"dbfile"`
-	HTTPPort   int    `koanf:"port"`
-	SessionKey *ecdsa.PrivateKey
+	DBFile      string `koanf:"dbfile"`
+	HTTPPort    int    `koanf:"port"`
+	NodeAddress string `koanf:"nodeaddress"`
+	SessionKey  *ecdsa.PrivateKey
 }
 
 func generateSessionKey() (*ecdsa.PrivateKey, error) {
