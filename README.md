@@ -25,6 +25,7 @@ $ go run main.go live
 The API is generated from the `api/api.yaml`.
 ```shell
 $ oapi-codegen -generate types,server -package api api/api.yaml > api/generated.go
+$ oapi-codegen -generate types,client -package client https://nuts-node.readthedocs.io/en/latest/_static/vdr/v1.yaml > client/generated.go
 ```
 
 ### Docker
