@@ -27,18 +27,24 @@ const defaultHTTPPort = 1303
 func defaultConfig() Config {
 	return Config{
 		HTTPPort: defaultHTTPPort,
-		DBFile: defaultDBFile,
+		DBFile:   defaultDBFile,
 	}
 }
 
 type Config struct {
-	Credentials struct {
-		Username string `koanf:"username"`
-		Password string `koanf:"password"`
-	}
-	DBFile     string `koanf:"dbfile"`
-	HTTPPort   int    `koanf:"port"`
-	SessionKey *ecdsa.PrivateKey
+	Credentials Credentials `koanf:"credentials"`
+	DBFile      string      `koanf:"dbfile"`
+	HTTPPort    int         `koanf:"port"`
+	sessionKey  *ecdsa.PrivateKey
+}
+
+type Credentials struct {
+	Username string `koanf:"username"`
+	Password string `koanf:"password"`
+}
+
+func (c Credentials) Empty() bool {
+	return len(c.Username) == 0 && len(c.Password) == 0
 }
 
 func generateSessionKey() (*ecdsa.PrivateKey, error) {
@@ -65,7 +71,7 @@ func loadConfig() Config {
 	if err != nil {
 		log.Fatalf("unable to generate session key: %v", err)
 	}
-	config.SessionKey = sessionKey
+	config.sessionKey = sessionKey
 
 	if err := k.Unmarshal("", &config); err != nil {
 		log.Fatalf("error while unmarshalling config: %v", err)

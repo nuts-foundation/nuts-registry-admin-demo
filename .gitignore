@@ -2,3 +2,5 @@ node_modules
 .idea
 web/dist
 registry-admin.db
+
+nuts-registry-admin-demo
