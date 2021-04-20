@@ -6,6 +6,7 @@
       <thead class="bg-gray-50">
       <tr>
         <th class="thead">Name</th>
+        <th class="thead">ID</th>
         <th class="thead">DID</th>
       </tr>
       </thead>
@@ -16,7 +17,9 @@
             {{ customer.name }}
           </div>
         </td>
-        <td>{{ customer.did }}</td>
+        <td>{{ customer.id }}</td>
+        <td v-if="customer.did">{{ customer.did }}</td>
+        <td v-if="!customer.did" ><button class="btn-submit" @click="connectCustomer(customer.id)">connect</button></td>
       </tr>
       </tbody>
     </table>
@@ -26,29 +29,29 @@
 <script>
 
 export default {
-  data() {
+  data () {
     return {
-      fetchError: "",
+      fetchError: '',
       customers: []
     }
   },
-  created() {
+  created () {
     // watch the params of the route to fetch the data again
     this.$watch(
-        () => this.$route.params,
-        () => {
-          this.fetchData()
-        },
-        // fetch the data when the view is created and the data is
-        // already being observed
-        {immediate: true}
+      () => this.$route.params,
+      () => {
+        this.fetchData()
+      },
+      // fetch the data when the view is created and the data is
+      // already being observed
+      {immediate: true}
     )
   },
   methods: {
-    fetchData() {
-      fetch("web/customers", {
+    fetchData () {
+      fetch('web/customers', {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem("session")}`
+          Authorization: `Bearer ${localStorage.getItem('session')}`
         }
       }).then(response => {
         if (!response.ok) {
@@ -59,10 +62,31 @@ export default {
         }
         return response.json()
       }).then(data => this.customers = data)
-          .catch(reason => {
-            console.log(reason)
-            this.fetchError = reason
-          })
+        .catch(reason => {
+          console.log(reason)
+          this.fetchError = reason
+        })
+    },
+    connectCustomer (id) {
+      fetch(`web/customer/${id}/connect`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('session')}`
+        },
+        method: 'POST'
+      }).then(response => {
+        if (!response.ok) {
+          if (response.status == 403) {
+            throw 'Invalid credentials'
+          }
+          throw response.statusText
+        }
+        return response.json()
+      }).then(json => {
+        console.log(json)
+      }).catch(reason => {
+        console.log(reason)
+        this.fetchError = reason
+      })
     }
   }
 }

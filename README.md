@@ -19,7 +19,7 @@ During front-end development, you probably want to use the real filesystem and w
 ```shell
 $ npm install
 $ npm run watch
-$ go run main.go live
+$ go run . live
 ```
 
 The API is generated from the `api/api.yaml`.

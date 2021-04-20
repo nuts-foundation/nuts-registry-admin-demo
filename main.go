@@ -51,7 +51,7 @@ func main() {
 
 	auth := api.NewAuth(config.SessionKey, []api.UserAccount{{Username: config.Credentials.Username, Password: config.Credentials.Password}})
 	spRepo := domain.ServiceProviderRepository{DB: db}
-	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo}
+	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo, NodeAddress: config.NodeAddress}
 
 	api.RegisterHandlers(e, apiWrapper)
 

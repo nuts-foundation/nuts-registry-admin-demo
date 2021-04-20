@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/lestrrat-go/jwx/jwt/openid"
+	v1 "github.com/nuts-foundation/nuts-node/vdr/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 )
 
 type Wrapper struct {
-	Auth auth
-	SPRepo domain.ServiceProviderRepository
+	Auth        auth
+	SPRepo      domain.ServiceProviderRepository
+	NodeAddress string
 }
 
 func (w Wrapper) checkAuthorization(ctx echo.Context) (jwt.Token, error) {
@@ -59,8 +62,8 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 	}
 
 	customers := []map[string]string{
-		{"name": "Zorginstelling de notenboom", "did": "did:nuts:123"},
-		{"name": "Verpleehuis de nootjes", "did": "did:nuts:456"},
+		{"name": "Zorginstelling de notenboom", "id": "1"},
+		{"name": "Verpleehuis de nootjes", "id": "2"},
 	}
 	return ctx.JSON(200, customers)
 }
@@ -128,3 +131,28 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	return ctx.JSON(200, spRequest)
 }
 
+func (w Wrapper) ConnectCustomer(ctx echo.Context, id string) error {
+	_, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
+
+	nodeClient := v1.HTTPClient{
+		ServerAddress: w.NodeAddress,
+		Timeout:       1 * time.Second,
+	}
+
+	didDocument, err := nodeClient.Create()
+	if err != nil {
+		return err
+	}
+
+	did := didDocument.ID.String()
+	customer := Customer{
+		Did:  &did,
+		Id:   id,
+		Name: "",
+	}
+
+	return ctx.JSON(http.StatusOK, customer)
+}
