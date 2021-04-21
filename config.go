@@ -61,8 +61,14 @@ func loadConfig() Config {
 
 	var k = koanf.New(".")
 
-	if err := k.Load(file.Provider(resolveConfigFile(flagset)), yaml.Parser()); err != nil {
-		log.Fatalf("error while loading config from file: %v", err)
+	configFile := resolveConfigFile(flagset)
+	if _, err := os.Stat(configFile); err == nil {
+		log.Printf("Loading config from file: %s", configFile)
+		if err := k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
+			log.Fatalf("error while loading config from file: %v", err)
+		}
+	} else {
+		log.Printf("Using default config because no file was found at: %s", configFile)
 	}
 
 	config := defaultConfig()
@@ -111,6 +117,5 @@ func resolveConfigFile(flagset *pflag.FlagSet) string {
 	_ = k.Load(posflag.Provider(flagset, defaultDelimiter, k), nil)
 
 	configFile := k.String(configFileFlag)
-	log.Printf("using config: %s", configFile)
 	return configFile
 }
