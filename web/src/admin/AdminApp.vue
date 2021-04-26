@@ -1,12 +1,12 @@
 <template>
   <div class="flex">
-    <nav class="h-screen sticky top-0 w-96 border border-r-1 border-gray-200">
+    <nav class="min-h-screen sticky top-0 w-96 border border-r-1 border-gray-200">
       <!-- Navigation -->
       <h1 class="my-24 text-2xl text-center">registry admin</h1>
 
       <div class="grid grid-cols-1">
         <router-link
-            to="customers"
+            :to="{name: 'admin.customers'}"
             active-class="text-blue-400"
             class="menu-link">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
@@ -17,7 +17,7 @@
           Your care organisations
         </router-link>
         <router-link
-            to="service-provider"
+            :to="{name: 'admin.serviceProvider'}"
             active-class="text-blue-400"
             class="menu-link">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"

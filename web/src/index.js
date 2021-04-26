@@ -11,6 +11,8 @@ import Logout from './Logout.vue'
 import NotFound from './NotFound.vue'
 import Customers from './admin/Customers.vue'
 import ServiceProvider from './admin/ServiceProvider.vue'
+import NewCustomer from './admin/NewCustomer.vue'
+import Modal from './layout/Modal.vue'
 
 const routes = [
   {path: '/', components: {default: Landing, menu: PublicMenu}},
@@ -18,21 +20,32 @@ const routes = [
   {path: '/logout', components: {default: Logout, menu: PublicMenu}},
   {
     path: '/admin',
-    components: {default: AdminApp, menu: AdminMenu},
+    components: {
+      default: AdminApp,
+    },
     children: [
       {
         path: '',
-        name: 'admin-home',
+        name: 'admin.home',
         redirect: '/admin/customers'
       },
       {
         path: 'customers',
-        name: 'customers',
-        component: Customers
+        name: 'admin.customers',
+        component: Customers,
+        children: [
+          {
+            path: 'new',
+            name: 'admin.newCustomer',
+            components: {
+              modal: NewCustomer
+            }
+          },
+        ]
       },
       {
         path: 'service-provider',
-        name: 'service-provider',
+        name: 'admin.serviceProvider',
         component: ServiceProvider
       }
     ],
@@ -56,8 +69,8 @@ router.beforeEach((to, from) => {
   }
 })
 
-// const app = createApp({})
 const app = createApp(App)
 
 app.use(router)
 app.mount('#app')
+app.component('nrad-modal', Modal)

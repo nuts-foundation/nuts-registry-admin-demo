@@ -1,6 +1,6 @@
 <template>
   <div class="">
-    <h1 class="page-header">Welcome!</h1>
+    <h1 class="page-title">Welcome!</h1>
     <p class="mt-4 leading-normal">
     Welcome to the Nuts Registry Administration Demo.
     </p>
