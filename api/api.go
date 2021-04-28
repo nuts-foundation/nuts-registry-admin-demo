@@ -9,11 +9,13 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/lestrrat-go/jwx/jwt/openid"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
 )
 
 type Wrapper struct {
 	Auth auth
 	SPRepo domain.ServiceProviderRepository
+	CustomerService customers.Service
 }
 
 func (w Wrapper) checkAuthorization(ctx echo.Context) (jwt.Token, error) {
@@ -53,7 +55,7 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 		return err
 	}
 	if user, ok := token.Get(openid.EmailKey); ok {
-		ctx.Logger().Print("Customers requested by: %s", user)
+		ctx.Logger().Printf("Customers requested by: %s", user)
 	} else {
 		return echo.NewHTTPError(http.StatusForbidden, "unknown user")
 	}
@@ -128,3 +130,15 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	return ctx.JSON(200, spRequest)
 }
 
+func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
+	connectReq := ConnectCustomerRequest{}
+	if err := ctx.Bind(&connectReq); err != nil {
+		return err
+	}
+
+	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(200, customer)
+}

@@ -33,7 +33,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CustomersResponse"
-
+    post:
+      operationId: connectCustomer
+      description: Connect an existing customer ID to a new Nuts DID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ConnectCustomerRequest"
+      responses:
+        200:
+          description: The newly connected customer.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
   /web/service-provider:
     get:
       operationId: getServiceProvider
@@ -98,6 +113,17 @@ components:
         token:
           type: string
 
+    ConnectCustomerRequest:
+      required:
+        - id
+        - name
+      properties:
+        id:
+          type: string
+          example: C12
+        name:
+          type: string
+          example: "Good Care Org - Driebergen"
     CustomersResponse:
       type: array
       items:
@@ -107,9 +133,14 @@ components:
       description: A customer object
       required:
         - id
+        - did
         - name
       properties:
         id:
+          type: string
+          description: The internal customer ID
+          example: "C12"
+        did:
           type: string
           description: The customer DID
           example:

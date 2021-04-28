@@ -15,6 +15,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/api"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
 	bolt "go.etcd.io/bbolt"
 )
 
@@ -65,7 +66,7 @@ func main() {
 	// Initialize repos
 	spRepo := domain.ServiceProviderRepository{DB: db}
 	// Initialize wrapper
-	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo}
+	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo, CustomerService: customers.Service{NutsNodeAddr: config.NutsNodeAddress}}
 
 	api.RegisterHandlers(e, apiWrapper)
 

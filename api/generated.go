@@ -7,6 +7,12 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// ConnectCustomerRequest defines model for ConnectCustomerRequest.
+type ConnectCustomerRequest struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+}
+
 // CreateSessionRequest defines model for CreateSessionRequest.
 type CreateSessionRequest struct {
 	Password string `json:"password"`
@@ -22,6 +28,9 @@ type CreateSessionResponse struct {
 type Customer struct {
 
 	// The customer DID
+	Did string `json:"did"`
+
+	// The internal customer ID
 	Id string `json:"id"`
 
 	// Internal name for this customer
@@ -50,6 +59,9 @@ type ServiceProvider struct {
 // CreateSessionJSONBody defines parameters for CreateSession.
 type CreateSessionJSONBody CreateSessionRequest
 
+// ConnectCustomerJSONBody defines parameters for ConnectCustomer.
+type ConnectCustomerJSONBody ConnectCustomerRequest
+
 // CreateServiceProviderJSONBody defines parameters for CreateServiceProvider.
 type CreateServiceProviderJSONBody ServiceProvider
 
@@ -58,6 +70,9 @@ type UpdateServiceProviderJSONBody ServiceProvider
 
 // CreateSessionJSONRequestBody defines body for CreateSession for application/json ContentType.
 type CreateSessionJSONRequestBody CreateSessionJSONBody
+
+// ConnectCustomerJSONRequestBody defines body for ConnectCustomer for application/json ContentType.
+type ConnectCustomerJSONRequestBody ConnectCustomerJSONBody
 
 // CreateServiceProviderJSONRequestBody defines body for CreateServiceProvider for application/json ContentType.
 type CreateServiceProviderJSONRequestBody CreateServiceProviderJSONBody
@@ -73,6 +88,9 @@ type ServerInterface interface {
 
 	// (GET /web/customers)
 	GetCustomers(ctx echo.Context) error
+
+	// (POST /web/customers)
+	ConnectCustomer(ctx echo.Context) error
 
 	// (GET /web/service-provider)
 	GetServiceProvider(ctx echo.Context) error
@@ -104,6 +122,15 @@ func (w *ServerInterfaceWrapper) GetCustomers(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.GetCustomers(ctx)
+	return err
+}
+
+// ConnectCustomer converts echo context to params.
+func (w *ServerInterfaceWrapper) ConnectCustomer(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.ConnectCustomer(ctx)
 	return err
 }
 
@@ -164,6 +191,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
 	router.GET(baseURL+"/web/customers", wrapper.GetCustomers)
+	router.POST(baseURL+"/web/customers", wrapper.ConnectCustomer)
 	router.GET(baseURL+"/web/service-provider", wrapper.GetServiceProvider)
 	router.POST(baseURL+"/web/service-provider", wrapper.CreateServiceProvider)
 	router.PUT(baseURL+"/web/service-provider", wrapper.UpdateServiceProvider)
