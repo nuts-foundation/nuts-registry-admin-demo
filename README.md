@@ -8,7 +8,7 @@ To build for production:
 ```shell
 $ npm install
 $ npm run build
-$ go run main.go
+$ go run .
 ```
 
 This will serve the front end from the embedded filesystem.
@@ -19,7 +19,7 @@ During front-end development, you probably want to use the real filesystem and w
 ```shell
 $ npm install
 $ npm run watch
-$ go run main.go live
+$ go run . live
 ```
 
 The API is generated from the `api/api.yaml`.
