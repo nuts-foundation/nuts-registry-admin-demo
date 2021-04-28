@@ -3,16 +3,7 @@
 </template>
 
 <script>
-
-import Header from "./layout/Header.vue"
-import Footer from "./layout/Footer.vue"
-
-export default {
-  components: {
-    "nrad-header": Header,
-    "nrad-footer": Footer
-  }
-}
+export default {}
 </script>
 
 <style>

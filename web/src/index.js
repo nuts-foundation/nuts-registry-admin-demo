@@ -4,19 +4,18 @@ import './style.css'
 import App from './App.vue'
 import AdminApp from './admin/AdminApp.vue'
 import Landing from './Landing.vue'
-import PublicMenu from './layout/PublicMenu.vue'
 import Login from './Login.vue'
 import Logout from './Logout.vue'
 import NotFound from './NotFound.vue'
 import Customers from './admin/Customers.vue'
 import ServiceProvider from './admin/ServiceProvider.vue'
 import NewCustomer from './admin/NewCustomer.vue'
-import Modal from './layout/Modal.vue'
+import Modal from './components/Modal.vue'
 
 const routes = [
-  {path: '/', components: {default: Landing, menu: PublicMenu}},
-  {path: '/login', components: {default: Login, menu: PublicMenu}},
-  {path: '/logout', components: {default: Logout, menu: PublicMenu}},
+  {path: '/', component: Landing},
+  {path: '/login', component: Login},
+  {path: '/logout', component: Logout},
   {
     path: '/admin',
     components: {
@@ -50,7 +49,7 @@ const routes = [
     ],
     meta: {requiresAuth: true}
   },
-  {path: '/:pathMatch*', name: 'NotFound', components: {default: NotFound, menu: PublicMenu}},
+  {path: '/:pathMatch*', name: 'NotFound', component: NotFound}
 ]
 
 const router = createRouter({
