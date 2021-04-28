@@ -5,6 +5,7 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -23,19 +24,22 @@ const configFileFlag = "configfile"
 const defaultConfigFile = "server.config.yaml"
 const defaultDBFile = "registry-admin.db"
 const defaultHTTPPort = 1303
+const defaultNutsNodeAddress = "http://localhost:1323"
 
 func defaultConfig() Config {
 	return Config{
-		HTTPPort: defaultHTTPPort,
-		DBFile:   defaultDBFile,
+		HTTPPort:        defaultHTTPPort,
+		DBFile:          defaultDBFile,
+		NutsNodeAddress: defaultNutsNodeAddress,
 	}
 }
 
 type Config struct {
-	Credentials Credentials `koanf:"credentials"`
-	DBFile      string      `koanf:"dbfile"`
-	HTTPPort    int         `koanf:"port"`
-	sessionKey  *ecdsa.PrivateKey
+	Credentials     Credentials `koanf:"credentials"`
+	DBFile          string      `koanf:"dbfile"`
+	HTTPPort        int         `koanf:"port"`
+	NutsNodeAddress string      `koanf:"nutsNodeAddr"`
+	sessionKey      *ecdsa.PrivateKey
 }
 
 type Credentials struct {
@@ -54,6 +58,25 @@ func generateSessionKey() (*ecdsa.PrivateKey, error) {
 		return nil, err
 	}
 	return key, nil
+}
+
+func (c Config) Print(writer io.Writer) error {
+	if _, err := fmt.Fprintln(writer, "========== CONFIG: =========="); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(writer, "HTTP Port: %d\n", c.HTTPPort); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(writer, "Nuts Node Address: %s\n", c.NutsNodeAddress); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(writer, "DBFile: %s\n", c.DBFile); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintln(writer, "========= END CONFIG ========="); err != nil {
+		return err
+	}
+	return nil
 }
 
 func loadConfig() Config {

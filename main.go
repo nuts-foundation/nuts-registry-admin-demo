@@ -40,6 +40,7 @@ func getFileSystem(useFS bool) http.FileSystem {
 
 func main() {
 	config := loadConfig()
+	config.Print(log.Writer())
 	// load bbolt db
 	db, err := bolt.Open(config.DBFile, 0600, nil)
 	if err != nil {
