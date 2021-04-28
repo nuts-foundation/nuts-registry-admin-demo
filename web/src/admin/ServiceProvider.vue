@@ -1,5 +1,5 @@
 <template>
-  <h1 class="page-header">Service Provider Configuration</h1>
+  <h1 class="page-title">Service Provider Configuration</h1>
   <p>A Service Provider offers (Nuts) services to its customers.</p>
   <p>Here you can create or update the contact information of your Service Provider.</p>
   <form class="vertical-form">

@@ -1,5 +1,17 @@
 <template>
-  <h1 class="page-header">Customers</h1>
+  <div class="flex justify-between mb-6">
+    <h1 class="text-3xl">Customers</h1>
+    <button
+        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
+        @click="$router.push({name: 'admin.newCustomer'})"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+      Add
+    </button>
+  </div>
   <div class="customer-container">
     <p v-if="fetchError" class="m-4">Could not fetch customers: {{ fetchError }}</p>
     <table v-if="customers.length > 0" class="min-w-full divide-y divide-gray-200">
@@ -21,6 +33,7 @@
       </tbody>
     </table>
   </div>
+  <router-view name="modal"></router-view>
 </template>
 
 <script>
