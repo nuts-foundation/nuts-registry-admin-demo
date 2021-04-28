@@ -13,7 +13,7 @@ import NewCustomer from './admin/NewCustomer.vue'
 import Modal from './components/Modal.vue'
 
 const routes = [
-  {path: '/', component: Landing},
+  {path: '/', component: Login},
   {path: '/login', component: Login},
   {path: '/logout', component: Logout},
   {
