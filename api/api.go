@@ -60,11 +60,20 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, "unknown user")
 	}
 
-	customers := []map[string]string{
-		{"name": "Zorginstelling de notenboom", "did": "did:nuts:123"},
-		{"name": "Verpleehuis de nootjes", "did": "did:nuts:456"},
+	customers, err := w.CustomerService.Repository.All()
+	if err != nil {
+		return err
 	}
-	return ctx.JSON(200, customers)
+	response := CustomersResponse{}
+	for _, c := range customers {
+		customer := Customer{
+			Did:  c.DID,
+			Id:   c.ID,
+			Name: c.Name,
+		}
+		response = append(response, customer)
+	}
+	return ctx.JSON(200, response)
 }
 
 func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
@@ -131,9 +140,20 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
+	token, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
+
 	connectReq := ConnectCustomerRequest{}
 	if err := ctx.Bind(&connectReq); err != nil {
 		return err
+	}
+
+	if user, ok := token.Get(openid.EmailKey); ok {
+		ctx.Logger().Printf("Customer with id %s connected by: %s", user, connectReq.Id)
+	} else {
+		return echo.NewHTTPError(http.StatusForbidden, "unknown user")
 	}
 
 	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name)

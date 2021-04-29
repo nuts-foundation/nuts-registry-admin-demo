@@ -17,6 +17,7 @@
     <table v-if="customers.length > 0" class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
       <tr>
+        <th class="thead">Customer ID</th>
         <th class="thead">Name</th>
         <th class="thead">DID</th>
       </tr>
@@ -25,10 +26,11 @@
       <tr v-for="customer in customers">
         <td>
           <div class="m-4">
-            {{ customer.name }}
+            {{ customer.id}}
           </div>
         </td>
-        <td>{{ customer.did }}</td>
+        <td>{{customer.name}}</td>
+        <td>{{ customer.did}}</td>
       </tr>
       </tbody>
     </table>

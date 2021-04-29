@@ -65,8 +65,13 @@ func main() {
 	auth := api.NewAuth(config.sessionKey, []api.UserAccount{account})
 	// Initialize repos
 	spRepo := domain.ServiceProviderRepository{DB: db}
+
 	// Initialize wrapper
-	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo, CustomerService: customers.Service{NutsNodeAddr: config.NutsNodeAddress}}
+	cService := customers.Service{
+		NutsNodeAddr: config.NutsNodeAddress,
+		Repository: customers.NewDB(config.CustomersFile),
+	}
+	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo, CustomerService: cService}
 
 	api.RegisterHandlers(e, apiWrapper)
 

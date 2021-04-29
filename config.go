@@ -25,12 +25,14 @@ const defaultConfigFile = "server.config.yaml"
 const defaultDBFile = "registry-admin.db"
 const defaultHTTPPort = 1303
 const defaultNutsNodeAddress = "http://localhost:1323"
+const defaultCustomerFile = "customers.json"
 
 func defaultConfig() Config {
 	return Config{
 		HTTPPort:        defaultHTTPPort,
 		DBFile:          defaultDBFile,
 		NutsNodeAddress: defaultNutsNodeAddress,
+		CustomersFile:   defaultCustomerFile,
 	}
 }
 
@@ -38,7 +40,8 @@ type Config struct {
 	Credentials     Credentials `koanf:"credentials"`
 	DBFile          string      `koanf:"dbfile"`
 	HTTPPort        int         `koanf:"port"`
-	NutsNodeAddress string      `koanf:"nutsNodeAddr"`
+	NutsNodeAddress string      `koanf:"nutsnodeaddr"`
+	CustomersFile   string      `koanf:"customersfile"`
 	sessionKey      *ecdsa.PrivateKey
 }
 

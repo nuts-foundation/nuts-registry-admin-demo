@@ -8,6 +8,7 @@ import (
 
 type Service struct {
 	NutsNodeAddr string
+	Repository Repository
 }
 
 func (s Service) ConnectCustomer(id, name string) (*Customer, error) {
@@ -21,13 +22,13 @@ func (s Service) ConnectCustomer(id, name string) (*Customer, error) {
 		return nil, err
 	}
 
-	// todo: save customer
-
-	return &Customer{
-		Did:  didDoc.ID.String(),
+	customer := Customer{
+		DID:  didDoc.ID.String(),
 		ID:   id,
 		Name: name,
-	}, nil
+	}
+
+	return s.Repository.NewCustomer(customer)
 }
 
 

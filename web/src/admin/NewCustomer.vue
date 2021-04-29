@@ -29,7 +29,8 @@ export default {
       fetch('web/customers', {
         method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem("session")}`
         },
         body: JSON.stringify(this.customer)
       }).then(response => {
