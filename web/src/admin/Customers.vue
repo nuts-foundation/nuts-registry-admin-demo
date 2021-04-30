@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-between mb-6">
-    <h1 class="text-3xl">Customers</h1>
+    <h1 class="text-3xl">Your Care Organisations</h1>
     <button
         class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
         @click="$router.push({name: 'admin.newCustomer'})"
@@ -24,13 +24,11 @@
       </thead>
       <tbody class="tbody">
       <tr v-for="customer in customers">
-        <td>
-          <div class="m-4">
-            {{ customer.id }}
-          </div>
+        <td class="tcell">
+          {{ customer.id }}
         </td>
-        <td>{{ customer.name }}</td>
-        <td>{{ customer.did }}</td>
+        <td class="tcell">{{ customer.name }}</td>
+        <td class="tcell">{{ customer.did }}</td>
       </tr>
       </tbody>
     </table>
@@ -83,12 +81,16 @@ export default {
   @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
 }
 
+.tcell {
+  @apply px-6 py-4 text-left;
+}
+
 .body {
   @apply bg-white divide-y divide-gray-200;
 }
 
 .customer-container {
-  @apply shadow overflow-hidden border-b border-gray-200 sm:rounded-lg;
+  @apply shadow overflow-hidden border-gray-200 rounded;
 }
 
 </style>
