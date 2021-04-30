@@ -55,28 +55,20 @@ export default {
   },
   methods: {
     onSubmit() {
-      fetch("web/auth", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(this.credentials)
-      }).then(response => {
-        if (!response.ok) {
-          if (response.status == 403) {
-            throw "Invalid credentials"
-          }
-          throw response.statusText
-        }
-        return response.json()
-      }).then(responseData => {
-        console.log("success!")
-        localStorage.setItem("session", responseData.token)
-        this.$router.push("/admin/")
-      }).catch(reason => {
-        console.error("failure", reason)
-        this.loginError = reason
-      })
+      this.$api.post('web/auth', this.credentials)
+          .then(responseData => {
+            console.log("success!")
+            localStorage.setItem("session", responseData.token)
+            this.$router.push("/admin/")
+          })
+          .catch(response => {
+            console.error("failure", response)
+            if (response.status === 403) {
+              this.loginError = "Invalid credentials"
+            } else {
+              this.loginError = response.statusText
+            }
+          })
     }
   }
 }

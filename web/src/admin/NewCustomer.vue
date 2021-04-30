@@ -26,25 +26,9 @@ export default {
   },
   methods: {
     confirm() {
-      fetch('web/customers', {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem("session")}`
-        },
-        body: JSON.stringify(this.customer)
-      }).then(response => {
-            if (response.ok) {
-              this.$router.push({name: 'admin.customers'})
-            } else {
-              if (response.status == 403) {
-                throw "Invalid credentials"
-              } else {
-                throw response.statusText
-              }
-            }
-          }
-      )
+      this.$api.post('web/customers', this.customer)
+          .then(response => this.$router.push({name: 'admin.customers'}))
+          .catch(response => this.apiError = response.statusText)
     }
   }
 }

@@ -61,22 +61,16 @@ export default {
   },
   methods: {
     fetchData() {
-      fetch("web/customers", {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("session")}`
-        }
-      }).then(response => {
-        if (!response.ok) {
-          if (response.status == 403) {
-            throw "Invalid credentials"
-          }
-          throw response.statusText
-        }
-        return response.json()
-      }).then(data => this.customers = data)
-          .catch(reason => {
-            console.log(reason)
-            this.fetchError = reason
+      this.$api.get('web/customers')
+          .then(data => this.customers = data)
+          .catch(response => {
+            console.error("failure", response)
+            if (response.status === 403) {
+              this.fetchError = "Invalid credentials"
+              return
+            }
+            console.log(response)
+            this.fetchError = response.statusText
           })
     }
   }

@@ -11,6 +11,7 @@ import Customers from './admin/Customers.vue'
 import ServiceProvider from './admin/ServiceProvider.vue'
 import NewCustomer from './admin/NewCustomer.vue'
 import Modal from './components/Modal.vue'
+import Api from './plugins/api'
 
 const routes = [
   {path: '/', component: Landing},
@@ -70,5 +71,6 @@ router.beforeEach((to, from) => {
 const app = createApp(App)
 
 app.use(router)
+app.use(Api)
 app.mount('#app')
 app.component('nrad-modal', Modal)
