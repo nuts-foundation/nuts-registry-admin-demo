@@ -135,6 +135,9 @@ func (db *FlatFileDB) ReadAll() error {
 }
 
 func (db *FlatFileDB) All() ([]Customer, error) {
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
+
 	if err := db.ReadAll(); err != nil {
 		return nil, err
 	}

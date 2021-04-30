@@ -26,11 +26,11 @@
       <tr v-for="customer in customers">
         <td>
           <div class="m-4">
-            {{ customer.id}}
+            {{ customer.id }}
           </div>
         </td>
-        <td>{{customer.name}}</td>
-        <td>{{ customer.did}}</td>
+        <td>{{ customer.name }}</td>
+        <td>{{ customer.did }}</td>
       </tr>
       </tbody>
     </table>

@@ -156,6 +156,10 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, "unknown user")
 	}
 
+	if len(connectReq.Id) == 0 || len(connectReq.Name) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "name and id must be provided")
+	}
+
 	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name)
 	if err != nil {
 		return err
