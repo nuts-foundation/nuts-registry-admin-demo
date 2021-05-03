@@ -4,6 +4,7 @@ import (
 	"time"
 
 	nutsApi "github.com/nuts-foundation/nuts-node/vdr/api/v1"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 )
 
 type Service struct {
@@ -11,7 +12,7 @@ type Service struct {
 	Repository Repository
 }
 
-func (s Service) ConnectCustomer(id, name string) (*Customer, error) {
+func (s Service) ConnectCustomer(id, name string) (*domain.Customer, error) {
 	nodeClient := nutsApi.HTTPClient{
 		ServerAddress: s.NutsNodeAddr,
 		Timeout:       5*time.Second,
@@ -22,9 +23,9 @@ func (s Service) ConnectCustomer(id, name string) (*Customer, error) {
 		return nil, err
 	}
 
-	customer := Customer{
-		DID:  didDoc.ID.String(),
-		ID:   id,
+	customer := domain.Customer{
+		Did:  didDoc.ID.String(),
+		Id:   id,
 		Name: name,
 	}
 

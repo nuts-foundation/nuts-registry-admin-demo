@@ -32,7 +32,7 @@ func (w Wrapper) checkAuthorization(ctx echo.Context) (jwt.Token, error) {
 }
 
 func (w Wrapper) CreateSession(ctx echo.Context) error {
-	credentials := CreateSessionRequest{}
+	credentials := domain.CreateSessionRequest{}
 	if err := ctx.Bind(&credentials); err != nil {
 		return err
 	}
@@ -46,7 +46,7 @@ func (w Wrapper) CreateSession(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	return ctx.JSON(200, CreateSessionResponse{Token: string(token)})
+	return ctx.JSON(200, domain.CreateSessionResponse{Token: string(token)})
 }
 
 func (w Wrapper) GetCustomers(ctx echo.Context) error {
@@ -71,7 +71,11 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 			Id:   c.ID,
 			Name: c.Name,
 		}
-		response = append(response, customer)
+	}
+
+	response := domain.CustomersResponse{}
+	for _, c := range customers {
+		response = append(response, c)
 	}
 	return ctx.JSON(200, response)
 }
@@ -102,20 +106,14 @@ func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	spRequest := ServiceProvider{}
-	if err := ctx.Bind(&spRequest); err != nil {
+	sp:= domain.ServiceProvider{}
+	if err := ctx.Bind(&sp); err != nil {
 		return err
-	}
-	sp := domain.ServiceProvider{
-		ID:    spRequest.Id,
-		Name:  spRequest.Name,
-		Email: spRequest.Email,
-		Phone: spRequest.Phone,
 	}
 	if err := w.SPRepo.CreateOrUpdate(sp); err != nil {
 		return err
 	}
-	return ctx.JSON(201, spRequest)
+	return ctx.JSON(201, sp)
 }
 
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
@@ -123,20 +121,14 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	spRequest := ServiceProvider{}
-	if err := ctx.Bind(&spRequest); err != nil {
-		return err
-	}
-	sp := domain.ServiceProvider{
-		ID:    spRequest.Id,
-		Name:  spRequest.Name,
-		Email: spRequest.Email,
-		Phone: spRequest.Phone,
+	sp := domain.ServiceProvider{}
+	if err := ctx.Bind(&sp); err != nil {
+		return echo.NewHTTPError(500, err.Error())
 	}
 	if err := w.SPRepo.CreateOrUpdate(sp); err != nil {
-		return err
+		return echo.NewHTTPError(500, err.Error())
 	}
-	return ctx.JSON(200, spRequest)
+	return ctx.JSON(200, sp)
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
@@ -145,9 +137,9 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		return err
 	}
 
-	connectReq := ConnectCustomerRequest{}
+	connectReq := domain.ConnectCustomerRequest{}
 	if err := ctx.Bind(&connectReq); err != nil {
-		return err
+		return echo.NewHTTPError(500, err.Error())
 	}
 
 	if user, ok := token.Get(openid.EmailKey); ok {

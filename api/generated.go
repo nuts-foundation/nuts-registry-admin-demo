@@ -4,81 +4,12 @@
 package api
 
 import (
+	"fmt"
+	"net/http"
+
+	"github.com/deepmap/oapi-codegen/pkg/runtime"
 	"github.com/labstack/echo/v4"
 )
-
-// ConnectCustomerRequest defines model for ConnectCustomerRequest.
-type ConnectCustomerRequest struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
-}
-
-// CreateSessionRequest defines model for CreateSessionRequest.
-type CreateSessionRequest struct {
-	Password string `json:"password"`
-	Username string `json:"username"`
-}
-
-// CreateSessionResponse defines model for CreateSessionResponse.
-type CreateSessionResponse struct {
-	Token string `json:"token"`
-}
-
-// A customer object
-type Customer struct {
-
-	// The customer DID
-	Did string `json:"did"`
-
-	// The internal customer ID
-	Id string `json:"id"`
-
-	// Internal name for this customer
-	Name string `json:"name"`
-}
-
-// CustomersResponse defines model for CustomersResponse.
-type CustomersResponse []Customer
-
-// A Service Provider is a controller of other DID documents
-type ServiceProvider struct {
-
-	// Email addres available for other service providers in the network for getting support
-	Email string `json:"email"`
-
-	// The DID of the service provider
-	Id string `json:"id"`
-
-	// The name of the service provider
-	Name string `json:"name"`
-
-	// Number available for other service providers in the network to call in case of emergency
-	Phone string `json:"phone"`
-}
-
-// CreateSessionJSONBody defines parameters for CreateSession.
-type CreateSessionJSONBody CreateSessionRequest
-
-// ConnectCustomerJSONBody defines parameters for ConnectCustomer.
-type ConnectCustomerJSONBody ConnectCustomerRequest
-
-// CreateServiceProviderJSONBody defines parameters for CreateServiceProvider.
-type CreateServiceProviderJSONBody ServiceProvider
-
-// UpdateServiceProviderJSONBody defines parameters for UpdateServiceProvider.
-type UpdateServiceProviderJSONBody ServiceProvider
-
-// CreateSessionJSONRequestBody defines body for CreateSession for application/json ContentType.
-type CreateSessionJSONRequestBody CreateSessionJSONBody
-
-// ConnectCustomerJSONRequestBody defines body for ConnectCustomer for application/json ContentType.
-type ConnectCustomerJSONRequestBody ConnectCustomerJSONBody
-
-// CreateServiceProviderJSONRequestBody defines body for CreateServiceProvider for application/json ContentType.
-type CreateServiceProviderJSONRequestBody CreateServiceProviderJSONBody
-
-// UpdateServiceProviderJSONRequestBody defines body for UpdateServiceProvider for application/json ContentType.
-type UpdateServiceProviderJSONRequestBody UpdateServiceProviderJSONBody
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -91,6 +22,9 @@ type ServerInterface interface {
 
 	// (POST /web/customers)
 	ConnectCustomer(ctx echo.Context) error
+
+	// (PUT /web/customers/{id})
+	UpdateCustomer(ctx echo.Context, id string) error
 
 	// (GET /web/service-provider)
 	GetServiceProvider(ctx echo.Context) error
@@ -131,6 +65,22 @@ func (w *ServerInterfaceWrapper) ConnectCustomer(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.ConnectCustomer(ctx)
+	return err
+}
+
+// UpdateCustomer converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateCustomer(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.UpdateCustomer(ctx, id)
 	return err
 }
 
@@ -192,6 +142,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
 	router.GET(baseURL+"/web/customers", wrapper.GetCustomers)
 	router.POST(baseURL+"/web/customers", wrapper.ConnectCustomer)
+	router.PUT(baseURL+"/web/customers/:id", wrapper.UpdateCustomer)
 	router.GET(baseURL+"/web/service-provider", wrapper.GetServiceProvider)
 	router.POST(baseURL+"/web/service-provider", wrapper.CreateServiceProvider)
 	router.PUT(baseURL+"/web/service-provider", wrapper.UpdateServiceProvider)

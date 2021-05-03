@@ -135,19 +135,29 @@ components:
         - id
         - did
         - name
+        - active
       properties:
         id:
           type: string
-          description: The internal customer ID
+          description: The internal customer ID.
           example: "C12"
         did:
           type: string
-          description: The customer DID
+          description: The customer DID.
           example:
             "did:nuts:123"
         name:
           type: string
-          description: Internal name for this customer
+          description: Internal name for this customer.
+        town:
+          type: string
+          description: Locality for this customer.
+        domain:
+          type: string
+          description: The email domain of the care providers employees, required for logging in.
+        active:
+          type: boolean
+          description: If a VC has been issued for this customer.
 
     ServiceProvider:
       type: object

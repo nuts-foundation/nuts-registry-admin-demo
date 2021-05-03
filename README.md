@@ -22,9 +22,11 @@ $ npm run watch
 $ go run . live
 ```
 
-The API is generated from the `api/api.yaml`.
+The API and domain types are generated from the `api/api.yaml`.
 ```shell
-$ oapi-codegen -generate types,server -package api api/api.yaml > api/generated.go
+$ oapi-codegen -generate server -package api api/api.yaml > api/generated.go
+$ oapi-codegen -generate types -package domain -o domain/generated_types.go api/api.yaml
+
 ```
 
 ### Docker

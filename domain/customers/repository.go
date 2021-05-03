@@ -5,34 +5,28 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"sort"
 	"sync"
+
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 )
 
-// Customer record in DB
-type Customer struct {
-	ID   string `json:"id"`
-	DID  string `json:"did"`
-	Name string `json:"name"`
-	// Domain is also used as login constraint
-	Domain string `json:"domain"`
-}
-
 type Repository interface {
-	NewCustomer(customer Customer) (*Customer, error)
-	FindByID(id string) (*Customer, error)
-	Update(id string, updateFn func(c Customer) (*Customer, error)) error
-	All() ([]Customer, error)
+	NewCustomer(customer domain.Customer) (*domain.Customer, error)
+	FindByID(id string) (*domain.Customer, error)
+	Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error)
+	All() ([]domain.Customer, error)
 }
 
 type FlatFileDB struct {
 	filepath string
 	mutex    sync.Mutex
 	// records is a cache
-	records map[string]Customer
+	records map[string]domain.Customer
 }
 
 func NewDB(filepath string) *FlatFileDB {
-	f, err := os.OpenFile(filepath, os.O_CREATE,0666)
+	f, err := os.OpenFile(filepath, os.O_CREATE, 0666)
 	defer f.Close()
 	if err != nil {
 		panic(err)
@@ -41,28 +35,28 @@ func NewDB(filepath string) *FlatFileDB {
 	return &FlatFileDB{
 		filepath: filepath,
 		mutex:    sync.Mutex{},
-		records:  make(map[string]Customer, 0),
+		records:  make(map[string]domain.Customer, 0),
 	}
 }
 
 // NewCustomer creates a new customer with a valid id
-func (db *FlatFileDB) NewCustomer(customer Customer) (*Customer, error) {
+func (db *FlatFileDB) NewCustomer(customer domain.Customer) (*domain.Customer, error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
 	if err := db.ReadAll(); err != nil {
 		return nil, err
 	}
-	if _, ok := db.records[customer.ID]; ok {
+	if _, ok := db.records[customer.Id]; ok {
 		return nil, errors.New("customer already exists")
 	}
 
-	db.records[customer.ID] = customer
+	db.records[customer.Id] = customer
 
 	return &customer, db.WriteAll()
 }
 
-func (db *FlatFileDB) FindByID(id string) (*Customer, error) {
+func (db *FlatFileDB) FindByID(id string) (*domain.Customer, error) {
 	if len(db.records) == 0 {
 		if err := db.ReadAll(); err != nil {
 			return nil, err
@@ -70,7 +64,7 @@ func (db *FlatFileDB) FindByID(id string) (*Customer, error) {
 	}
 
 	for _, r := range db.records {
-		if r.ID == id {
+		if r.Id == id {
 			// Hazardous to return a pointer, but this is a demo.
 			return &r, nil
 		}
@@ -79,29 +73,33 @@ func (db *FlatFileDB) FindByID(id string) (*Customer, error) {
 	return nil, errors.New("not found")
 }
 
-func (db *FlatFileDB) Update(id string, updateFn func(c Customer) (*Customer, error)) error {
+func (db *FlatFileDB) Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
 	if len(db.records) == 0 {
 		if err := db.ReadAll(); err != nil {
-			return err
+			return nil, err
 		}
 	}
 
 	for i, r := range db.records {
-		if r.ID == id {
+		if r.Id == id {
 			updatedCustomer, err := updateFn(db.records[i])
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			db.records[i] = *updatedCustomer
-			return db.WriteAll()
+			err = db.WriteAll()
+			if err != nil {
+				return nil, err
+			}
+			return updatedCustomer, nil
 		}
 	}
 
-	return errors.New("not found")
+	return nil, errors.New("not found")
 }
 
 // WriteAll writes all records to the file, truncating the file if it exists
@@ -119,13 +117,14 @@ func (db *FlatFileDB) WriteAll() error {
 }
 
 func (db *FlatFileDB) ReadAll() error {
+	//log.Debug("Reading full customer list from file")
 	bytes, err := os.ReadFile(db.filepath)
 	if err != nil {
 		return fmt.Errorf("unable to read db from file: %w", err)
 	}
 
 	if len(bytes) == 0 {
-		return  nil
+		return nil
 	}
 
 	if err = json.Unmarshal(bytes, &db.records); err != nil {
@@ -134,7 +133,7 @@ func (db *FlatFileDB) ReadAll() error {
 	return nil
 }
 
-func (db *FlatFileDB) All() ([]Customer, error) {
+func (db *FlatFileDB) All() ([]domain.Customer, error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
@@ -142,10 +141,12 @@ func (db *FlatFileDB) All() ([]Customer, error) {
 		return nil, err
 	}
 
-	v := make([]Customer, 0, len(db.records))
+	v := make([]domain.Customer, len(db.records))
 
+	idx := 0
 	for _, value := range db.records {
-		v = append(v, value)
+		v[idx] = value
+		idx = idx + 1
 	}
 	sort.SliceStable(v, func(i, j int) bool {
 		return v[i].Id < v[j].Id

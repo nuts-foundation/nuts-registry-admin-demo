@@ -6,13 +6,6 @@ import (
 	"go.etcd.io/bbolt"
 )
 
-type ServiceProvider struct {
-	ID    string
-	Name  string
-	Email string
-	Phone string
-}
-
 const serviceProviderBucketName = "ServiceProvider"
 const defaultServiceProviderKey = "default"
 
