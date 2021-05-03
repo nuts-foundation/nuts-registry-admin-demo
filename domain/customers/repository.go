@@ -147,5 +147,8 @@ func (db *FlatFileDB) All() ([]Customer, error) {
 	for _, value := range db.records {
 		v = append(v, value)
 	}
+	sort.SliceStable(v, func(i, j int) bool {
+		return v[i].Id < v[j].Id
+	})
 	return v, nil
 }
