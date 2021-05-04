@@ -12,7 +12,7 @@ type Service struct {
 	Repository Repository
 }
 
-func (s Service) ConnectCustomer(id, name string) (*domain.Customer, error) {
+func (s Service) ConnectCustomer(id, name, town string) (*domain.Customer, error) {
 	nodeClient := nutsApi.HTTPClient{
 		ServerAddress: s.NutsNodeAddr,
 		Timeout:       5*time.Second,
@@ -27,6 +27,7 @@ func (s Service) ConnectCustomer(id, name string) (*domain.Customer, error) {
 		Did:  didDoc.ID.String(),
 		Id:   id,
 		Name: name,
+		Town: &town,
 	}
 
 	return s.Repository.NewCustomer(customer)

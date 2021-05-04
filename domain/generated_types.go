@@ -7,6 +7,9 @@ package domain
 type ConnectCustomerRequest struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
+
+	// Used for issueing the NutsOrgCredential
+	Town *string `json:"town,omitempty"`
 }
 
 // CreateSessionRequest defines model for CreateSessionRequest.
@@ -69,8 +72,9 @@ type ConnectCustomerJSONBody ConnectCustomerRequest
 
 // UpdateCustomerJSONBody defines parameters for UpdateCustomer.
 type UpdateCustomerJSONBody struct {
-	Active bool   `json:"active"`
-	Name   string `json:"name"`
+	Active bool    `json:"active"`
+	Name   string  `json:"name"`
+	Town   *string `json:"town,omitempty"`
 }
 
 // CreateServiceProviderJSONBody defines parameters for CreateServiceProvider.

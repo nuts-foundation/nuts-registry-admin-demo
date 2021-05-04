@@ -169,6 +169,10 @@ components:
         name:
           type: string
           example: "Good Care Org - Driebergen"
+        town:
+          type: string
+          description: Used for issueing the NutsOrgCredential
+          example: "Hengelo"
     CustomersResponse:
       type: array
       items:

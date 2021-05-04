@@ -8,6 +8,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	ssi "github.com/nuts-foundation/go-did"
@@ -148,7 +149,7 @@ func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) 
 	defer cancel()
 
 	for _, credential := range credentials {
-		response, err := s.client().Revoke(ctx, credential.Id)
+		response, err := s.client().Revoke(ctx, url.PathEscape(credential.Id))
 		if err != nil {
 			return err
 		}

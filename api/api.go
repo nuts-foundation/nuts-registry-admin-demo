@@ -62,23 +62,21 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, "unknown user")
 	}
 
-	customers, err := w.CustomerService.Repository.All()
+	allCustomers, err := w.CustomerService.Repository.All()
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
 
-	for _, c := range customers {
-		credentials, err := w.CredentialService.GetCredentials(c)
+	for i, c := range allCustomers {
+		credentialsForCustomer, err := w.CredentialService.GetCredentials(c)
 		if err != nil {
 			return echo.NewHTTPError(500, err.Error())
 		}
-		if len(credentials) > 0 {
-			c.Active = true
-		}
+		allCustomers[i].Active = len(credentialsForCustomer) > 0
 	}
 
 	response := domain.CustomersResponse{}
-	for _, c := range customers {
+	for _, c := range allCustomers {
 		response = append(response, c)
 	}
 	return ctx.JSON(200, response)
@@ -152,7 +150,12 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "name and id must be provided")
 	}
 
-	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name)
+	town := ""
+	if connectReq.Town != nil {
+		town = *connectReq.Town
+	}
+
+	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town)
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
@@ -178,7 +181,7 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 
 	customer, err := w.CustomerService.Repository.Update(id, func(c domain.Customer) (*domain.Customer, error) {
 		c.Name = req.Name
-		if len(req.Town) > 0 {
+		if len(req.Town) >= 0 {
 			c.Town = &req.Town
 		}
 		if err := w.CredentialService.ManageNutsOrgCredential(c, req.Active); err != nil {
@@ -204,5 +207,11 @@ func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
 	if customer == nil {
 		ctx.NoContent(404)
 	}
+
+	credentialsForCustomer, err := w.CredentialService.GetCredentials(*customer)
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	}
+	customer.Active = len(credentialsForCustomer) > 0
 	return ctx.JSON(200, customer)
 }
