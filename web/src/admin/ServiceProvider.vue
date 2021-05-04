@@ -62,6 +62,7 @@ export default {
       }
     }
   },
+  emits: ["statusUpdate"],
   created() {
     this.fetchData()
   },
@@ -84,7 +85,7 @@ export default {
         return response.json()
       }).then(responseData => {
         this.responseState = 'success'
-        this.feedbackMsg = "Service Provider Updated"
+        this.$emit("statusUpdate", "Service Provider Saved")
         this.serviceProvider = responseData
       }).catch(reason => {
         console.error("failure", reason)
@@ -110,7 +111,7 @@ export default {
         return response.json()
       }).then(responseData => {
         this.responseState = 'success'
-        this.feedbackMsg = "Service Provider Created"
+        this.$emit("statusUpdate", "Service Provider Saved")
         this.serviceProvider = responseData
       }).catch(reason => {
         console.error("failure", reason)

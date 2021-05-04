@@ -53,6 +53,7 @@ export default {
       loading: true,
     }
   },
+  emits: ["statusUpdate"],
   watch: {
     "$route.params": {
       handler(toParams, previousParams) {
@@ -98,6 +99,7 @@ export default {
       this.$api.put(`web/customers/${this.customer.id}`, this.customer)
           .then((customer) => {
             this.customer = customer
+            this.$emit("statusUpdate", "Customer saved")
             this.$router.push({name: 'admin.customers'})
           })
           .catch((reason) => {

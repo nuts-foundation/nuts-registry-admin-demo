@@ -47,17 +47,31 @@
 
     </nav>
 
-    <main class="w-full p-5">
+    <main class="relative w-full p-5">
       <!-- Main content -->
       <div class="max-w-4xl mx-auto my-8">
-        <router-view></router-view>
+        <router-view @statusUpdate="updateStatus"></router-view>
       </div>
+      <status-bar :statusMessage="eventMessage"></status-bar>
     </main>
   </div>
 </template>
 
 <script>
-export default {}
+import StatusBar from "../components/StatusBar.vue";
+export default {
+  components: {StatusBar},
+  data() {
+    return {
+      eventMessage: ''
+    }
+  },
+  methods: {
+    updateStatus(status) {
+      this.eventMessage = status
+    }
+  }
+}
 </script>
 
 <style>

@@ -37,7 +37,7 @@
       </tbody>
     </table>
   </div>
-  <router-view name="modal"></router-view>
+  <router-view name="modal" @statusUpdate="updateStatus"></router-view>
 </template>
 
 <script>
@@ -62,7 +62,11 @@ export default {
         {immediate: true}
     )
   },
+  emits: ["statusUpdate"],
   methods: {
+    updateStatus(event) {
+      this.$emit("statusUpdate", event)
+    },
     openCustomer(customer) {
       console.log("open customer", customer.name)
 
