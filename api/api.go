@@ -9,13 +9,15 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/lestrrat-go/jwx/jwt/openid"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/credentials"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
 )
 
 type Wrapper struct {
-	Auth auth
-	SPRepo domain.ServiceProviderRepository
-	CustomerService customers.Service
+	Auth              auth
+	SPRepo            domain.ServiceProviderRepository
+	CustomerService   customers.Service
+	CredentialService credentials.Service
 }
 
 func (w Wrapper) checkAuthorization(ctx echo.Context) (jwt.Token, error) {
@@ -62,14 +64,16 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 
 	customers, err := w.CustomerService.Repository.All()
 	if err != nil {
-		return err
+		return echo.NewHTTPError(500, err.Error())
 	}
-	response := CustomersResponse{}
+
 	for _, c := range customers {
-		customer := Customer{
-			Did:  c.DID,
-			Id:   c.ID,
-			Name: c.Name,
+		credentials, err := w.CredentialService.GetCredentials(c)
+		if err != nil {
+			return echo.NewHTTPError(500, err.Error())
+		}
+		if len(credentials) > 0 {
+			c.Active = true
 		}
 	}
 
@@ -92,13 +96,7 @@ func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
 	if sp == nil {
 		return ctx.NoContent(404)
 	}
-	response := ServiceProvider{
-		Email: sp.Email,
-		Id:    sp.ID,
-		Name:  sp.Name,
-		Phone: sp.Phone,
-	}
-	return ctx.JSON(200, response)
+	return ctx.JSON(200, sp)
 }
 
 func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
@@ -106,7 +104,7 @@ func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	sp:= domain.ServiceProvider{}
+	sp := domain.ServiceProvider{}
 	if err := ctx.Bind(&sp); err != nil {
 		return err
 	}
@@ -154,7 +152,46 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 
 	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name)
 	if err != nil {
-		return err
+		return echo.NewHTTPError(500, err.Error())
+	}
+	return ctx.JSON(200, customer)
+}
+
+func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
+	req := struct {
+		Name   string
+		Active bool
+		Town   string
+	}{}
+	ctx.Bind(&req)
+
+	if len(req.Name) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "name")
+	}
+
+	customer, err := w.CustomerService.Repository.Update(id, func(c domain.Customer) (*domain.Customer, error) {
+		c.Name = req.Name
+		if len(req.Town) > 0 {
+			c.Town = &req.Town
+		}
+		if err := w.CredentialService.ManageNutsOrgCredential(c, req.Active); err != nil {
+			return nil, err
+		}
+		return &c, nil
+	})
+	if err != nil {
+		ctx.JSON(500, err.Error())
+	}
+	return ctx.JSON(200, customer)
+}
+
+func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
+	customer, err := w.CustomerService.Repository.FindByID(id)
+	if err != nil {
+		ctx.JSON(500, err.Error())
+	}
+	if customer == nil {
+		ctx.NoContent(404)
 	}
 	return ctx.JSON(200, customer)
 }

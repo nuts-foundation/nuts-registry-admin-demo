@@ -23,6 +23,9 @@ type ServerInterface interface {
 	// (POST /web/customers)
 	ConnectCustomer(ctx echo.Context) error
 
+	// (GET /web/customers/{id})
+	GetCustomer(ctx echo.Context, id string) error
+
 	// (PUT /web/customers/{id})
 	UpdateCustomer(ctx echo.Context, id string) error
 
@@ -65,6 +68,22 @@ func (w *ServerInterfaceWrapper) ConnectCustomer(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.ConnectCustomer(ctx)
+	return err
+}
+
+// GetCustomer converts echo context to params.
+func (w *ServerInterfaceWrapper) GetCustomer(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetCustomer(ctx, id)
 	return err
 }
 
@@ -142,6 +161,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
 	router.GET(baseURL+"/web/customers", wrapper.GetCustomers)
 	router.POST(baseURL+"/web/customers", wrapper.ConnectCustomer)
+	router.GET(baseURL+"/web/customers/:id", wrapper.GetCustomer)
 	router.PUT(baseURL+"/web/customers/:id", wrapper.UpdateCustomer)
 	router.GET(baseURL+"/web/service-provider", wrapper.GetServiceProvider)
 	router.POST(baseURL+"/web/service-provider", wrapper.CreateServiceProvider)

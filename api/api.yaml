@@ -49,6 +49,51 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Customer"
+  /web/customers/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: internal customer id
+        required: true
+        example:
+          - "C12"
+        schema:
+          type: string
+    get:
+      operationId: getCustomer
+      responses:
+        200:
+          description: when all was fine
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+    put:
+      operationId: updateCustomer
+      description: Update a customers name and activation status
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - active
+                - name
+              properties:
+                active:
+                  type: boolean
+                name:
+                  type: string
+                town:
+                  type: string
+      responses:
+        200:
+          description: when all was fine
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
   /web/service-provider:
     get:
       operationId: getServiceProvider

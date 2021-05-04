@@ -16,7 +16,6 @@ export default {
     app.config.globalProperties.$api = {
 
       get: (url, reqOptions = {}) => {
-
         const options = {
           method: 'GET',
           headers: {
@@ -34,9 +33,26 @@ export default {
         })
       },
       post: (url, data, reqOptions = {}) => {
-
         const options = {
           method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...authHeader()
+          },
+          ...reqOptions,
+          body: JSON.stringify(data)
+        }
+
+        return fetch(url, options).then((response) => {
+          if (!response.ok) {
+            throw response
+          }
+          return response.json()
+        })
+      },
+      put: (url, data, reqOptions = {}) => {
+        const options = {
+          method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             ...authHeader()

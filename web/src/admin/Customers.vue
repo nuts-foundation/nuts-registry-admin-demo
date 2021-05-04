@@ -19,16 +19,18 @@
       <tr>
         <th class="thead">Customer ID</th>
         <th class="thead">Name</th>
-        <th class="thead">DID</th>
+        <th class="thead">Active</th>
       </tr>
       </thead>
       <tbody class="tbody">
-      <tr v-for="customer in customers">
+      <tr class="hover:bg-gray-100 cursor-pointer"
+          @click="$router.push({name: 'admin.editCustomer', params: {id: customer.id} })"
+          v-for="customer in customers">
         <td class="tcell">
           {{ customer.id }}
         </td>
         <td class="tcell">{{ customer.name }}</td>
-        <td class="tcell">{{ customer.did }}</td>
+        <td class="tcell">{{ customer.active }}</td>
       </tr>
       </tbody>
     </table>
@@ -58,6 +60,10 @@ export default {
     )
   },
   methods: {
+    openCustomer(customer) {
+      console.log("open customer", customer.name)
+
+    },
     fetchData() {
       this.$api.get('web/customers')
           .then(data => this.customers = data)

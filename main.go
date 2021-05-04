@@ -15,6 +15,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/api"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/credentials"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
 	bolt "go.etcd.io/bbolt"
 )
@@ -63,24 +64,33 @@ func main() {
 		account = api.UserAccount{Username: config.Credentials.Username, Password: config.Credentials.Password}
 	}
 	auth := api.NewAuth(config.sessionKey, []api.UserAccount{account})
+
 	// Initialize repos
-	spRepo := domain.ServiceProviderRepository{DB: db}
+	spRepo := domain.ServiceProviderRepository{NodeAddr: config.NutsNodeAddress, DB: db}
+	cRepo := customers.NewDB(config.CustomersFile)
+
+	// Initialize services
+	customerService := customers.Service{
+		NutsNodeAddr: config.NutsNodeAddress,
+		Repository:   cRepo,
+	}
+	credentialService := credentials.Service{
+		NutsNodeAddr: config.NutsNodeAddress,
+		SPRepository: spRepo,
+	}
 
 	// Initialize wrapper
-	cService := customers.Service{
-		NutsNodeAddr: config.NutsNodeAddress,
-		Repository: customers.NewDB(config.CustomersFile),
-	}
-	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo, CustomerService: cService}
+	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo, CustomerService: customerService, CredentialService: credentialService}
 
 	api.RegisterHandlers(e, apiWrapper)
 
+	// Setup asset serving:
 	// Check if we use live mode from the file system or using embedded files
 	useFS := len(os.Args) > 1 && os.Args[1] == "live"
-
 	assetHandler := http.FileServer(getFileSystem(useFS))
 	e.GET("/*", echo.WrapHandler(assetHandler))
 
+	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.HTTPPort)))
 }
 
