@@ -1,7 +1,9 @@
 <template>
   <nrad-modal :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Save Customer"
               title="Edit Customer" type="edit">
-    <form class="space-y-3">
+    <div v-if="loading && !apiError">Loading...</div>
+    <div class="p-2 rounded-md w-full bg-red-100" v-if="apiError">Error during server communication: {{ apiError }}</div>
+    <form v-if="!loading" class="space-y-3">
       <div>
         <label>Internal customer ID:</label>
         <div>
@@ -34,6 +36,7 @@ export default {
       },
       formErrors: [],
       apiError: '',
+      loading: true,
     }
   },
   watch: {
@@ -68,8 +71,14 @@ export default {
     fetchCustomer(id) {
       console.log("id: ", id)
       this.$api.get(`web/customers/${id}`)
-          .then((customer) => this.customer = customer)
-          .catch((reason) => console.log("failed:", reason))
+          .then((customer) => {
+            this.customer = customer
+            this.loading = false
+          })
+          .catch((reason) => {
+            this.apiError = reason.statusText
+            console.log("failed:", reason)
+          })
     },
     saveCustomer() {
       this.$api.put(`web/customers/${this.customer.id}`, this.customer)
@@ -77,7 +86,10 @@ export default {
             this.customer = customer
             this.$router.push({name: 'admin.customers'})
           })
-          .catch((reason) => console.log("failed:", reason))
+          .catch((reason) => {
+            this.apiError = reason.statusText
+            console.log("failed:", reason)
+          })
     }
   }
 }

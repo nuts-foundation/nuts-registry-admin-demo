@@ -160,6 +160,11 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 }
 
 func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
+	_, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
+
 	req := struct {
 		Name   string
 		Active bool
@@ -188,6 +193,10 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 }
 
 func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
+	_, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
 	customer, err := w.CustomerService.Repository.FindByID(id)
 	if err != nil {
 		ctx.JSON(500, err.Error())
