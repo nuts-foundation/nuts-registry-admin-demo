@@ -108,10 +108,11 @@ func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
 	if err := ctx.Bind(&sp); err != nil {
 		return err
 	}
-	if err := w.SPRepo.CreateOrUpdate(sp); err != nil {
+	res, err := w.SPRepo.CreateOrUpdate(sp)
+	if err != nil {
 		return err
 	}
-	return ctx.JSON(201, sp)
+	return ctx.JSON(201, res)
 }
 
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
@@ -123,10 +124,11 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	if err := ctx.Bind(&sp); err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
-	if err := w.SPRepo.CreateOrUpdate(sp); err != nil {
+	res, err := w.SPRepo.CreateOrUpdate(sp)
+	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
-	return ctx.JSON(200, sp)
+	return ctx.JSON(200, res)
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
