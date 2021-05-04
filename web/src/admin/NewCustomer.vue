@@ -44,6 +44,7 @@ export default {
       }
     }
   },
+  emits: ["statusUpdate"],
   methods: {
     checkForm(e) {
       // reset the errors
@@ -66,7 +67,10 @@ export default {
     },
     confirm() {
       this.$api.post('web/customers', this.customer)
-          .then(response => this.$router.push({name: 'admin.customers'}))
+          .then(response => {
+            this.$emit("statusUpdate", "Customer connected")
+            this.$router.push({name: 'admin.customers'})
+          })
           .catch(response => this.apiError = response.statusText)
     }
   }
