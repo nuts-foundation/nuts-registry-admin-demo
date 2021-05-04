@@ -20,12 +20,12 @@
         <input type="text" v-model="customer.id" id="newCustomerIdInput">
       </div>
       <div>
-        <label for="customerTownInput">Town</label>
-        <input type="text" v-model="customer.town" id="customerTownInput">
-      </div>
-      <div>
         <label for="newCustomerNameInput">Customer name</label>
         <input type="text" v-model="customer.name" id="newCustomerNameInput">
+      </div>
+      <div>
+        <label for="customerTownInput">Town</label>
+        <input type="text" v-model="customer.town" id="customerTownInput">
       </div>
     </form>
   </nrad-modal>
