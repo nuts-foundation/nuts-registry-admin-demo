@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-between mb-6">
-    <h1 class="text-3xl">Customers</h1>
+    <h1 class="text-3xl">Your Care Organisations</h1>
     <button
         class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
         @click="$router.push({name: 'admin.newCustomer'})"
@@ -14,21 +14,25 @@
   </div>
   <div class="customer-container">
     <p v-if="fetchError" class="m-4">Could not fetch customers: {{ fetchError }}</p>
+    <div class="m-4" v-if="loading">Loading...</div>
+    <div class="m-4" v-if="!loading && customers.length == 0 && !fetchError">No customers yet, add one!</div>
     <table v-if="customers.length > 0" class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
       <tr>
+        <th class="thead">Customer ID</th>
         <th class="thead">Name</th>
-        <th class="thead">DID</th>
+        <th class="thead">Active</th>
       </tr>
       </thead>
       <tbody class="tbody">
-      <tr v-for="customer in customers">
-        <td>
-          <div class="m-4">
-            {{ customer.name }}
-          </div>
+      <tr class="hover:bg-gray-100 cursor-pointer"
+          @click="$router.push({name: 'admin.editCustomer', params: {id: customer.id} })"
+          v-for="customer in customers">
+        <td class="tcell">
+          {{ customer.id }}
         </td>
-        <td>{{ customer.did }}</td>
+        <td class="tcell">{{ customer.name }}</td>
+        <td class="tcell">{{ customer.active }}</td>
       </tr>
       </tbody>
     </table>
@@ -42,7 +46,8 @@ export default {
   data() {
     return {
       fetchError: "",
-      customers: []
+      customers: [],
+      loading: true,
     }
   },
   created() {
@@ -58,24 +63,23 @@ export default {
     )
   },
   methods: {
+    openCustomer(customer) {
+      console.log("open customer", customer.name)
+
+    },
     fetchData() {
-      fetch("web/customers", {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("session")}`
-        }
-      }).then(response => {
-        if (!response.ok) {
-          if (response.status == 403) {
-            throw "Invalid credentials"
-          }
-          throw response.statusText
-        }
-        return response.json()
-      }).then(data => this.customers = data)
-          .catch(reason => {
-            console.log(reason)
-            this.fetchError = reason
+      this.$api.get('web/customers')
+          .then(data => this.customers = data)
+          .catch(response => {
+            console.error("failure", response)
+            if (response.status === 403) {
+              this.fetchError = "Invalid credentials"
+              return
+            }
+            console.log(response)
+            this.fetchError = response.statusText
           })
+          .finally(() => this.loading = false)
     }
   }
 }
@@ -87,12 +91,16 @@ export default {
   @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
 }
 
+.tcell {
+  @apply px-6 py-4 text-left;
+}
+
 .body {
   @apply bg-white divide-y divide-gray-200;
 }
 
 .customer-container {
-  @apply shadow overflow-hidden border-b border-gray-200 sm:rounded-lg;
+  @apply shadow overflow-hidden border-gray-200 rounded;
 }
 
 </style>

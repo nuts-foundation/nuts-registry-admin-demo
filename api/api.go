@@ -9,11 +9,15 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/lestrrat-go/jwx/jwt/openid"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/credentials"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
 )
 
 type Wrapper struct {
-	Auth auth
-	SPRepo domain.ServiceProviderRepository
+	Auth              auth
+	SPRepo            domain.ServiceProviderRepository
+	CustomerService   customers.Service
+	CredentialService credentials.Service
 }
 
 func (w Wrapper) checkAuthorization(ctx echo.Context) (jwt.Token, error) {
@@ -30,7 +34,7 @@ func (w Wrapper) checkAuthorization(ctx echo.Context) (jwt.Token, error) {
 }
 
 func (w Wrapper) CreateSession(ctx echo.Context) error {
-	credentials := CreateSessionRequest{}
+	credentials := domain.CreateSessionRequest{}
 	if err := ctx.Bind(&credentials); err != nil {
 		return err
 	}
@@ -44,7 +48,7 @@ func (w Wrapper) CreateSession(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	return ctx.JSON(200, CreateSessionResponse{Token: string(token)})
+	return ctx.JSON(200, domain.CreateSessionResponse{Token: string(token)})
 }
 
 func (w Wrapper) GetCustomers(ctx echo.Context) error {
@@ -53,16 +57,29 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 		return err
 	}
 	if user, ok := token.Get(openid.EmailKey); ok {
-		ctx.Logger().Print("Customers requested by: %s", user)
+		ctx.Logger().Printf("Customers requested by: %s", user)
 	} else {
 		return echo.NewHTTPError(http.StatusForbidden, "unknown user")
 	}
 
-	customers := []map[string]string{
-		{"name": "Zorginstelling de notenboom", "did": "did:nuts:123"},
-		{"name": "Verpleehuis de nootjes", "did": "did:nuts:456"},
+	allCustomers, err := w.CustomerService.Repository.All()
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
 	}
-	return ctx.JSON(200, customers)
+
+	for i, c := range allCustomers {
+		credentialsForCustomer, err := w.CredentialService.GetCredentials(c)
+		if err != nil {
+			return echo.NewHTTPError(500, err.Error())
+		}
+		allCustomers[i].Active = len(credentialsForCustomer) > 0
+	}
+
+	response := domain.CustomersResponse{}
+	for _, c := range allCustomers {
+		response = append(response, c)
+	}
+	return ctx.JSON(200, response)
 }
 
 func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
@@ -77,13 +94,7 @@ func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
 	if sp == nil {
 		return ctx.NoContent(404)
 	}
-	response := ServiceProvider{
-		Email: sp.Email,
-		Id:    sp.ID,
-		Name:  sp.Name,
-		Phone: sp.Phone,
-	}
-	return ctx.JSON(200, response)
+	return ctx.JSON(200, sp)
 }
 
 func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
@@ -91,20 +102,15 @@ func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	spRequest := ServiceProvider{}
-	if err := ctx.Bind(&spRequest); err != nil {
+	sp := domain.ServiceProvider{}
+	if err := ctx.Bind(&sp); err != nil {
 		return err
 	}
-	sp := domain.ServiceProvider{
-		ID:    spRequest.Id,
-		Name:  spRequest.Name,
-		Email: spRequest.Email,
-		Phone: spRequest.Phone,
-	}
-	if err := w.SPRepo.CreateOrUpdate(sp); err != nil {
+	res, err := w.SPRepo.CreateOrUpdate(sp)
+	if err != nil {
 		return err
 	}
-	return ctx.JSON(201, spRequest)
+	return ctx.JSON(201, res)
 }
 
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
@@ -112,19 +118,100 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	if err != nil {
 		return err
 	}
-	spRequest := ServiceProvider{}
-	if err := ctx.Bind(&spRequest); err != nil {
-		return err
+	sp := domain.ServiceProvider{}
+	if err := ctx.Bind(&sp); err != nil {
+		return echo.NewHTTPError(500, err.Error())
 	}
-	sp := domain.ServiceProvider{
-		ID:    spRequest.Id,
-		Name:  spRequest.Name,
-		Email: spRequest.Email,
-		Phone: spRequest.Phone,
+	res, err := w.SPRepo.CreateOrUpdate(sp)
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
 	}
-	if err := w.SPRepo.CreateOrUpdate(sp); err != nil {
-		return err
-	}
-	return ctx.JSON(200, spRequest)
+	return ctx.JSON(200, res)
 }
 
+func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
+	token, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
+
+	connectReq := domain.ConnectCustomerRequest{}
+	if err := ctx.Bind(&connectReq); err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	}
+
+	if user, ok := token.Get(openid.EmailKey); ok {
+		ctx.Logger().Printf("Customer with id %s connected by: %s", user, connectReq.Id)
+	} else {
+		return echo.NewHTTPError(http.StatusForbidden, "unknown user")
+	}
+
+	if len(connectReq.Id) == 0 || len(connectReq.Name) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "name and id must be provided")
+	}
+
+	town := ""
+	if connectReq.Town != nil {
+		town = *connectReq.Town
+	}
+
+	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town)
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	}
+	return ctx.JSON(200, customer)
+}
+
+func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
+	_, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
+
+	req := struct {
+		Name   string
+		Active bool
+		Town   string
+	}{}
+	ctx.Bind(&req)
+
+	if len(req.Name) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "name")
+	}
+
+	customer, err := w.CustomerService.Repository.Update(id, func(c domain.Customer) (*domain.Customer, error) {
+		c.Name = req.Name
+		if len(req.Town) >= 0 {
+			c.Town = &req.Town
+		}
+		if err := w.CredentialService.ManageNutsOrgCredential(c, req.Active); err != nil {
+			return nil, err
+		}
+		return &c, nil
+	})
+	if err != nil {
+		ctx.JSON(500, err.Error())
+	}
+	return ctx.JSON(200, customer)
+}
+
+func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
+	_, err := w.checkAuthorization(ctx)
+	if err != nil {
+		return err
+	}
+	customer, err := w.CustomerService.Repository.FindByID(id)
+	if err != nil {
+		ctx.JSON(500, err.Error())
+	}
+	if customer == nil {
+		ctx.NoContent(404)
+	}
+
+	credentialsForCustomer, err := w.CredentialService.GetCredentials(*customer)
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	}
+	customer.Active = len(credentialsForCustomer) > 0
+	return ctx.JSON(200, customer)
+}

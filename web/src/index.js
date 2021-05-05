@@ -10,7 +10,9 @@ import NotFound from './NotFound.vue'
 import Customers from './admin/Customers.vue'
 import ServiceProvider from './admin/ServiceProvider.vue'
 import NewCustomer from './admin/NewCustomer.vue'
+import EditCustomer from './admin/EditCustomer.vue'
 import Modal from './components/Modal.vue'
+import Api from './plugins/api'
 
 const routes = [
   {path: '/', component: Login},
@@ -37,6 +39,13 @@ const routes = [
             name: 'admin.newCustomer',
             components: {
               modal: NewCustomer
+            }
+          },
+          {
+            path: ':id/edit',
+            name: 'admin.editCustomer',
+            components: {
+              modal: EditCustomer
             }
           },
         ]
@@ -70,5 +79,6 @@ router.beforeEach((to, from) => {
 const app = createApp(App)
 
 app.use(router)
+app.use(Api)
 app.mount('#app')
 app.component('nrad-modal', Modal)
