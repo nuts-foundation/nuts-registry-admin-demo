@@ -10,9 +10,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/api"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/credentials"
@@ -54,6 +56,21 @@ func main() {
 	e.HideBanner = true
 	e.Use(middleware.Logger())
 	//e.Use(middleware.Recover())
+	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
+		Skipper: func(c echo.Context) bool {
+			protectedPaths := []string{
+				"/web/private",
+			}
+			for _, path := range protectedPaths {
+				if !strings.HasPrefix(c.Request().RequestURI, path) {
+					return true
+				}
+			}
+			return false
+		},
+		SigningKey:    &config.sessionKey.PublicKey,
+		SigningMethod: jwa.ES256.String(),
+	}))
 
 	// Initialize Auth
 	var account api.UserAccount

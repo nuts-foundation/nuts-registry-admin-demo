@@ -67,7 +67,7 @@ export default {
     },
     fetchCustomer(id) {
       console.log("id: ", id)
-      this.$api.get(`web/customers/${id}`)
+      this.$api.get(`web/private/customers/${id}`)
           .then((customer) => {
             this.customer = customer
             this.loading = false
@@ -78,7 +78,7 @@ export default {
           })
     },
     saveCustomer() {
-      this.$api.put(`web/customers/${this.customer.id}`, this.customer)
+      this.$api.put(`web/private/customers/${this.customer.id}`, this.customer)
           .then((customer) => {
             this.customer = customer
             this.$emit("statusUpdate", "Customer saved")

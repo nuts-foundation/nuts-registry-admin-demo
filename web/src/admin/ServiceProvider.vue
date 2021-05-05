@@ -68,7 +68,7 @@ export default {
   },
   methods: {
     updateServiceProvider() {
-      fetch("web/service-provider", {
+      fetch("web/private/service-provider", {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default {
       })
     },
     createServiceProvider() {
-      fetch("web/service-provider", {
+      fetch("web/private/service-provider", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ export default {
       })
     },
     fetchData() {
-      fetch("web/service-provider", {
+      fetch("web/private/service-provider", {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("session")}`
         }

@@ -17,25 +17,25 @@ type ServerInterface interface {
 	// (POST /web/auth)
 	CreateSession(ctx echo.Context) error
 
-	// (GET /web/customers)
+	// (GET /web/private/customers)
 	GetCustomers(ctx echo.Context) error
 
-	// (POST /web/customers)
+	// (POST /web/private/customers)
 	ConnectCustomer(ctx echo.Context) error
 
-	// (GET /web/customers/{id})
+	// (GET /web/private/customers/{id})
 	GetCustomer(ctx echo.Context, id string) error
 
-	// (PUT /web/customers/{id})
+	// (PUT /web/private/customers/{id})
 	UpdateCustomer(ctx echo.Context, id string) error
 
-	// (GET /web/service-provider)
+	// (GET /web/private/service-provider)
 	GetServiceProvider(ctx echo.Context) error
 
-	// (POST /web/service-provider)
+	// (POST /web/private/service-provider)
 	CreateServiceProvider(ctx echo.Context) error
 
-	// (PUT /web/service-provider)
+	// (PUT /web/private/service-provider)
 	UpdateServiceProvider(ctx echo.Context) error
 }
 
@@ -159,13 +159,13 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
-	router.GET(baseURL+"/web/customers", wrapper.GetCustomers)
-	router.POST(baseURL+"/web/customers", wrapper.ConnectCustomer)
-	router.GET(baseURL+"/web/customers/:id", wrapper.GetCustomer)
-	router.PUT(baseURL+"/web/customers/:id", wrapper.UpdateCustomer)
-	router.GET(baseURL+"/web/service-provider", wrapper.GetServiceProvider)
-	router.POST(baseURL+"/web/service-provider", wrapper.CreateServiceProvider)
-	router.PUT(baseURL+"/web/service-provider", wrapper.UpdateServiceProvider)
+	router.GET(baseURL+"/web/private/customers", wrapper.GetCustomers)
+	router.POST(baseURL+"/web/private/customers", wrapper.ConnectCustomer)
+	router.GET(baseURL+"/web/private/customers/:id", wrapper.GetCustomer)
+	router.PUT(baseURL+"/web/private/customers/:id", wrapper.UpdateCustomer)
+	router.GET(baseURL+"/web/private/service-provider", wrapper.GetServiceProvider)
+	router.POST(baseURL+"/web/private/service-provider", wrapper.CreateServiceProvider)
+	router.PUT(baseURL+"/web/private/service-provider", wrapper.UpdateServiceProvider)
 
 }
 
