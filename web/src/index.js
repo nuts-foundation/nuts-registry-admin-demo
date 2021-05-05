@@ -16,8 +16,16 @@ import Api from './plugins/api'
 
 const routes = [
   {path: '/', component: Landing},
-  {path: '/login', component: Login},
-  {path: '/logout', component: Logout},
+  {
+    name: 'login',
+    path: '/login',
+    component: Login
+  },
+  {
+    name: 'logout',
+    path: '/logout',
+    component: Logout
+  },
   {
     path: '/admin',
     components: {
@@ -79,6 +87,6 @@ router.beforeEach((to, from) => {
 const app = createApp(App)
 
 app.use(router)
-app.use(Api)
+app.use(Api, {forbiddenRoute: {name: 'logout'}})
 app.mount('#app')
 app.component('nrad-modal', Modal)
