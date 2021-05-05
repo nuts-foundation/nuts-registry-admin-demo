@@ -1,5 +1,5 @@
 export default {
-  install: (app, options = {}) => {
+  install: (app, defaultOptions = {}) => {
 
     const authHeader = () => {
       const sessionToken = localStorage.getItem("session")
@@ -8,66 +8,34 @@ export default {
       }
       return {}
     }
+    let api = {}
 
-    const {
-      headers = {},
-    } = options
-
-    app.config.globalProperties.$api = {
-
-      get: (url, reqOptions = {}) => {
+    let httpMethods = ['get', 'post', 'put', 'delete']
+    httpMethods.forEach((method) => {
+      api[method] = (url, data = null, requestOptions = {}) => {
         const options = {
-          method: 'GET',
+          ...defaultOptions,
+          method: method.toUpperCase(),
           headers: {
             'Content-Type': 'application/json',
             ...authHeader()
           },
-          ...reqOptions,
+          ...requestOptions,
+        }
+        if (data) {
+          options.body = JSON.stringify(data)
         }
 
-        return fetch(url, options).then((response) => {
-          if (!response.ok) {
-            throw response
-          }
-          return response.json()
-        })
-      },
-      post: (url, data, reqOptions = {}) => {
-        const options = {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader()
-          },
-          ...reqOptions,
-          body: JSON.stringify(data)
-        }
-
-        return fetch(url, options).then((response) => {
-          if (!response.ok) {
-            throw response
-          }
-          return response.json()
-        })
-      },
-      put: (url, data, reqOptions = {}) => {
-        const options = {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader()
-          },
-          ...reqOptions,
-          body: JSON.stringify(data)
-        }
-
-        return fetch(url, options).then((response) => {
-          if (!response.ok) {
-            throw response
-          }
-          return response.json()
-        })
+        return fetch(url, options)
+          .then((response) => {
+            if (!response.ok) {
+              throw response
+            }
+            return response.json()
+          })
       }
-    }
+    })
+
+    app.config.globalProperties.$api = api
   }
 }
