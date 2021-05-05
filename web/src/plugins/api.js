@@ -1,5 +1,7 @@
 export default {
-  install: (app, defaultOptions = {}) => {
+  install: (app, apiOptions = {}) => {
+
+    let { defaultOptions } = apiOptions
 
     const authHeader = () => {
       const sessionToken = localStorage.getItem("session")
@@ -29,7 +31,11 @@ export default {
         return fetch(url, options)
           .then((response) => {
             if (!response.ok) {
-              throw response
+              if (apiOptions.forbiddenRoute && response.status === 403) {
+                app.config.globalProperties.$router.push(apiOptions.forbiddenRoute)
+              } else {
+                throw response
+              }
             }
             return response.json()
           })
