@@ -1,5 +1,5 @@
 <template>
-  <nrad-modal :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Save Customer"
+  <modal-window :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Save Customer"
               title="Edit Customer" type="edit">
     <div v-if="loading && !apiError">Loading...</div>
     <div class="p-2 rounded-md w-full bg-red-100" v-if="apiError">Error during server communication: {{
@@ -32,7 +32,7 @@
         </label>
       </div>
     </form>
-  </nrad-modal>
+  </modal-window>
 </template>
 <style>
 input:checked + svg {
@@ -41,7 +41,9 @@ input:checked + svg {
 </style>
 
 <script>
+import ModalWindow from "../components/ModalWindow.vue";
 export default {
+  components: {ModalWindow},
   data() {
     return {
       customer: {
