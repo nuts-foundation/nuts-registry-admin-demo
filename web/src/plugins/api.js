@@ -31,7 +31,7 @@ export default {
         return fetch(url, options)
           .then((response) => {
             if (!response.ok) {
-              if (apiOptions.forbiddenRoute && response.status === 403) {
+              if (apiOptions.forbiddenRoute && response.status === 401) {
                 app.config.globalProperties.$router.push(apiOptions.forbiddenRoute)
               } else {
                 throw response

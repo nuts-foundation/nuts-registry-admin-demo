@@ -23,7 +23,7 @@ paths:
         '403':
           description: Invalid credentials
 
-  /web/customers:
+  /web/private/customers:
     get:
       operationId: getCustomers
       responses:
@@ -49,7 +49,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Customer"
-  /web/customers/{id}:
+  /web/private/customers/{id}:
     parameters:
       - name: id
         in: path
@@ -94,7 +94,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Customer"
-  /web/service-provider:
+  /web/private/service-provider:
     get:
       operationId: getServiceProvider
       description: Get the information of the current service provider of the Nuts node

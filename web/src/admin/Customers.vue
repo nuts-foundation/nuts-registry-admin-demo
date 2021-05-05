@@ -74,7 +74,7 @@ export default {
 
     },
     fetchData() {
-      this.$api.get('web/customers')
+      this.$api.get('web/private/customers')
           .then(data => this.customers = data)
           .catch(response => {
             console.error("failure", response)

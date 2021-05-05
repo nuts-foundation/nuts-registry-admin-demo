@@ -56,7 +56,7 @@ export default {
       e.preventDefault()
     },
     confirm() {
-      this.$api.post('web/customers', this.customer)
+      this.$api.post('web/private/customers', this.customer)
           .then(response => {
             this.$emit("statusUpdate", "Customer connected")
             this.$router.push({name: 'admin.customers'})
