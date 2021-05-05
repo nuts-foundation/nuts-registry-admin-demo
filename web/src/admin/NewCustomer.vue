@@ -12,30 +12,17 @@
         <li v-for="error in formErrors">* {{ error }}</li>
       </ul>
     </div>
+    <customer-form mode="new" :value="customer" @input="(newCustomer)=> {customer = newCustomer}"/>
 
-
-    <form class="space-y-3">
-      <div>
-        <label for="newCustomerIdInput">Internal customer ID</label>
-        <input type="text" v-model="customer.id" id="newCustomerIdInput">
-      </div>
-      <div>
-        <label for="newCustomerNameInput">Customer name</label>
-        <input type="text" v-model="customer.name" id="newCustomerNameInput">
-      </div>
-      <div>
-        <label for="customerTownInput">Town</label>
-        <input type="text" v-model="customer.town" id="customerTownInput">
-      </div>
-    </form>
   </modal-window>
 </template>
 
 <script>
 import ModalWindow from "../components/ModalWindow.vue";
+import CustomerForm from "./CustomerForm.vue";
 
 export default {
-  components: {ModalWindow},
+  components: {ModalWindow, CustomerForm},
   data() {
     return {
       apiError: '',
