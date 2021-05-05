@@ -1,5 +1,5 @@
 <template>
-  <nrad-modal :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Connect Customer"
+  <modal-window :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Connect Customer"
               title="Connect existing customer" type="add">
 
     <p class="mb-3 text-sm">Here you can link an existing customer to the Nuts network by creating a new Nuts DID.</p>
@@ -28,11 +28,14 @@
         <input type="text" v-model="customer.town" id="customerTownInput">
       </div>
     </form>
-  </nrad-modal>
+  </modal-window>
 </template>
 
 <script>
+import ModalWindow from "../components/ModalWindow.vue";
+
 export default {
+  components: {ModalWindow},
   data() {
     return {
       apiError: '',
@@ -55,12 +58,12 @@ export default {
         return this.confirm()
       }
 
-      if (!this.customer.name) {
-        this.formErrors.push("Name required")
+      if (!this.customer.id) {
+        this.formErrors.push("ID required")
       }
 
-      if (!this.customer.id) {
-        this.formErrors.push("Id required")
+      if (!this.customer.name) {
+        this.formErrors.push("Name required")
       }
 
       e.preventDefault()
