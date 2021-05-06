@@ -1,5 +1,5 @@
 <template>
-  <nrad-modal :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Connect Customer"
+  <modal-window :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Connect Customer"
               title="Connect existing customer" type="add">
 
     <p class="mb-3 text-sm">Here you can link an existing customer to the Nuts network by creating a new Nuts DID.</p>
@@ -12,27 +12,17 @@
         <li v-for="error in formErrors">* {{ error }}</li>
       </ul>
     </div>
+    <customer-form mode="new" :value="customer" @input="(newCustomer)=> {customer = newCustomer}"/>
 
-
-    <form class="space-y-3">
-      <div>
-        <label for="newCustomerIdInput">Internal customer ID</label>
-        <input type="text" v-model="customer.id" id="newCustomerIdInput">
-      </div>
-      <div>
-        <label for="newCustomerNameInput">Customer name</label>
-        <input type="text" v-model="customer.name" id="newCustomerNameInput">
-      </div>
-      <div>
-        <label for="customerTownInput">Town</label>
-        <input type="text" v-model="customer.town" id="customerTownInput">
-      </div>
-    </form>
-  </nrad-modal>
+  </modal-window>
 </template>
 
 <script>
+import ModalWindow from "../components/ModalWindow.vue";
+import CustomerForm from "./CustomerForm.vue";
+
 export default {
+  components: {ModalWindow, CustomerForm},
   data() {
     return {
       apiError: '',
@@ -44,6 +34,7 @@ export default {
       }
     }
   },
+  emits: ["statusUpdate"],
   methods: {
     checkForm(e) {
       // reset the errors
@@ -54,19 +45,22 @@ export default {
         return this.confirm()
       }
 
-      if (!this.customer.name) {
-        this.formErrors.push("Name required")
+      if (!this.customer.id) {
+        this.formErrors.push("ID required")
       }
 
-      if (!this.customer.id) {
-        this.formErrors.push("Id required")
+      if (!this.customer.name) {
+        this.formErrors.push("Name required")
       }
 
       e.preventDefault()
     },
     confirm() {
-      this.$api.post('web/customers', this.customer)
-          .then(response => this.$router.push({name: 'admin.customers'}))
+      this.$api.post('web/private/customers', this.customer)
+          .then(response => {
+            this.$emit("statusUpdate", "Customer connected")
+            this.$router.push({name: 'admin.customers'})
+          })
           .catch(response => this.apiError = response.statusText)
     }
   }

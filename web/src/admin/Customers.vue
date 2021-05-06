@@ -21,7 +21,8 @@
       <tr>
         <th class="thead">Customer ID</th>
         <th class="thead">Name</th>
-        <th class="thead">Active</th>
+        <th class="thead">Town</th>
+        <th class="thead">Published</th>
       </tr>
       </thead>
       <tbody class="tbody">
@@ -32,12 +33,13 @@
           {{ customer.id }}
         </td>
         <td class="tcell">{{ customer.name }}</td>
+        <td class="tcell">{{ customer.town }}</td>
         <td class="tcell">{{ customer.active }}</td>
       </tr>
       </tbody>
     </table>
   </div>
-  <router-view name="modal"></router-view>
+  <router-view name="modal" @statusUpdate="updateStatus"></router-view>
 </template>
 
 <script>
@@ -62,13 +64,17 @@ export default {
         {immediate: true}
     )
   },
+  emits: ["statusUpdate"],
   methods: {
+    updateStatus(event) {
+      this.$emit("statusUpdate", event)
+    },
     openCustomer(customer) {
       console.log("open customer", customer.name)
 
     },
     fetchData() {
-      this.$api.get('web/customers')
+      this.$api.get('web/private/customers')
           .then(data => this.customers = data)
           .catch(response => {
             console.error("failure", response)

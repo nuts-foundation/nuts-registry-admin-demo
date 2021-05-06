@@ -62,12 +62,13 @@ export default {
       }
     }
   },
+  emits: ["statusUpdate"],
   created() {
     this.fetchData()
   },
   methods: {
     updateServiceProvider() {
-      fetch("web/service-provider", {
+      fetch("web/private/service-provider", {
         method: "PUT",
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +85,7 @@ export default {
         return response.json()
       }).then(responseData => {
         this.responseState = 'success'
-        this.feedbackMsg = "Service Provider Updated"
+        this.$emit("statusUpdate", "Service Provider Saved")
         this.serviceProvider = responseData
       }).catch(reason => {
         console.error("failure", reason)
@@ -93,7 +94,7 @@ export default {
       })
     },
     createServiceProvider() {
-      fetch("web/service-provider", {
+      fetch("web/private/service-provider", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json',
@@ -110,7 +111,7 @@ export default {
         return response.json()
       }).then(responseData => {
         this.responseState = 'success'
-        this.feedbackMsg = "Service Provider Created"
+        this.$emit("statusUpdate", "Service Provider Saved")
         this.serviceProvider = responseData
       }).catch(reason => {
         console.error("failure", reason)
@@ -119,7 +120,7 @@ export default {
       })
     },
     fetchData() {
-      fetch("web/service-provider", {
+      fetch("web/private/service-provider", {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem("session")}`
         }

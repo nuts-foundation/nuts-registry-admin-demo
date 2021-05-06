@@ -1,9 +1,8 @@
-import {createApp, h} from 'vue'
+import {createApp} from 'vue'
 import {createRouter, createWebHashHistory} from 'vue-router'
 import './style.css'
 import App from './App.vue'
 import AdminApp from './admin/AdminApp.vue'
-import Landing from './Landing.vue'
 import Login from './Login.vue'
 import Logout from './Logout.vue'
 import NotFound from './NotFound.vue'
@@ -11,13 +10,20 @@ import Customers from './admin/Customers.vue'
 import ServiceProvider from './admin/ServiceProvider.vue'
 import NewCustomer from './admin/NewCustomer.vue'
 import EditCustomer from './admin/EditCustomer.vue'
-import Modal from './components/Modal.vue'
 import Api from './plugins/api'
 
 const routes = [
   {path: '/', component: Login},
-  {path: '/login', component: Login},
-  {path: '/logout', component: Logout},
+  {
+    name: 'login',
+    path: '/login',
+    component: Login
+  },
+  {
+    name: 'logout',
+    path: '/logout',
+    component: Logout
+  },
   {
     path: '/admin',
     components: {
@@ -79,6 +85,5 @@ router.beforeEach((to, from) => {
 const app = createApp(App)
 
 app.use(router)
-app.use(Api)
+app.use(Api, {forbiddenRoute: {name: 'logout'}})
 app.mount('#app')
-app.component('nrad-modal', Modal)
