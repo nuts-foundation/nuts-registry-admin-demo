@@ -1,6 +1,7 @@
 package customers
 
 import (
+	"net"
 	"time"
 
 	nutsApi "github.com/nuts-foundation/nuts-node/vdr/api/v1"
@@ -20,6 +21,9 @@ func (s Service) ConnectCustomer(id, name, town string) (*domain.Customer, error
 
 	didDoc, err := nodeClient.Create()
 	if err != nil {
+		if _, ok := err.(net.Error); ok {
+			return nil, domain.ErrNutsNodeUnreachable
+		}
 		return nil, err
 	}
 

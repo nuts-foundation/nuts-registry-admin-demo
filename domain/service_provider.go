@@ -2,6 +2,7 @@ package domain
 
 import (
 	"encoding/json"
+	"net"
 	"time"
 
 	nutsApi "github.com/nuts-foundation/nuts-node/vdr/api/v1"
@@ -43,6 +44,9 @@ func (repo ServiceProviderRepository) CreateOrUpdate(sp ServiceProvider) (*Servi
 
 		didDoc, err := nodeClient.Create()
 		if err != nil {
+			if _, ok := err.(net.Error); ok {
+				return nil, ErrNutsNodeUnreachable
+			}
 			return nil, err
 		}
 		sp.Id = didDoc.ID.String()

@@ -1,5 +1,9 @@
 package domain
 
+import "errors"
+
+var ErrNutsNodeUnreachable = errors.New("nuts node unreachable")
+
 type OrganizationCredential struct {
 	Id                string              `json:"id"`
 	CredentialSubject []CredentialSubject `json:"credentialSubject"`
