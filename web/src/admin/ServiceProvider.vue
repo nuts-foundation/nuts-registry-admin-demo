@@ -68,77 +68,42 @@ export default {
   },
   methods: {
     updateServiceProvider() {
-      fetch("web/private/service-provider", {
-        method: "PUT",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem("session")}`
-        },
-        body: JSON.stringify(this.serviceProvider)
-      }).then(response => {
-        if (!response.ok) {
-          if (response.status == 403) {
-            throw "Invalid credentials"
-          }
-          throw response.statusText
-        }
-        return response.json()
-      }).then(responseData => {
-        this.responseState = 'success'
-        this.$emit("statusUpdate", "Service Provider Saved")
-        this.serviceProvider = responseData
-      }).catch(reason => {
-        console.error("failure", reason)
-        this.responseState = 'error'
-        this.feedbackMsg = reason
-      })
+      this.$api.post("web/private/service-provider", this.serviceProvider)
+          .then(responseData => {
+            this.responseState = 'success'
+            this.$emit("statusUpdate", "Service Provider Saved")
+            this.serviceProvider = responseData
+          })
+          .catch(reason => {
+            console.error("failure", reason)
+            this.responseState = 'error'
+            this.feedbackMsg = reason
+          })
     },
     createServiceProvider() {
-      fetch("web/private/service-provider", {
-        method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem("session")}`
-        },
-        body: JSON.stringify(this.serviceProvider)
-      }).then(response => {
-        if (!response.ok) {
-          if (response.status == 403) {
-            throw "Invalid credentials"
-          }
-          throw response.statusText
-        }
-        return response.json()
-      }).then(responseData => {
-        this.responseState = 'success'
-        this.$emit("statusUpdate", "Service Provider Saved")
-        this.serviceProvider = responseData
-      }).catch(reason => {
-        console.error("failure", reason)
-        this.responseState = 'error'
-        this.feedbackMsg = reason
-      })
+      this.$api.put("web/private/service-provider", this.serviceProvider)
+          .then(responseData => {
+            this.responseState = 'success'
+            this.$emit("statusUpdate", "Service Provider Saved")
+            this.serviceProvider = responseData
+          })
+          .catch(reason => {
+            console.error("failure", reason)
+            this.responseState = 'error'
+            this.feedbackMsg = reason
+          })
     },
     fetchData() {
-      fetch("web/private/service-provider", {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem("session")}`
-        }
-      }).then(response => {
-        if (!response.ok) {
-          if (response.status == 403) {
-            throw "Invalid credentials"
-          }
-          throw response.statusText
-        }
-        return response.json()
-      }).then(responseData => {
-        this.serviceProvider = responseData
-      }).catch(reason => {
-        console.error("failure", reason)
-        this.feedbackMsg = reason
-        this.responseState = 'error'
-      })
+      this.$api.get("web/private/service-provider")
+          .then(responseData => {
+            this.responseState = 'success'
+            this.serviceProvider = responseData
+          })
+          .catch(reason => {
+            console.error("failure", reason)
+            this.responseState = 'error'
+            this.feedbackMsg = reason
+          })
     }
   }
 }
