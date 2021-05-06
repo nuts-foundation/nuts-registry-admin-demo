@@ -55,6 +55,7 @@ func main() {
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger())
+	//e.Debug = true
 	//e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		Skipper: func(c echo.Context) bool {
@@ -71,6 +72,7 @@ func main() {
 		SigningKey:    &config.sessionKey.PublicKey,
 		SigningMethod: jwa.ES256.String(),
 	}))
+	e.HTTPErrorHandler = httpErrorHandler
 
 	// Initialize Auth
 	var account api.UserAccount
@@ -114,4 +116,39 @@ func main() {
 func generateDefaultAccount(config Config) api.UserAccount {
 	pkHashBytes := sha1.Sum(elliptic.Marshal(config.sessionKey.Curve, config.sessionKey.X, config.sessionKey.Y))
 	return api.UserAccount{Username: "demo@nuts.nl", Password: hex.EncodeToString(pkHashBytes[:])}
+}
+
+// httpErrorHandler includes the err.Err() string in a { "error": "msg" } json hash
+func httpErrorHandler(err error, c echo.Context) {
+	var (
+		code = http.StatusInternalServerError
+		msg  interface{}
+	)
+	type Map map[string]interface{}
+
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+		msg = he.Message
+		if he.Internal != nil {
+			err = fmt.Errorf("%v, %v", err, he.Internal)
+		}
+	} else {
+		msg = err.Error()
+	}
+
+	if _, ok := msg.(string); ok {
+		msg = Map{"error": msg}
+	}
+
+	// Send response
+	if !c.Response().Committed {
+		if c.Request().Method == http.MethodHead {
+			err = c.NoContent(code)
+		} else {
+			err = c.JSON(code, msg)
+		}
+		if err != nil {
+			c.Logger().Error(err)
+		}
+	}
 }
