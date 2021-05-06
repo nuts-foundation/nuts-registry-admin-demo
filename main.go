@@ -62,11 +62,11 @@ func main() {
 				"/web/private",
 			}
 			for _, path := range protectedPaths {
-				if !strings.HasPrefix(c.Request().RequestURI, path) {
-					return true
+				if strings.HasPrefix(c.Request().RequestURI, path) {
+					return false
 				}
 			}
-			return false
+			return true
 		},
 		SigningKey:    &config.sessionKey.PublicKey,
 		SigningMethod: jwa.ES256.String(),
