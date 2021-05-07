@@ -44,11 +44,11 @@ export default {
               }).catch(reason => {
                 // Handle 404 since it does not have content and the response.json() will fail.
                 if (response.status === 404) {
-                  return Promise.reject("not found")
+                  return Promise.reject(response.statusText)
                 }
                 // Handle 204 since it does not have content and the response.json() will fail.
                 if (response.status === 204) {
-                  return Promise.resolve()
+                  return Promise.resolve(response)
                 }
                 return Promise.reject(reason)
               })

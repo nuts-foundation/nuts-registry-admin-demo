@@ -1,7 +1,6 @@
 package sp
 
 import (
-	"encoding/json"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 	"go.etcd.io/bbolt"
 )
@@ -31,14 +30,7 @@ func (b bboltRepository) Get() (string, error) {
 			return nil
 		}
 		spData := b.Get([]byte(defaultServiceProviderKey))
-		// Backwards compatibility for when we persisted the complete SP including contact information, rather than
-		// reading it from the DID document. Can be removed when everyone has updated viewed their SP once.
-		result := domain.ServiceProvider{}
-		err := json.Unmarshal(spData, &result)
-		if err == nil {
-			return err
-		}
-		spDID = result.Id
+		spDID = string(spData)
 		return nil
 	})
 	return spDID, err

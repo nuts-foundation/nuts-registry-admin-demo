@@ -37,11 +37,11 @@
       <div v-if="!!feedbackMsg"
            :class="{ 'bg-green-300': responseState === 'success', 'bg-red-300': responseState === 'error'}"
            class="py-2 px-4 border rounded-md text-white">
-        <svg v-if="responseState === 'success'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+        <svg v-if="responseState === 'success'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none"
              viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
         </svg>
-        <svg v-if="responseState === 'error'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+        <svg v-if="responseState === 'error'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none"
              viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
@@ -78,6 +78,7 @@ export default {
             this.responseState = 'success'
             this.$emit("statusUpdate", "Service Provider Saved")
             this.serviceProvider = responseData
+            this.feedbackMsg = ''
           })
           .catch(reason => {
             console.error("failure", reason)
@@ -89,6 +90,7 @@ export default {
       this.$api.put("web/private/service-provider", this.serviceProvider)
           .then(responseData => {
             this.responseState = 'success'
+            this.feedbackMsg = ''
             this.$emit("statusUpdate", "Service Provider Saved")
             this.serviceProvider = responseData
           })
@@ -102,6 +104,7 @@ export default {
       this.$api.get("web/private/service-provider")
           .then(responseData => {
             this.responseState = 'success'
+            this.feedbackMsg = ''
             this.serviceProvider = responseData
           })
           .catch(reason => {

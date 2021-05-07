@@ -2,10 +2,11 @@ package sp
 
 import (
 	"fmt"
+	"net"
+
 	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
 	vdrAPI "github.com/nuts-foundation/nuts-node/vdr/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
-	"net"
 )
 
 type Service struct {
@@ -17,7 +18,6 @@ type Service struct {
 // Get tries to find the default service provider from the database.
 // Returns nil when no default service provider was found
 func (svc Service) Get() (*domain.ServiceProvider, error) {
-	sp := &domain.ServiceProvider{}
 
 	spDID, err := svc.Repository.Get()
 	if err != nil {
@@ -26,6 +26,7 @@ func (svc Service) Get() (*domain.ServiceProvider, error) {
 	if spDID == "" {
 		return nil, nil
 	}
+	sp := &domain.ServiceProvider{Id: spDID}
 	contactInformation, err := svc.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
 		return nil, unwrapAPIError(err)
@@ -34,6 +35,7 @@ func (svc Service) Get() (*domain.ServiceProvider, error) {
 		sp.Email = contactInformation.Email
 		sp.Name = contactInformation.Name
 		sp.Phone = contactInformation.Phone
+		sp.Website = contactInformation.Website
 	}
 	return sp, nil
 }
