@@ -16,13 +16,18 @@
 
       <div>
         <label for="email-input">Support email address</label>
-        <input id="email-input" v-model="serviceProvider.email" type="email">
+        <input id="email-input" v-model="serviceProvider.email" type="email" required>
       </div>
 
 
       <div>
         <label for="phone-input">Emergency phone number</label>
         <input id="phone-input" v-model="serviceProvider.phone" type="text">
+      </div>
+
+      <div>
+        <label for="website-input">Service Provider website</label>
+        <input id="website-input" v-model="serviceProvider.website" type="text" required>
       </div>
 
       <button v-if="!serviceProvider.id" class="btn-submit" @click="createServiceProvider">Create Service Provider

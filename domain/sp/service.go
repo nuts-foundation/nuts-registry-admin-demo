@@ -51,9 +51,10 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 		}
 	}
 	err := svc.DIDManClient.UpdateContactInformation(sp.Id, didmanAPI.ContactInformation{
-		Email: sp.Email,
-		Name:  sp.Name,
-		Phone: sp.Phone,
+		Name:    sp.Name,
+		Email:   sp.Email,
+		Website: sp.Website,
+		Phone:   sp.Phone,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("unable to update DID contact info: %w", unwrapAPIError(err))
