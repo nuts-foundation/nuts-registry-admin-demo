@@ -6,6 +6,7 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
+	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
 	vdrAPI "github.com/nuts-foundation/nuts-node/vdr/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"io/fs"
@@ -29,7 +30,7 @@ const assetPath = "web/dist"
 //go:embed web/dist/*
 var embeddedFiles embed.FS
 
-const apiTimeout = 5 * time.Second
+const apiTimeout = 10 * time.Second
 
 func getFileSystem(useFS bool) http.FileSystem {
 	if useFS {
@@ -93,9 +94,14 @@ func main() {
 		ServerAddress: config.NutsNodeAddress,
 		Timeout:       apiTimeout,
 	}
+	didmanClient := didmanAPI.HTTPClient{
+		ServerAddress: config.NutsNodeAddress,
+		Timeout:       apiTimeout,
+	}
 	spService := sp.Service{
-		Repository: sp.NewBBoltRepository(db),
-		VDRClient:  vdrClient,
+		Repository:   sp.NewBBoltRepository(db),
+		VDRClient:    vdrClient,
+		DIDManClient: didmanClient,
 	}
 
 	// Initialize services
@@ -109,7 +115,7 @@ func main() {
 	}
 
 	// Initialize wrapper
-	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spService, CustomerService: customerService, CredentialService: credentialService}
+	apiWrapper := api.Wrapper{Auth: auth, SPService: spService, CustomerService: customerService, CredentialService: credentialService}
 
 	api.RegisterHandlers(e, apiWrapper)
 

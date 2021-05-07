@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -11,7 +12,7 @@ import (
 
 type Wrapper struct {
 	Auth              auth
-	SPRepo            domain.ServiceProviderRepository
+	SPService         sp.Service
 	CustomerService   customers.Service
 	CredentialService credentials.Service
 }
@@ -56,7 +57,7 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 }
 
 func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
-	sp, err := w.SPRepo.Get()
+	sp, err := w.SPService.Get()
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
@@ -71,7 +72,7 @@ func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
 	if err := ctx.Bind(&sp); err != nil {
 		return err
 	}
-	res, err := w.SPRepo.CreateOrUpdate(sp)
+	res, err := w.SPService.CreateOrUpdate(sp)
 	if err != nil {
 		return err
 	}
@@ -83,7 +84,7 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	if err := ctx.Bind(&sp); err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
-	res, err := w.SPRepo.CreateOrUpdate(sp)
+	res, err := w.SPService.CreateOrUpdate(sp)
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}

@@ -1,14 +1,17 @@
 package sp
 
 import (
+	"fmt"
+	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
 	vdrAPI "github.com/nuts-foundation/nuts-node/vdr/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 	"net"
 )
 
 type Service struct {
-	Repository Repository
-	VDRClient  vdrAPI.HTTPClient
+	Repository   Repository
+	VDRClient    vdrAPI.HTTPClient
+	DIDManClient didmanAPI.HTTPClient
 }
 
 // Get tries to find the default service provider from the database.
@@ -23,24 +26,15 @@ func (svc Service) Get() (*domain.ServiceProvider, error) {
 	if spDID == "" {
 		return nil, nil
 	}
-	// TODO: Use DIDMAN!
-	document, _, err := svc.VDRClient.Get(spDID)
+	contactInformation, err := svc.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
-		return nil, err
+		return nil, unwrapAPIError(err)
 	}
-	for _, service := range document.Service {
-		if service.Type == "node-contact-info" {
-			contactInfo := make(map[string]string, 0)
-			err := service.UnmarshalServiceEndpoint(&contactInfo)
-			if err == nil {
-				sp.Name = contactInfo["name"]
-				sp.Email = contactInfo["email"]
-				sp.Phone = contactInfo["tel"]
-				continue
-			}
-		}
+	if contactInformation != nil {
+		sp.Email = contactInformation.Email
+		sp.Name = contactInformation.Name
+		sp.Phone = contactInformation.Phone
 	}
-
 	return sp, nil
 }
 
@@ -56,9 +50,14 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 			return nil, err
 		}
 	}
-
-
-
+	err := svc.DIDManClient.UpdateContactInformation(sp.Id, didmanAPI.ContactInformation{
+		Email: sp.Email,
+		Name:  sp.Name,
+		Phone: sp.Phone,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("unable to update DID contact info: %w", unwrapAPIError(err))
+	}
 	return &sp, nil
 }
 

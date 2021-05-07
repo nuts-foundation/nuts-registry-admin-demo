@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"io"
 	"log"
 	"net/http"
@@ -18,7 +19,7 @@ import (
 
 type Service struct {
 	NutsNodeAddr string
-	SPService    domain.ServiceProviderRepository
+	SPService    sp.Service
 }
 
 func (s Service) client() vcrApi.ClientInterface {
