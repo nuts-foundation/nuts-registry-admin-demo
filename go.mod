@@ -11,7 +11,7 @@ require (
 	github.com/mitchellh/copystructure v1.1.2 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/nuts-foundation/go-did v0.0.0-20210406065435-ed072ef7b317
-	github.com/nuts-foundation/nuts-node v0.0.0-20210426061241-d21e294784c3
+	github.com/nuts-foundation/nuts-node v0.0.0-20210506130803-b9bf8e9fe513
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/bbolt v1.3.5
 	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad // indirect
