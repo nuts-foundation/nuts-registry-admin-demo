@@ -18,21 +18,21 @@ type Repository interface {
 	All() ([]domain.Customer, error)
 }
 
-type FlatFileDB struct {
+type flatFileRepo struct {
 	filepath string
 	mutex    sync.Mutex
 	// records is a cache
 	records map[string]domain.Customer
 }
 
-func NewDB(filepath string) *FlatFileDB {
+func NewFlatFileRepository(filepath string) *flatFileRepo {
 	f, err := os.OpenFile(filepath, os.O_CREATE, 0666)
 	defer f.Close()
 	if err != nil {
 		panic(err)
 	}
 
-	return &FlatFileDB{
+	return &flatFileRepo{
 		filepath: filepath,
 		mutex:    sync.Mutex{},
 		records:  make(map[string]domain.Customer, 0),
@@ -40,7 +40,7 @@ func NewDB(filepath string) *FlatFileDB {
 }
 
 // NewCustomer creates a new customer with a valid id
-func (db *FlatFileDB) NewCustomer(customer domain.Customer) (*domain.Customer, error) {
+func (db *flatFileRepo) NewCustomer(customer domain.Customer) (*domain.Customer, error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
@@ -56,7 +56,7 @@ func (db *FlatFileDB) NewCustomer(customer domain.Customer) (*domain.Customer, e
 	return &customer, db.WriteAll()
 }
 
-func (db *FlatFileDB) FindByID(id string) (*domain.Customer, error) {
+func (db *flatFileRepo) FindByID(id string) (*domain.Customer, error) {
 	if len(db.records) == 0 {
 		if err := db.ReadAll(); err != nil {
 			return nil, err
@@ -73,7 +73,7 @@ func (db *FlatFileDB) FindByID(id string) (*domain.Customer, error) {
 	return nil, errors.New("not found")
 }
 
-func (db *FlatFileDB) Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
+func (db *flatFileRepo) Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 
@@ -103,7 +103,7 @@ func (db *FlatFileDB) Update(id string, updateFn func(c domain.Customer) (*domai
 }
 
 // WriteAll writes all records to the file, truncating the file if it exists
-func (db *FlatFileDB) WriteAll() error {
+func (db *flatFileRepo) WriteAll() error {
 
 	bytes, err := json.Marshal(db.records)
 	if err != nil {
@@ -116,7 +116,7 @@ func (db *FlatFileDB) WriteAll() error {
 	return nil
 }
 
-func (db *FlatFileDB) ReadAll() error {
+func (db *flatFileRepo) ReadAll() error {
 	//log.Debug("Reading full customer list from file")
 	bytes, err := os.ReadFile(db.filepath)
 	if err != nil {
@@ -133,7 +133,7 @@ func (db *FlatFileDB) ReadAll() error {
 	return nil
 }
 
-func (db *FlatFileDB) All() ([]domain.Customer, error) {
+func (db *flatFileRepo) All() ([]domain.Customer, error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 

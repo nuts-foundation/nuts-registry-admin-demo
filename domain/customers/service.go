@@ -1,25 +1,22 @@
 package customers
 
 import (
-	"time"
-
 	nutsApi "github.com/nuts-foundation/nuts-node/vdr/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	"net"
 )
 
 type Service struct {
-	NutsNodeAddr string
+	VDRClient  nutsApi.HTTPClient
 	Repository Repository
 }
 
 func (s Service) ConnectCustomer(id, name, town string) (*domain.Customer, error) {
-	nodeClient := nutsApi.HTTPClient{
-		ServerAddress: s.NutsNodeAddr,
-		Timeout:       5*time.Second,
-	}
-
-	didDoc, err := nodeClient.Create()
+	didDoc, err := s.VDRClient.Create(nutsApi.DIDCreateRequest{})
 	if err != nil {
+		if _, ok := err.(net.Error); ok {
+			return nil, domain.ErrNutsNodeUnreachable
+		}
 		return nil, err
 	}
 
@@ -32,5 +29,3 @@ func (s Service) ConnectCustomer(id, name, town string) (*domain.Customer, error
 
 	return s.Repository.NewCustomer(customer)
 }
-
-

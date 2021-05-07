@@ -6,17 +6,20 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
+	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
+	vdrAPI "github.com/nuts-foundation/nuts-node/vdr/api/v1"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/api"
-	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/credentials"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
 	bolt "go.etcd.io/bbolt"
@@ -26,6 +29,8 @@ const assetPath = "web/dist"
 
 //go:embed web/dist/*
 var embeddedFiles embed.FS
+
+const apiTimeout = 10 * time.Second
 
 func getFileSystem(useFS bool) http.FileSystem {
 	if useFS {
@@ -55,6 +60,7 @@ func main() {
 	e := echo.New()
 	e.HideBanner = true
 	e.Use(middleware.Logger())
+	//e.Debug = true
 	//e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
 		Skipper: func(c echo.Context) bool {
@@ -71,6 +77,7 @@ func main() {
 		SigningKey:    &config.sessionKey.PublicKey,
 		SigningMethod: jwa.ES256.String(),
 	}))
+	e.HTTPErrorHandler = httpErrorHandler
 
 	// Initialize Auth
 	var account api.UserAccount
@@ -83,21 +90,32 @@ func main() {
 	auth := api.NewAuth(config.sessionKey, []api.UserAccount{account})
 
 	// Initialize repos
-	spRepo := domain.ServiceProviderRepository{NodeAddr: config.NutsNodeAddress, DB: db}
-	cRepo := customers.NewDB(config.CustomersFile)
+	vdrClient := vdrAPI.HTTPClient{
+		ServerAddress: config.NutsNodeAddress,
+		Timeout:       apiTimeout,
+	}
+	didmanClient := didmanAPI.HTTPClient{
+		ServerAddress: config.NutsNodeAddress,
+		Timeout:       apiTimeout,
+	}
+	spService := sp.Service{
+		Repository:   sp.NewBBoltRepository(db),
+		VDRClient:    vdrClient,
+		DIDManClient: didmanClient,
+	}
 
 	// Initialize services
 	customerService := customers.Service{
-		NutsNodeAddr: config.NutsNodeAddress,
-		Repository:   cRepo,
+		VDRClient:  vdrClient,
+		Repository: customers.NewFlatFileRepository(config.CustomersFile),
 	}
 	credentialService := credentials.Service{
 		NutsNodeAddr: config.NutsNodeAddress,
-		SPRepository: spRepo,
+		SPService:    spService,
 	}
 
 	// Initialize wrapper
-	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo, CustomerService: customerService, CredentialService: credentialService}
+	apiWrapper := api.Wrapper{Auth: auth, SPService: spService, CustomerService: customerService, CredentialService: credentialService}
 
 	api.RegisterHandlers(e, apiWrapper)
 
@@ -114,4 +132,39 @@ func main() {
 func generateDefaultAccount(config Config) api.UserAccount {
 	pkHashBytes := sha1.Sum(elliptic.Marshal(config.sessionKey.Curve, config.sessionKey.X, config.sessionKey.Y))
 	return api.UserAccount{Username: "demo@nuts.nl", Password: hex.EncodeToString(pkHashBytes[:])}
+}
+
+// httpErrorHandler includes the err.Err() string in a { "error": "msg" } json hash
+func httpErrorHandler(err error, c echo.Context) {
+	var (
+		code = http.StatusInternalServerError
+		msg  interface{}
+	)
+	type Map map[string]interface{}
+
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+		msg = he.Message
+		if he.Internal != nil {
+			err = fmt.Errorf("%v, %v", err, he.Internal)
+		}
+	} else {
+		msg = err.Error()
+	}
+
+	if _, ok := msg.(string); ok {
+		msg = Map{"error": msg}
+	}
+
+	// Send response
+	if !c.Response().Committed {
+		if c.Request().Method == http.MethodHead {
+			err = c.NoContent(code)
+		} else {
+			err = c.JSON(code, msg)
+		}
+		if err != nil {
+			c.Logger().Error(err)
+		}
+	}
 }

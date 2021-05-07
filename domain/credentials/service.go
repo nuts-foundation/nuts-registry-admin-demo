@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"io"
 	"log"
 	"net/http"
@@ -18,7 +19,7 @@ import (
 
 type Service struct {
 	NutsNodeAddr string
-	SPRepository domain.ServiceProviderRepository
+	SPService    sp.Service
 }
 
 func (s Service) client() vcrApi.ClientInterface {
@@ -96,7 +97,7 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 }
 
 func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
-	vendorDID, err := s.SPRepository.Get()
+	vendorDID, err := s.SPService.Get()
 	if err != nil {
 		return err
 	}
@@ -137,7 +138,7 @@ func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
 }
 
 func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) error {
-	vendorDID, err := s.SPRepository.Get()
+	vendorDID, err := s.SPService.Get()
 	if err != nil {
 		return err
 	}
