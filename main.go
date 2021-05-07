@@ -6,17 +6,19 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
+	vdrAPI "github.com/nuts-foundation/nuts-node/vdr/api/v1"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/api"
-	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/credentials"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
 	bolt "go.etcd.io/bbolt"
@@ -26,6 +28,8 @@ const assetPath = "web/dist"
 
 //go:embed web/dist/*
 var embeddedFiles embed.FS
+
+const apiTimeout = 5 * time.Second
 
 func getFileSystem(useFS bool) http.FileSystem {
 	if useFS {
@@ -85,21 +89,27 @@ func main() {
 	auth := api.NewAuth(config.sessionKey, []api.UserAccount{account})
 
 	// Initialize repos
-	spRepo := domain.ServiceProviderRepository{NodeAddr: config.NutsNodeAddress, DB: db}
-	cRepo := customers.NewDB(config.CustomersFile)
+	vdrClient := vdrAPI.HTTPClient{
+		ServerAddress: config.NutsNodeAddress,
+		Timeout:       apiTimeout,
+	}
+	spService := sp.Service{
+		Repository: sp.NewBBoltRepository(db),
+		VDRClient:  vdrClient,
+	}
 
 	// Initialize services
 	customerService := customers.Service{
-		NutsNodeAddr: config.NutsNodeAddress,
-		Repository:   cRepo,
+		VDRClient:  vdrClient,
+		Repository: customers.NewFlatFileRepository(config.CustomersFile),
 	}
 	credentialService := credentials.Service{
 		NutsNodeAddr: config.NutsNodeAddress,
-		SPRepository: spRepo,
+		SPService:    spService,
 	}
 
 	// Initialize wrapper
-	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spRepo, CustomerService: customerService, CredentialService: credentialService}
+	apiWrapper := api.Wrapper{Auth: auth, SPRepo: spService, CustomerService: customerService, CredentialService: credentialService}
 
 	api.RegisterHandlers(e, apiWrapper)
 

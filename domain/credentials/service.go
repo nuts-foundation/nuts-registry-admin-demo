@@ -18,7 +18,7 @@ import (
 
 type Service struct {
 	NutsNodeAddr string
-	SPRepository domain.ServiceProviderRepository
+	SPService    domain.ServiceProviderRepository
 }
 
 func (s Service) client() vcrApi.ClientInterface {
@@ -96,7 +96,7 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 }
 
 func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
-	vendorDID, err := s.SPRepository.Get()
+	vendorDID, err := s.SPService.Get()
 	if err != nil {
 		return err
 	}
@@ -137,7 +137,7 @@ func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
 }
 
 func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) error {
-	vendorDID, err := s.SPRepository.Get()
+	vendorDID, err := s.SPService.Get()
 	if err != nil {
 		return err
 	}
