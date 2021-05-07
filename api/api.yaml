@@ -216,6 +216,7 @@ components:
         - name
         - phone
         - email
+        - website
       properties:
         id:
           description: The DID of the service provider
@@ -228,5 +229,8 @@ components:
           description: Number available for other service providers in the network to call in case of emergency
           type: string
         email:
-          description: Email addres available for other service providers in the network for getting support
+          description: Email address available for other service providers in the network for getting support
+          type: string
+        website:
+          description: Publicly reachable website address of the service provider
           type: string
