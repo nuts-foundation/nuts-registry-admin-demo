@@ -1,8 +1,10 @@
 package api
 
 import (
-	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
+	"fmt"
 	"net/http"
+
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	"github.com/labstack/echo/v4"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
@@ -106,7 +108,12 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		town = *connectReq.Town
 	}
 
-	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town)
+	spID, err := w.SPService.Repository.Get()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("unable to fetch service provider ID: %w", err))
+	}
+
+	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town, spID)
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
