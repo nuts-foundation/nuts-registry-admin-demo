@@ -1,5 +1,9 @@
 <template>
   <form class="space-y-3">
+    <div v-if="mode === 'edit'">
+      <label for="customerDIDInput">Nuts Network DID:</label>
+      <input type="text" disabled v-model="value.did" id="customerDIDInput">
+    </div>
     <div>
       <label for="customerIDInput">Internal ID:</label>
       <input type="text" :disabled="mode==='edit'" v-model="value.id" id="customerIDInput">
