@@ -136,7 +136,7 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 		return &c, nil
 	})
 	if err != nil {
-		ctx.JSON(500, err.Error())
+		return echo.NewHTTPError(500, err.Error())
 	}
 	return ctx.JSON(200, customer)
 }
@@ -144,10 +144,10 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
 	customer, err := w.CustomerService.Repository.FindByID(id)
 	if err != nil {
-		ctx.JSON(500, err.Error())
+		return echo.NewHTTPError(500, err.Error())
 	}
 	if customer == nil {
-		ctx.NoContent(404)
+		return ctx.NoContent(404)
 	}
 
 	credentialsForCustomer, err := w.CredentialService.GetCredentials(*customer)
