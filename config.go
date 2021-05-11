@@ -87,14 +87,16 @@ func loadConfig() Config {
 
 	var k = koanf.New(".")
 
-	configFile := resolveConfigFile(flagset)
-	if _, err := os.Stat(configFile); err == nil {
-		log.Printf("Loading config from file: %s", configFile)
-		if err := k.Load(file.Provider(configFile), yaml.Parser()); err != nil {
+	// Prepare koanf for parsing the config file
+	configFilePath := resolveConfigFile(flagset)
+	// Check if the file exists
+	if _, err := os.Stat(configFilePath); err == nil {
+		log.Printf("Loading config from file: %s", configFilePath)
+		if err := k.Load(file.Provider(configFilePath), yaml.Parser()); err != nil {
 			log.Fatalf("error while loading config from file: %v", err)
 		}
 	} else {
-		log.Printf("Using default config because no file was found at: %s", configFile)
+		log.Printf("Using default config because no file was found at: %s", configFilePath)
 	}
 
 	config := defaultConfig()
@@ -105,6 +107,7 @@ func loadConfig() Config {
 	}
 	config.sessionKey = sessionKey
 
+	// Unmarshal values of the config file into the config struct, potentially replacing default values
 	if err := k.Unmarshal("", &config); err != nil {
 		log.Fatalf("error while unmarshalling config: %v", err)
 	}
