@@ -173,15 +173,9 @@ func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
 }
 
 func (w Wrapper) GetCredentialIssuers(ctx echo.Context) error {
-	issuersByType := domain.CredentialIssuers{}
-	issuersByType.Set("NutsOrganizationCredential", []domain.CredentialIssuer{
-		{Trusted: true, ServiceProvider: domain.ServiceProvider{Name: "GoodGuys Care", Id: "did:nuts:123"}},
-		{Trusted: false, ServiceProvider: domain.ServiceProvider{Name: "Matchbox Corp", Id: "did:nuts:1u5iFr"}},
-	})
-
-	issuersByType.Set("LRZAOrganizationCredential", []domain.CredentialIssuer {
-		{Trusted: true, ServiceProvider: domain.ServiceProvider{Name: "CIBG", Id: "did:web:cibg.nl"}},
-		{ Trusted: false, ServiceProvider: domain.ServiceProvider{Name: "ElviSoft", Id: "did:nuts:666"}},
-	})
-	return ctx.JSON(200, issuersByType)
+	res, err := w.CredentialService.GetCredentialIssuers([]string{"NutsOrganizationCredential"})
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	}
+	return ctx.JSON(200, res)
 }

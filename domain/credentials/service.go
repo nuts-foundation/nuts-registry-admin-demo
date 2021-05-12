@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/nuts-foundation/go-did/did"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	ssi "github.com/nuts-foundation/go-did"
@@ -98,6 +99,52 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 		return nil, err
 	}
 	return credentials, nil
+}
+
+func (s Service) GetCredentialIssuers(credentials []string) (domain.CredentialIssuers, error) {
+	result := domain.CredentialIssuers{}
+	for _, credential := range credentials {
+
+		trustedDIDs, err := s.fetchCredentialIssuers(credential, s.client().ListTrusted)
+		if err != nil {
+			return result, err
+		}
+		untrustedDIDs, err := s.fetchCredentialIssuers(credential, s.client().ListUntrusted)
+		if err != nil {
+			return result, err
+		}
+		issuers := make([]domain.CredentialIssuer, len(trustedDIDs) + len(untrustedDIDs))
+		for i, id := range trustedDIDs {
+			issuers[i] = domain.CredentialIssuer{Trusted: true, ServiceProvider: domain.ServiceProvider{Id: id.String()}}
+		}
+		for i, id := range untrustedDIDs {
+			issuers[len(trustedDIDs) + i] = domain.CredentialIssuer{Trusted: false, ServiceProvider: domain.ServiceProvider{Id: id.String()}}
+		}
+		result.Set(credential, issuers)
+	}
+	return result, nil
+}
+
+func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx context.Context, credentialType string) (*http.Response, error)) ([]did.DID, error) {
+	var issuerDIDs []did.DID
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	response, err := clientFn(ctx, credential)
+	defer cancel()
+	if err != nil {
+		if _, ok := err.(net.Error); ok {
+			return issuerDIDs, domain.ErrNutsNodeUnreachable
+		}
+		return issuerDIDs, err
+	}
+
+	body, _ := io.ReadAll(response.Body)
+	if response.StatusCode != http.StatusOK {
+		return issuerDIDs, err
+	}
+	err = json.Unmarshal(body, &issuerDIDs)
+	return issuerDIDs, err
+
 }
 
 func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
