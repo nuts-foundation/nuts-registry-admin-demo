@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	ssi "github.com/nuts-foundation/go-did"
 	vcrApi "github.com/nuts-foundation/nuts-node/vcr/api/v1"
@@ -79,8 +81,10 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 		"organization",
 		searchBody,
 	)
-
 	if err != nil {
+		if _, ok := err.(net.Error); ok {
+			return nil, domain.ErrNutsNodeUnreachable
+		}
 		return nil, err
 	}
 
