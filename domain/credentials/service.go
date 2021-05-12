@@ -91,7 +91,7 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 
 	body, _ := io.ReadAll(response.Body)
 	if response.StatusCode != http.StatusOK {
-		return nil, err
+		return nil, fmt.Errorf("expected status 200: %s", response.Status)
 	}
 
 	var credentials = make([]domain.OrganizationCredential, 0)
@@ -238,6 +238,47 @@ func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) 
 
 	return nil
 }
+
+func (s Service) ManageIssuerTrust(credentialType string, issuerID did.DID, trusted bool) (*domain.CredentialIssuer, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var (
+		response *http.Response
+		err      error
+	)
+
+	if trusted {
+		requestBody := vcrApi.TrustIssuerJSONRequestBody{
+			CredentialType: credentialType,
+			Issuer:         issuerID.ID,
+		}
+		response, err = s.client().TrustIssuer(ctx, requestBody)
+	} else {
+		requestBody := vcrApi.UntrustIssuerJSONRequestBody{
+			CredentialType: credentialType,
+			Issuer:         issuerID.ID,
+		}
+		response, err = s.client().UntrustIssuer(ctx, requestBody)
+	}
+	if response.StatusCode != http.StatusNoContent {
+		return nil, fmt.Errorf("expected status 204: %s", response.Status)
+	}
+
+	if err != nil {
+		return nil, unwrapAPIError(err)
+	}
+
+	sp, err := s.GetIssuer(issuerID)
+	if err != nil {
+		return nil, unwrapAPIError(err)
+	}
+	return &domain.CredentialIssuer{
+		ServiceProvider: *sp,
+		Trusted:         trusted,
+	}, nil
+}
+
 func unwrapAPIError(err error) error {
 	if _, ok := err.(net.Error); ok {
 		return domain.ErrNutsNodeUnreachable

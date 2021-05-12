@@ -149,6 +149,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CredentialIssuers"
+  /web/private/credential/{type}/issuer/{did}:
+    parameters:
+      - name: type
+        in: path
+        description: Credential type
+        required: true
+        example:
+          - "NutsOrganizationCredential"
+        schema:
+          type: string
+      - name: did
+        in: path
+        description: DID of the credential issuer
+        required: true
+        example:
+          - "did:nuts:123"
+        schema:
+          type: string
+    put:
+      operationId: updateCredentialIssuer
+      description: Update the trust status for a credential issuer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialIssuer"
+      responses:
+        200:
+          description: When the change is accepted
 
 components:
   schemas:

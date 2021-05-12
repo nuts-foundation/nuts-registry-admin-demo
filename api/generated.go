@@ -17,6 +17,9 @@ type ServerInterface interface {
 	// (POST /web/auth)
 	CreateSession(ctx echo.Context) error
 
+	// (PUT /web/private/credential/{type}/issuer/{did})
+	UpdateCredentialIssuer(ctx echo.Context, pType string, did string) error
+
 	// (GET /web/private/credentials/issuers)
 	GetCredentialIssuers(ctx echo.Context) error
 
@@ -53,6 +56,30 @@ func (w *ServerInterfaceWrapper) CreateSession(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.CreateSession(ctx)
+	return err
+}
+
+// UpdateCredentialIssuer converts echo context to params.
+func (w *ServerInterfaceWrapper) UpdateCredentialIssuer(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "type" -------------
+	var pType string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "type", runtime.ParamLocationPath, ctx.Param("type"), &pType)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter type: %s", err))
+	}
+
+	// ------------- Path parameter "did" -------------
+	var did string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "did", runtime.ParamLocationPath, ctx.Param("did"), &did)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter did: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.UpdateCredentialIssuer(ctx, pType, did)
 	return err
 }
 
@@ -171,6 +198,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
+	router.PUT(baseURL+"/web/private/credential/:type/issuer/:did", wrapper.UpdateCredentialIssuer)
 	router.GET(baseURL+"/web/private/credentials/issuers", wrapper.GetCredentialIssuers)
 	router.GET(baseURL+"/web/private/customers", wrapper.GetCustomers)
 	router.POST(baseURL+"/web/private/customers", wrapper.ConnectCustomer)

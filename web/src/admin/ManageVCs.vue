@@ -39,7 +39,10 @@ export default {
     },
     toggleTrust(type, issuer) {
       console.log("toggle", type, issuer)
-      this.fetchIssuers()
+      this.$api.put(`web/private/credential/${type}/issuer/${encodeURIComponent(issuer.serviceProvider.id)}`, {trusted: issuer.trusted})
+      .then((response)=> {
+      }).catch((reason => console.log("update status failed:", reason)))
+      .finally(this.fetchIssuers)
     },
   },
   mounted() {
