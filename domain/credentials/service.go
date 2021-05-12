@@ -113,16 +113,40 @@ func (s Service) GetCredentialIssuers(credentials []string) (domain.CredentialIs
 		if err != nil {
 			return result, err
 		}
-		issuers := make([]domain.CredentialIssuer, len(trustedDIDs) + len(untrustedDIDs))
+		issuers := make([]domain.CredentialIssuer, len(trustedDIDs)+len(untrustedDIDs))
 		for i, id := range trustedDIDs {
-			issuers[i] = domain.CredentialIssuer{Trusted: true, ServiceProvider: domain.ServiceProvider{Id: id.String()}}
+			s.SPService.Get()
+			issuer, err := s.GetIssuer(id)
+			if err != nil {
+				return result, nil
+			}
+			issuers[i] = domain.CredentialIssuer{Trusted: true, ServiceProvider: *issuer}
 		}
 		for i, id := range untrustedDIDs {
-			issuers[len(trustedDIDs) + i] = domain.CredentialIssuer{Trusted: false, ServiceProvider: domain.ServiceProvider{Id: id.String()}}
+			issuer, err := s.GetIssuer(id)
+			if err != nil {
+				return result, nil
+			}
+			issuers[len(trustedDIDs)+i] = domain.CredentialIssuer{Trusted: false, ServiceProvider: *issuer}
 		}
 		result.Set(credential, issuers)
 	}
 	return result, nil
+}
+
+func (s Service) GetIssuer(id did.DID) (*domain.ServiceProvider, error) {
+	sp := &domain.ServiceProvider{Id: id.String()}
+	contactInformation, err := s.SPService.DIDManClient.GetContactInformation(sp.Id)
+	if err != nil {
+		return nil, unwrapAPIError(err)
+	}
+	if contactInformation != nil {
+		sp.Email = contactInformation.Email
+		sp.Name = contactInformation.Name
+		sp.Phone = contactInformation.Phone
+		sp.Website = contactInformation.Website
+	}
+	return sp, nil
 }
 
 func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx context.Context, credentialType string) (*http.Response, error)) ([]did.DID, error) {
@@ -213,4 +237,10 @@ func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) 
 	}
 
 	return nil
+}
+func unwrapAPIError(err error) error {
+	if _, ok := err.(net.Error); ok {
+		return domain.ErrNutsNodeUnreachable
+	}
+	return err
 }
