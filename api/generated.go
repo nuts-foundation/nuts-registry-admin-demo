@@ -17,6 +17,9 @@ type ServerInterface interface {
 	// (POST /web/auth)
 	CreateSession(ctx echo.Context) error
 
+	// (GET /web/private/credentials/issuers)
+	GetCredentialIssuers(ctx echo.Context) error
+
 	// (GET /web/private/customers)
 	GetCustomers(ctx echo.Context) error
 
@@ -50,6 +53,15 @@ func (w *ServerInterfaceWrapper) CreateSession(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.CreateSession(ctx)
+	return err
+}
+
+// GetCredentialIssuers converts echo context to params.
+func (w *ServerInterfaceWrapper) GetCredentialIssuers(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetCredentialIssuers(ctx)
 	return err
 }
 
@@ -159,6 +171,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
+	router.GET(baseURL+"/web/private/credentials/issuers", wrapper.GetCredentialIssuers)
 	router.GET(baseURL+"/web/private/customers", wrapper.GetCustomers)
 	router.POST(baseURL+"/web/private/customers", wrapper.ConnectCustomer)
 	router.GET(baseURL+"/web/private/customers/:id", wrapper.GetCustomer)

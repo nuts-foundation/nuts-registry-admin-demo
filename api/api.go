@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/nuts-foundation/go-did/did"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	"github.com/labstack/echo/v4"
+	"github.com/nuts-foundation/go-did/did"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/credentials"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
@@ -170,4 +170,18 @@ func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
 	}
 	customer.Active = len(credentialsForCustomer) > 0
 	return ctx.JSON(200, customer)
+}
+
+func (w Wrapper) GetCredentialIssuers(ctx echo.Context) error {
+	issuersByType := domain.CredentialIssuers{}
+	issuersByType.Set("NutsOrganizationCredential", []domain.CredentialIssuer{
+		{Trusted: true, ServiceProvider: domain.ServiceProvider{Name: "GoodGuys Care", Id: "did:nuts:123"}},
+		{Trusted: false, ServiceProvider: domain.ServiceProvider{Name: "Matchbox Corp", Id: "did:nuts:1u5iFr"}},
+	})
+
+	issuersByType.Set("LRZAOrganizationCredential", []domain.CredentialIssuer {
+		{Trusted: true, ServiceProvider: domain.ServiceProvider{Name: "CIBG", Id: "did:web:cibg.nl"}},
+		{ Trusted: false, ServiceProvider: domain.ServiceProvider{Name: "ElviSoft", Id: "did:nuts:666"}},
+	})
+	return ctx.JSON(200, issuersByType)
 }
