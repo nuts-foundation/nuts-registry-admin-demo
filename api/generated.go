@@ -43,6 +43,9 @@ type ServerInterface interface {
 
 	// (PUT /web/private/service-provider)
 	UpdateServiceProvider(ctx echo.Context) error
+
+	// (POST /web/private/service-provider/endpoints)
+	RegisterEndpoint(ctx echo.Context) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -169,6 +172,15 @@ func (w *ServerInterfaceWrapper) UpdateServiceProvider(ctx echo.Context) error {
 	return err
 }
 
+// RegisterEndpoint converts echo context to params.
+func (w *ServerInterfaceWrapper) RegisterEndpoint(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.RegisterEndpoint(ctx)
+	return err
+}
+
 // This is a simple interface which specifies echo.Route addition functions which
 // are present on both echo.Echo and echo.Group, since we want to allow using
 // either of them for path registration
@@ -207,6 +219,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/web/private/service-provider", wrapper.GetServiceProvider)
 	router.POST(baseURL+"/web/private/service-provider", wrapper.CreateServiceProvider)
 	router.PUT(baseURL+"/web/private/service-provider", wrapper.UpdateServiceProvider)
+	router.POST(baseURL+"/web/private/service-provider/endpoints", wrapper.RegisterEndpoint)
 
 }
 

@@ -68,6 +68,19 @@ type Customer struct {
 // CustomersResponse defines model for CustomersResponse.
 type CustomersResponse []Customer
 
+// An endpoint registered on a DID Document.
+type Endpoint struct {
+
+	// ID of the endpoint which is calculated on creation.
+	Id *string `json:"id,omitempty"`
+
+	// Type of the endpoint.
+	Type string `json:"type"`
+
+	// URL of the endpoint.
+	Url string `json:"url"`
+}
+
 // A Service Provider is a controller of other DID documents
 type ServiceProvider struct {
 
@@ -90,6 +103,9 @@ type ServiceProvider struct {
 // CreateSessionJSONBody defines parameters for CreateSession.
 type CreateSessionJSONBody CreateSessionRequest
 
+// UpdateCredentialIssuerJSONBody defines parameters for UpdateCredentialIssuer.
+type UpdateCredentialIssuerJSONBody CredentialIssuer
+
 // ConnectCustomerJSONBody defines parameters for ConnectCustomer.
 type ConnectCustomerJSONBody ConnectCustomerRequest
 
@@ -106,8 +122,14 @@ type CreateServiceProviderJSONBody ServiceProvider
 // UpdateServiceProviderJSONBody defines parameters for UpdateServiceProvider.
 type UpdateServiceProviderJSONBody ServiceProvider
 
+// RegisterEndpointJSONBody defines parameters for RegisterEndpoint.
+type RegisterEndpointJSONBody Endpoint
+
 // CreateSessionJSONRequestBody defines body for CreateSession for application/json ContentType.
 type CreateSessionJSONRequestBody CreateSessionJSONBody
+
+// UpdateCredentialIssuerJSONRequestBody defines body for UpdateCredentialIssuer for application/json ContentType.
+type UpdateCredentialIssuerJSONRequestBody UpdateCredentialIssuerJSONBody
 
 // ConnectCustomerJSONRequestBody defines body for ConnectCustomer for application/json ContentType.
 type ConnectCustomerJSONRequestBody ConnectCustomerJSONBody
@@ -120,6 +142,9 @@ type CreateServiceProviderJSONRequestBody CreateServiceProviderJSONBody
 
 // UpdateServiceProviderJSONRequestBody defines body for UpdateServiceProvider for application/json ContentType.
 type UpdateServiceProviderJSONRequestBody UpdateServiceProviderJSONBody
+
+// RegisterEndpointJSONRequestBody defines body for RegisterEndpoint for application/json ContentType.
+type RegisterEndpointJSONRequestBody RegisterEndpointJSONBody
 
 // Getter for additional properties for CredentialIssuers. Returns the specified
 // element and whether it was found

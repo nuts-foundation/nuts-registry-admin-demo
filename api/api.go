@@ -95,6 +95,18 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	return ctx.JSON(200, res)
 }
 
+func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
+	ep := domain.Endpoint{}
+	if err := ctx.Bind(&ep); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	res, err := w.SPService.RegisterEndpoint(ep)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return ctx.JSON(http.StatusCreated, res)
+}
+
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 	connectReq := domain.ConnectCustomerRequest{}
 	if err := ctx.Bind(&connectReq); err != nil {

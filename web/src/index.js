@@ -8,6 +8,7 @@ import Logout from './Logout.vue'
 import NotFound from './NotFound.vue'
 import Customers from './admin/Customers.vue'
 import ServiceProvider from './admin/ServiceProvider.vue'
+import NewEndpoint from './admin/NewEndpoint.vue'
 import NewCustomer from './admin/NewCustomer.vue'
 import EditCustomer from './admin/EditCustomer.vue'
 import ManageVCs from './admin/ManageVCs.vue'
@@ -60,7 +61,16 @@ const routes = [
       {
         path: 'service-provider',
         name: 'admin.serviceProvider',
-        component: ServiceProvider
+        component: ServiceProvider,
+        children: [
+          {
+            path: 'endpoints/new',
+            name: 'admin.newEndpoint',
+            components: {
+              modal: NewEndpoint
+            }
+          },
+        ]
       },
       {
         path:'manage-vcs',

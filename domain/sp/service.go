@@ -63,6 +63,10 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 	return &sp, nil
 }
 
+func (svc Service) RegisterEndpoint(endpoint domain.Endpoint) (*domain.Endpoint, error) {
+	panic("not implemented")
+}
+
 func unwrapAPIError(err error) error {
 	if _, ok := err.(net.Error); ok {
 		return domain.ErrNutsNodeUnreachable
