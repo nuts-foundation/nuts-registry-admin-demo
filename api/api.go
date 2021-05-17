@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/nuts-foundation/go-did/did"
+	ssi "github.com/nuts-foundation/go-did"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	"github.com/labstack/echo/v4"
@@ -186,7 +186,7 @@ func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string,
 		Trusted bool
 	}{}
 	ctx.Bind(&request)
-	id, err := did.ParseDID(didStr)
+	id, err := ssi.ParseURI(didStr)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}

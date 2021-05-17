@@ -12,7 +12,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/nuts-foundation/go-did/did"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	ssi "github.com/nuts-foundation/go-did"
@@ -115,17 +114,16 @@ func (s Service) GetCredentialIssuers(credentials []string) (domain.CredentialIs
 		}
 		issuers := make([]domain.CredentialIssuer, len(trustedDIDs)+len(untrustedDIDs))
 		for i, id := range trustedDIDs {
-			s.SPService.Get()
 			issuer, err := s.GetIssuer(id)
 			if err != nil {
-				return result, nil
+				return result, err
 			}
 			issuers[i] = domain.CredentialIssuer{Trusted: true, ServiceProvider: *issuer}
 		}
 		for i, id := range untrustedDIDs {
 			issuer, err := s.GetIssuer(id)
 			if err != nil {
-				return result, nil
+				return result, err
 			}
 			issuers[len(trustedDIDs)+i] = domain.CredentialIssuer{Trusted: false, ServiceProvider: *issuer}
 		}
@@ -134,8 +132,11 @@ func (s Service) GetCredentialIssuers(credentials []string) (domain.CredentialIs
 	return result, nil
 }
 
-func (s Service) GetIssuer(id did.DID) (*domain.ServiceProvider, error) {
+func (s Service) GetIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
 	sp := &domain.ServiceProvider{Id: id.String()}
+	if id.Scheme != "did" {
+		return sp, nil
+	}
 	contactInformation, err := s.SPService.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
 		return nil, unwrapAPIError(err)
@@ -149,8 +150,8 @@ func (s Service) GetIssuer(id did.DID) (*domain.ServiceProvider, error) {
 	return sp, nil
 }
 
-func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx context.Context, credentialType string) (*http.Response, error)) ([]did.DID, error) {
-	var issuerDIDs []did.DID
+func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx context.Context, credentialType string) (*http.Response, error)) ([]ssi.URI, error) {
+	var issuerDIDs []ssi.URI
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	response, err := clientFn(ctx, credential)
@@ -239,7 +240,7 @@ func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) 
 	return nil
 }
 
-func (s Service) ManageIssuerTrust(credentialType string, issuerID did.DID, trusted bool) (*domain.CredentialIssuer, error) {
+func (s Service) ManageIssuerTrust(credentialType string, issuerID ssi.URI, trusted bool) (*domain.CredentialIssuer, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
@@ -251,13 +252,13 @@ func (s Service) ManageIssuerTrust(credentialType string, issuerID did.DID, trus
 	if trusted {
 		requestBody := vcrApi.TrustIssuerJSONRequestBody{
 			CredentialType: credentialType,
-			Issuer:         issuerID.ID,
+			Issuer:         issuerID.String(),
 		}
 		response, err = s.client().TrustIssuer(ctx, requestBody)
 	} else {
 		requestBody := vcrApi.UntrustIssuerJSONRequestBody{
 			CredentialType: credentialType,
-			Issuer:         issuerID.ID,
+			Issuer:         issuerID.String(),
 		}
 		response, err = s.client().UntrustIssuer(ctx, requestBody)
 	}
