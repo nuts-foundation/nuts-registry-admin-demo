@@ -27,7 +27,7 @@
 
       <div>
         <label for="website-input">Service Provider website</label>
-        <input id="website-input" v-model="serviceProvider.website" type="text" required>
+        <input id="website-input" v-model="serviceProvider.website" type="text">
       </div>
 
       <button v-if="!serviceProvider.id" class="btn-submit" @click="createServiceProvider">Create Service Provider
