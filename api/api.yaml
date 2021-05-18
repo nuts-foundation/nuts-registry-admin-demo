@@ -116,7 +116,7 @@ paths:
               $ref: "#/components/schemas/ServiceProvider"
       responses:
         201:
-          description: The resulting created Service Provider
+          description: The resulting created service provider
           content:
             application/json:
               schema:
@@ -132,7 +132,7 @@ paths:
               $ref: "#/components/schemas/ServiceProvider"
       responses:
         200:
-          description: The resulting created Service Provider
+          description: The resulting created service provider
           content:
             application/json:
               schema:
@@ -141,7 +141,7 @@ paths:
   /web/private/service-provider/endpoints:
     post:
       operationId: registerEndpoint
-      description: Register endpoint URL on Service Provider's DID.
+      description: Register endpoint URL on service provider's DID.
       requestBody:
         required: true
         content:
@@ -151,10 +151,6 @@ paths:
       responses:
         201:
           description: The resulting created endpoint.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Endpoint"
 
   /web/private/credentials/issuers:
     get:
@@ -269,13 +265,14 @@ components:
 
     ServiceProvider:
       type: object
-      description: A Service Provider is a controller of other DID documents
+      description: A service provider is a controller of other DID documents
       required:
         - id
         - name
         - phone
         - email
         - website
+        - endpoints
       properties:
         id:
           description: The DID of the service provider
@@ -293,6 +290,11 @@ components:
         website:
           description: Publicly reachable website address of the service provider
           type: string
+        endpoints:
+          description: Endpoints published by the service provider.
+          type: array
+          items:
+            $ref: "#/components/schemas/Endpoint"
     Endpoint:
       type: object
       description: An endpoint registered on a DID Document.

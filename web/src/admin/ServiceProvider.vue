@@ -72,9 +72,6 @@
     </thead>
     <tbody class="tbody">
     <tr class="hover:bg-gray-100" v-for="endpoint in serviceProvider.endpoints">
-      <td class="tcell">
-        {{ endpoint.id }}
-      </td>
       <td class="tcell">{{ endpoint.type }}</td>
       <td class="tcell">{{ endpoint.url }}</td>
     </tr>

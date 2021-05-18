@@ -33,7 +33,7 @@ type CreateSessionResponse struct {
 // CredentialIssuer defines model for CredentialIssuer.
 type CredentialIssuer struct {
 
-	// A Service Provider is a controller of other DID documents
+	// A service provider is a controller of other DID documents
 	ServiceProvider ServiceProvider `json:"serviceProvider"`
 	Trusted         bool            `json:"trusted"`
 }
@@ -81,11 +81,14 @@ type Endpoint struct {
 	Url string `json:"url"`
 }
 
-// A Service Provider is a controller of other DID documents
+// A service provider is a controller of other DID documents
 type ServiceProvider struct {
 
 	// Email address available for other service providers in the network for getting support
 	Email string `json:"email"`
+
+	// Endpoints published by the service provider.
+	Endpoints []Endpoint `json:"endpoints"`
 
 	// The DID of the service provider
 	Id string `json:"id"`

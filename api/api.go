@@ -100,11 +100,11 @@ func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
 	if err := ctx.Bind(&ep); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	res, err := w.SPService.RegisterEndpoint(ep)
+	err := w.SPService.RegisterEndpoint(ep)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(http.StatusCreated, res)
+	return ctx.NoContent(http.StatusCreated)
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
