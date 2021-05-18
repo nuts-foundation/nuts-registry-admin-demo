@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"time"
 
+	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	ssi "github.com/nuts-foundation/go-did"
@@ -22,6 +23,7 @@ import (
 type Service struct {
 	NutsNodeAddr string
 	SPService    sp.Service
+	DIDManClient didmanAPI.HTTPClient
 }
 
 func (s Service) client() vcrApi.ClientInterface {
@@ -137,7 +139,7 @@ func (s Service) GetIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
 	if id.Scheme != "did" {
 		return sp, nil
 	}
-	contactInformation, err := s.SPService.DIDManClient.GetContactInformation(sp.Id)
+	contactInformation, err := s.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
 		return nil, unwrapAPIError(err)
 	}
@@ -151,22 +153,21 @@ func (s Service) GetIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
 }
 
 func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx context.Context, credentialType string) (*http.Response, error)) ([]ssi.URI, error) {
-	var issuerDIDs []ssi.URI
-
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	response, err := clientFn(ctx, credential)
 	defer cancel()
 	if err != nil {
 		if _, ok := err.(net.Error); ok {
-			return issuerDIDs, domain.ErrNutsNodeUnreachable
+			return nil, domain.ErrNutsNodeUnreachable
 		}
-		return issuerDIDs, err
+		return nil, err
 	}
 
 	body, _ := io.ReadAll(response.Body)
 	if response.StatusCode != http.StatusOK {
-		return issuerDIDs, err
+		return nil, err
 	}
+	var issuerDIDs []ssi.URI
 	err = json.Unmarshal(body, &issuerDIDs)
 	return issuerDIDs, err
 

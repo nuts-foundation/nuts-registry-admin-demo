@@ -13,7 +13,7 @@
     </button>
   </div>
   <div class="customer-container">
-    <p v-if="!!fetchError" class="m-4">Could not fetch customers: {{ fetchError }}</p>
+    <p v-if="fetchError" class="m-4">Could not fetch customers: {{ fetchError }}</p>
     <div class="m-4" v-if="loading">Loading...</div>
     <div class="m-4" v-if="!loading && customers.length == 0 && !fetchError">No customers yet, add one!</div>
     <table v-if="customers.length > 0" class="min-w-full divide-y divide-gray-200">
