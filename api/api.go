@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/nuts-foundation/go-did/did"
+	ssi "github.com/nuts-foundation/go-did"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	"github.com/labstack/echo/v4"
+	"github.com/nuts-foundation/go-did/did"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/credentials"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/customers"
@@ -171,3 +172,28 @@ func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
 	customer.Active = len(credentialsForCustomer) > 0
 	return ctx.JSON(200, customer)
 }
+
+func (w Wrapper) GetCredentialIssuers(ctx echo.Context) error {
+	res, err := w.CredentialService.GetCredentialIssuers([]string{"NutsOrganizationCredential"})
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	}
+	return ctx.JSON(200, res)
+}
+
+func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string, didStr string) error {
+	var request = struct {
+		Trusted bool
+	}{}
+	ctx.Bind(&request)
+	id, err := ssi.ParseURI(didStr)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err)
+	}
+	issuerTrust, err := w.CredentialService.ManageIssuerTrust(CredentialType, *id, request.Trusted)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	return ctx.JSON(200, issuerTrust)
+}
+

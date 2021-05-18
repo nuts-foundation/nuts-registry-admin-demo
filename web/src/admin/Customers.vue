@@ -82,8 +82,7 @@ export default {
               this.fetchError = "Invalid credentials"
               return
             }
-            console.log(response)
-            this.fetchError = response.statusText
+            this.fetchError = response
           })
           .finally(() => this.loading = false)
     }

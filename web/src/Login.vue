@@ -63,7 +63,7 @@ export default {
           })
           .catch(response => {
             console.error("failure", response)
-            if (response.status === 403) {
+            if (response === "invalid credentials") {
               this.loginError = "Invalid credentials"
             } else {
               this.loginError = response.statusText

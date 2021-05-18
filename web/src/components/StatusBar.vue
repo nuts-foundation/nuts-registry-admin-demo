@@ -1,5 +1,5 @@
 <template>
-  <div class="absolute p-4 w-full bottom-0 left-0" v-if="show">
+  <div class="fixed p-4 bottom-0 flex" v-if="show">
     <div class="rounded-md bg-green-300 p-4 flex justify-between">
       {{ statusMessage }}
       <div class="cursor-pointer text-white">

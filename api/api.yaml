@@ -138,6 +138,47 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServiceProvider"
 
+  /web/private/credentials/issuers:
+    get:
+      operationId: getCredentialIssuers
+      description: Get a list of credentials and their issuers sorted by trusted and untrusted issuers.
+      responses:
+        200:
+          description: The result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CredentialIssuers"
+  /web/private/credential/{type}/issuer/{did}:
+    parameters:
+      - name: type
+        in: path
+        description: Credential type
+        required: true
+        example:
+          - "NutsOrganizationCredential"
+        schema:
+          type: string
+      - name: did
+        in: path
+        description: DID of the credential issuer
+        required: true
+        example:
+          - "did:nuts:123"
+        schema:
+          type: string
+    put:
+      operationId: updateCredentialIssuer
+      description: Update the trust status for a credential issuer.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CredentialIssuer"
+      responses:
+        200:
+          description: When the change is accepted
 
 components:
   schemas:
@@ -234,3 +275,19 @@ components:
         website:
           description: Publicly reachable website address of the service provider
           type: string
+    CredentialIssuers:
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: "#/components/schemas/CredentialIssuer"
+    CredentialIssuer:
+      type: object
+      required:
+        - trusted
+        - serviceProvider
+      properties:
+        trusted:
+          type: boolean
+        serviceProvider:
+          $ref: "#/components/schemas/ServiceProvider"

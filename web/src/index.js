@@ -10,6 +10,7 @@ import Customers from './admin/Customers.vue'
 import ServiceProvider from './admin/ServiceProvider.vue'
 import NewCustomer from './admin/NewCustomer.vue'
 import EditCustomer from './admin/EditCustomer.vue'
+import ManageVCs from './admin/ManageVCs.vue'
 import Api from './plugins/api'
 
 const routes = [
@@ -60,6 +61,11 @@ const routes = [
         path: 'service-provider',
         name: 'admin.serviceProvider',
         component: ServiceProvider
+      },
+      {
+        path:'manage-vcs',
+        name: 'admin.manageVCs',
+        component: ManageVCs
       }
     ],
     meta: {requiresAuth: true}

@@ -5,12 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"io"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"time"
+
+	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	ssi "github.com/nuts-foundation/go-did"
 	vcrApi "github.com/nuts-foundation/nuts-node/vcr/api/v1"
@@ -20,6 +23,7 @@ import (
 type Service struct {
 	NutsNodeAddr string
 	SPService    sp.Service
+	DIDManClient didmanAPI.HTTPClient
 }
 
 func (s Service) client() vcrApi.ClientInterface {
@@ -79,14 +83,16 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 		"organization",
 		searchBody,
 	)
-
 	if err != nil {
+		if _, ok := err.(net.Error); ok {
+			return nil, domain.ErrNutsNodeUnreachable
+		}
 		return nil, err
 	}
 
 	body, _ := io.ReadAll(response.Body)
 	if response.StatusCode != http.StatusOK {
-		return nil, err
+		return nil, fmt.Errorf("expected status 200: %s", response.Status)
 	}
 
 	var credentials = make([]domain.OrganizationCredential, 0)
@@ -94,6 +100,77 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 		return nil, err
 	}
 	return credentials, nil
+}
+
+func (s Service) GetCredentialIssuers(credentials []string) (domain.CredentialIssuers, error) {
+	result := domain.CredentialIssuers{}
+	for _, credential := range credentials {
+
+		trustedDIDs, err := s.fetchCredentialIssuers(credential, s.client().ListTrusted)
+		if err != nil {
+			return result, err
+		}
+		untrustedDIDs, err := s.fetchCredentialIssuers(credential, s.client().ListUntrusted)
+		if err != nil {
+			return result, err
+		}
+		issuers := make([]domain.CredentialIssuer, len(trustedDIDs)+len(untrustedDIDs))
+		for i, id := range trustedDIDs {
+			issuer, err := s.getIssuer(id)
+			if err != nil {
+				return result, err
+			}
+			issuers[i] = domain.CredentialIssuer{Trusted: true, ServiceProvider: *issuer}
+		}
+		for i, id := range untrustedDIDs {
+			issuer, err := s.getIssuer(id)
+			if err != nil {
+				return result, err
+			}
+			issuers[len(trustedDIDs)+i] = domain.CredentialIssuer{Trusted: false, ServiceProvider: *issuer}
+		}
+		result.Set(credential, issuers)
+	}
+	return result, nil
+}
+
+func (s Service) getIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
+	sp := &domain.ServiceProvider{Id: id.String()}
+	if id.Scheme != "did" {
+		return sp, nil
+	}
+	contactInformation, err := s.DIDManClient.GetContactInformation(sp.Id)
+	if err != nil {
+		return nil, unwrapAPIError(err)
+	}
+	if contactInformation != nil {
+		sp.Email = contactInformation.Email
+		sp.Name = contactInformation.Name
+		sp.Phone = contactInformation.Phone
+		sp.Website = contactInformation.Website
+	}
+	return sp, nil
+}
+
+func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx context.Context, credentialType string) (*http.Response, error)) ([]ssi.URI, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	response, err := clientFn(ctx, credential)
+	defer cancel()
+	if err != nil {
+		if _, ok := err.(net.Error); ok {
+			return nil, domain.ErrNutsNodeUnreachable
+		}
+		return nil, err
+	}
+
+	body, _ := io.ReadAll(response.Body)
+	if response.StatusCode != http.StatusOK {
+		return nil, err
+	}
+	var issuerDIDs []ssi.URI
+	err = json.Unmarshal(body, &issuerDIDs)
+	return issuerDIDs, err
+
 }
 
 func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
@@ -162,4 +239,51 @@ func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) 
 	}
 
 	return nil
+}
+
+func (s Service) ManageIssuerTrust(credentialType string, issuerID ssi.URI, trusted bool) (*domain.CredentialIssuer, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var (
+		response *http.Response
+		err      error
+	)
+
+	if trusted {
+		requestBody := vcrApi.TrustIssuerJSONRequestBody{
+			CredentialType: credentialType,
+			Issuer:         issuerID.String(),
+		}
+		response, err = s.client().TrustIssuer(ctx, requestBody)
+	} else {
+		requestBody := vcrApi.UntrustIssuerJSONRequestBody{
+			CredentialType: credentialType,
+			Issuer:         issuerID.String(),
+		}
+		response, err = s.client().UntrustIssuer(ctx, requestBody)
+	}
+	if response.StatusCode != http.StatusNoContent {
+		return nil, fmt.Errorf("expected status 204: %s", response.Status)
+	}
+
+	if err != nil {
+		return nil, unwrapAPIError(err)
+	}
+
+	sp, err := s.getIssuer(issuerID)
+	if err != nil {
+		return nil, unwrapAPIError(err)
+	}
+	return &domain.CredentialIssuer{
+		ServiceProvider: *sp,
+		Trusted:         trusted,
+	}, nil
+}
+
+func unwrapAPIError(err error) error {
+	if _, ok := err.(net.Error); ok {
+		return domain.ErrNutsNodeUnreachable
+	}
+	return err
 }

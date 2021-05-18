@@ -6,15 +6,16 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
-	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
-	vdrAPI "github.com/nuts-foundation/nuts-node/vdr/api/v1"
-	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 	"io/fs"
 	"log"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
+	vdrAPI "github.com/nuts-foundation/nuts-node/vdr/api/v1"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -112,6 +113,7 @@ func main() {
 	credentialService := credentials.Service{
 		NutsNodeAddr: config.NutsNodeAddress,
 		SPService:    spService,
+		DIDManClient: didmanClient,
 	}
 
 	// Initialize wrapper
