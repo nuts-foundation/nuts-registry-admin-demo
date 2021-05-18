@@ -1,8 +1,11 @@
 package api
 
 import (
-	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
+	"fmt"
 	"net/http"
+
+	"github.com/nuts-foundation/go-did/did"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	"github.com/labstack/echo/v4"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
@@ -18,16 +21,16 @@ type Wrapper struct {
 }
 
 func (w Wrapper) CreateSession(ctx echo.Context) error {
-	credentials := domain.CreateSessionRequest{}
-	if err := ctx.Bind(&credentials); err != nil {
+	sessionRequest := domain.CreateSessionRequest{}
+	if err := ctx.Bind(&sessionRequest); err != nil {
 		return err
 	}
 
-	if !w.Auth.CheckCredentials(credentials.Username, credentials.Password) {
-		return echo.NewHTTPError(http.StatusForbidden, "invalid credentials")
+	if !w.Auth.CheckCredentials(sessionRequest.Username, sessionRequest.Password) {
+		return echo.NewHTTPError(http.StatusForbidden, "invalid sessionRequest")
 	}
 
-	token, err := w.Auth.CreateJWT(credentials.Username)
+	token, err := w.Auth.CreateJWT(sessionRequest.Username)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
@@ -57,22 +60,22 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 }
 
 func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
-	sp, err := w.SPService.Get()
+	serviceProvider, err := w.SPService.Get()
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
-	if sp == nil {
+	if serviceProvider == nil {
 		return ctx.NoContent(404)
 	}
-	return ctx.JSON(200, sp)
+	return ctx.JSON(200, serviceProvider)
 }
 
 func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
-	sp := domain.ServiceProvider{}
-	if err := ctx.Bind(&sp); err != nil {
+	serviceProvider := domain.ServiceProvider{}
+	if err := ctx.Bind(&serviceProvider); err != nil {
 		return err
 	}
-	res, err := w.SPService.CreateOrUpdate(sp)
+	res, err := w.SPService.CreateOrUpdate(serviceProvider)
 	if err != nil {
 		return err
 	}
@@ -80,11 +83,11 @@ func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
 }
 
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
-	sp := domain.ServiceProvider{}
-	if err := ctx.Bind(&sp); err != nil {
+	serviceProvider := domain.ServiceProvider{}
+	if err := ctx.Bind(&serviceProvider); err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
-	res, err := w.SPService.CreateOrUpdate(sp)
+	res, err := w.SPService.CreateOrUpdate(serviceProvider)
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
@@ -106,7 +109,16 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		town = *connectReq.Town
 	}
 
-	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town)
+	serviceProvider, err := w.SPService.Get()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("unable to fetch service provider ID: %w", err))
+	}
+	spID, err := did.ParseDID(serviceProvider.Id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("service provider not correctly configured: DID is invalid: %w", err))
+	}
+
+	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town, *spID)
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
@@ -119,7 +131,9 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 		Active bool
 		Town   string
 	}{}
-	ctx.Bind(&req)
+	if err := ctx.Bind(&req); err != nil {
+		return err
+	}
 
 	if len(req.Name) == 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, "name")

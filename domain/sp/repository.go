@@ -1,6 +1,7 @@
 package sp
 
 import (
+	"github.com/nuts-foundation/go-did/did"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 	"go.etcd.io/bbolt"
 )
@@ -10,7 +11,7 @@ const defaultServiceProviderKey = "default"
 
 type Repository interface {
 	// Get returns the DID of the Service Provider.
-	Get() (string, error)
+	Get() (*did.DID, error)
 	Set(did string) error
 }
 
@@ -22,16 +23,17 @@ func NewBBoltRepository(db *bbolt.DB) Repository {
 	return &bboltRepository{DB: db}
 }
 
-func (b bboltRepository) Get() (string, error) {
-	spDID := ""
+func (b bboltRepository) Get() (*did.DID, error) {
+	var spDID *did.DID
 	err := b.DB.View(func(tx *bbolt.Tx) error {
 		b := tx.Bucket([]byte(serviceProviderBucketName))
 		if b == nil {
 			return nil
 		}
 		spData := b.Get([]byte(defaultServiceProviderKey))
-		spDID = string(spData)
-		return nil
+		var err error
+		spDID, err = did.ParseDID(string(spData))
+		return err
 	})
 	return spDID, err
 }

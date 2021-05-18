@@ -18,15 +18,14 @@ type Service struct {
 // Get tries to find the default service provider from the database.
 // Returns nil when no default service provider was found
 func (svc Service) Get() (*domain.ServiceProvider, error) {
-
 	spDID, err := svc.Repository.Get()
 	if err != nil {
-		return nil, unwrapAPIError(err)
+		return nil, err
 	}
-	if spDID == "" {
+	if spDID == nil{
 		return nil, nil
 	}
-	sp := &domain.ServiceProvider{Id: spDID}
+	sp := &domain.ServiceProvider{Id: spDID.String()}
 	contactInformation, err := svc.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
 		return nil, unwrapAPIError(err)

@@ -1,9 +1,11 @@
 package customers
 
 import (
+	"net"
+
+	"github.com/nuts-foundation/go-did/did"
 	nutsApi "github.com/nuts-foundation/nuts-node/vdr/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
-	"net"
 )
 
 type Service struct {
@@ -11,8 +13,16 @@ type Service struct {
 	Repository Repository
 }
 
-func (s Service) ConnectCustomer(id, name, town string) (*domain.Customer, error) {
-	didDoc, err := s.VDRClient.Create(nutsApi.DIDCreateRequest{})
+func (s Service) ConnectCustomer(id, name, town string, serviceProviderID did.DID) (*domain.Customer, error) {
+	selfControl := false
+	capabilityInvocation := false
+	controllers := []string{serviceProviderID.String()}
+
+	didDoc, err := s.VDRClient.Create(nutsApi.DIDCreateRequest{
+		SelfControl:          &selfControl,
+		Controllers:          &controllers,
+		CapabilityInvocation: &capabilityInvocation,
+	})
 	if err != nil {
 		if _, ok := err.(net.Error); ok {
 			return nil, domain.ErrNutsNodeUnreachable
