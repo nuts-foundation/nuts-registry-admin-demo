@@ -108,12 +108,16 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		town = *connectReq.Town
 	}
 
-	spID, err := w.SPService.Repository.Get()
+	serviceProvider, err := w.SPService.Get()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("unable to fetch service provider ID: %w", err))
 	}
+	spID, err := did.ParseDID(serviceProvider.Id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("service provider not correctly configured: DID is invalid: %w", err))
+	}
 
-	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town, spID)
+	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town, *spID)
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}

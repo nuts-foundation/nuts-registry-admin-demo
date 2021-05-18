@@ -13,17 +13,15 @@ type Service struct {
 	Repository Repository
 }
 
-func (s Service) ConnectCustomer(id, name, town string, serviceProviderID *did.DID) (*domain.Customer, error) {
-	selfControl := true
-	var controllers []string
-	if serviceProviderID != nil {
-		controllers = append(controllers, serviceProviderID.String())
-	}
-
+func (s Service) ConnectCustomer(id, name, town string, serviceProviderID did.DID) (*domain.Customer, error) {
+	selfControl := false
+	capabilityInvocation := false
+	controllers := []string{serviceProviderID.String()}
 
 	didDoc, err := s.VDRClient.Create(nutsApi.DIDCreateRequest{
-		SelfControl: &selfControl,
-		Controllers: &controllers,
+		SelfControl:          &selfControl,
+		Controllers:          &controllers,
+		CapabilityInvocation: &capabilityInvocation,
 	})
 	if err != nil {
 		if _, ok := err.(net.Error); ok {
