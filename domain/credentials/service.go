@@ -116,14 +116,14 @@ func (s Service) GetCredentialIssuers(credentials []string) (domain.CredentialIs
 		}
 		issuers := make([]domain.CredentialIssuer, len(trustedDIDs)+len(untrustedDIDs))
 		for i, id := range trustedDIDs {
-			issuer, err := s.GetIssuer(id)
+			issuer, err := s.getIssuer(id)
 			if err != nil {
 				return result, err
 			}
 			issuers[i] = domain.CredentialIssuer{Trusted: true, ServiceProvider: *issuer}
 		}
 		for i, id := range untrustedDIDs {
-			issuer, err := s.GetIssuer(id)
+			issuer, err := s.getIssuer(id)
 			if err != nil {
 				return result, err
 			}
@@ -134,7 +134,7 @@ func (s Service) GetCredentialIssuers(credentials []string) (domain.CredentialIs
 	return result, nil
 }
 
-func (s Service) GetIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
+func (s Service) getIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
 	sp := &domain.ServiceProvider{Id: id.String()}
 	if id.Scheme != "did" {
 		return sp, nil
@@ -271,7 +271,7 @@ func (s Service) ManageIssuerTrust(credentialType string, issuerID ssi.URI, trus
 		return nil, unwrapAPIError(err)
 	}
 
-	sp, err := s.GetIssuer(issuerID)
+	sp, err := s.getIssuer(issuerID)
 	if err != nil {
 		return nil, unwrapAPIError(err)
 	}
