@@ -12,11 +12,11 @@ import (
 
 // ConnectCustomerRequest defines model for ConnectCustomerRequest.
 type ConnectCustomerRequest struct {
-	Id   string `json:"id"`
-	Name string `json:"name"`
 
 	// Used for issueing the NutsOrgCredential
-	Town *string `json:"town,omitempty"`
+	City *string `json:"city,omitempty"`
+	Id   string  `json:"id"`
+	Name string  `json:"name"`
 }
 
 // CreateSessionRequest defines model for CreateSessionRequest.
@@ -49,6 +49,9 @@ type Customer struct {
 	// If a VC has been issued for this customer.
 	Active bool `json:"active"`
 
+	// Locality for this customer.
+	City *string `json:"city,omitempty"`
+
 	// The customer DID.
 	Did string `json:"did"`
 
@@ -60,9 +63,6 @@ type Customer struct {
 
 	// Internal name for this customer.
 	Name string `json:"name"`
-
-	// Locality for this customer.
-	Town *string `json:"town,omitempty"`
 }
 
 // CustomersResponse defines model for CustomersResponse.
@@ -109,14 +109,20 @@ type CreateSessionJSONBody CreateSessionRequest
 // UpdateCredentialIssuerJSONBody defines parameters for UpdateCredentialIssuer.
 type UpdateCredentialIssuerJSONBody CredentialIssuer
 
+// SearchOrganizationsJSONBody defines parameters for SearchOrganizations.
+type SearchOrganizationsJSONBody struct {
+	City string `json:"city"`
+	Name string `json:"name"`
+}
+
 // ConnectCustomerJSONBody defines parameters for ConnectCustomer.
 type ConnectCustomerJSONBody ConnectCustomerRequest
 
 // UpdateCustomerJSONBody defines parameters for UpdateCustomer.
 type UpdateCustomerJSONBody struct {
 	Active bool    `json:"active"`
+	City   *string `json:"city,omitempty"`
 	Name   string  `json:"name"`
-	Town   *string `json:"town,omitempty"`
 }
 
 // CreateServiceProviderJSONBody defines parameters for CreateServiceProvider.
@@ -133,6 +139,9 @@ type CreateSessionJSONRequestBody CreateSessionJSONBody
 
 // UpdateCredentialIssuerJSONRequestBody defines body for UpdateCredentialIssuer for application/json ContentType.
 type UpdateCredentialIssuerJSONRequestBody UpdateCredentialIssuerJSONBody
+
+// SearchOrganizationsJSONRequestBody defines body for SearchOrganizations for application/json ContentType.
+type SearchOrganizationsJSONRequestBody SearchOrganizationsJSONBody
 
 // ConnectCustomerJSONRequestBody defines body for ConnectCustomer for application/json ContentType.
 type ConnectCustomerJSONRequestBody ConnectCustomerJSONBody

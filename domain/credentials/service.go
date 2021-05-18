@@ -63,16 +63,19 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 	return nil
 }
 
-func (s Service) GetCredentials(customer domain.Customer) ([]domain.OrganizationCredential, error) {
+func (s Service) GetCredentials(customer domain.Customer) ([]domain.OrganizationConceptCredential, error) {
 	// not enough info, return
-	if customer.Town == nil {
-		return []domain.OrganizationCredential{}, nil
+	if customer.City == nil {
+		return []domain.OrganizationConceptCredential{}, nil
 	}
+	return s.SearchOrganizations(customer.Name, *customer.City)
+}
 
+func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationConceptCredential, error) {
 	searchBody := vcrApi.SearchJSONRequestBody{
 		Params: []vcrApi.KeyValuePair{
-			{Key: "organization.name", Value: customer.Name},
-			{Key: "organization.city", Value: *customer.Town},
+			{Key: "organization.name", Value: name},
+			{Key: "organization.city", Value: city},
 		},
 	}
 
@@ -84,18 +87,14 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 		searchBody,
 	)
 	if err != nil {
-		if _, ok := err.(net.Error); ok {
-			return nil, domain.ErrNutsNodeUnreachable
-		}
-		return nil, err
+		return nil, unwrapAPIError(err)
 	}
 
 	body, _ := io.ReadAll(response.Body)
 	if response.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("expected status 200: %s", response.Status)
 	}
-
-	var credentials = make([]domain.OrganizationCredential, 0)
+	var credentials = make([]domain.OrganizationConceptCredential, 0)
 	if err = json.Unmarshal(body, &credentials); err != nil {
 		return nil, err
 	}
@@ -182,16 +181,16 @@ func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
 		return err
 	}
 
-	if customer.Town == nil {
-		return fmt.Errorf("customer.Town must be set for issuing a credential")
+	if customer.City == nil {
+		return fmt.Errorf("customer.City must be set for issuing a credential")
 	}
 
 	issuerURI, _ := ssi.ParseURI(vendorDID.Id)
 	typeURI, _ := ssi.ParseURI("NutsOrganizationCredential")
 	var credentialSubject = make([]interface{}, 0)
-	credentialSubject = append(credentialSubject, domain.CredentialSubject{ID: customer.Did, Organization: domain.Organization{
+	credentialSubject = append(credentialSubject, domain.NutsOrganizationCredentialSubject{ID: customer.Did, Organization: domain.Organization{
 		Name: customer.Name,
-		City: *customer.Town,
+		City: *customer.City,
 	}})
 	requestBody := vcrApi.CreateJSONRequestBody{
 		Type:              []ssi.URI{*typeURI},
@@ -214,7 +213,7 @@ func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
 	return nil
 }
 
-func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) error {
+func (s Service) RevokeCredentials(credentials []domain.OrganizationConceptCredential) error {
 	vendorDID, err := s.SPService.Get()
 	if err != nil {
 		return err
@@ -227,7 +226,7 @@ func (s Service) RevokeCredentials(credentials []domain.OrganizationCredential) 
 	defer cancel()
 
 	for _, credential := range credentials {
-		response, err := s.client().Revoke(ctx, url.PathEscape(credential.Id))
+		response, err := s.client().Revoke(ctx, url.PathEscape(credential.ID))
 		if err != nil {
 			return err
 		}

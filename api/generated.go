@@ -23,6 +23,9 @@ type ServerInterface interface {
 	// (GET /web/private/credentials/issuers)
 	GetCredentialIssuers(ctx echo.Context) error
 
+	// (POST /web/private/credentials/organizations)
+	SearchOrganizations(ctx echo.Context) error
+
 	// (GET /web/private/customers)
 	GetCustomers(ctx echo.Context) error
 
@@ -92,6 +95,15 @@ func (w *ServerInterfaceWrapper) GetCredentialIssuers(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.GetCredentialIssuers(ctx)
+	return err
+}
+
+// SearchOrganizations converts echo context to params.
+func (w *ServerInterfaceWrapper) SearchOrganizations(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.SearchOrganizations(ctx)
 	return err
 }
 
@@ -212,6 +224,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
 	router.PUT(baseURL+"/web/private/credential/:type/issuer/:did", wrapper.UpdateCredentialIssuer)
 	router.GET(baseURL+"/web/private/credentials/issuers", wrapper.GetCredentialIssuers)
+	router.POST(baseURL+"/web/private/credentials/organizations", wrapper.SearchOrganizations)
 	router.GET(baseURL+"/web/private/customers", wrapper.GetCustomers)
 	router.POST(baseURL+"/web/private/customers", wrapper.ConnectCustomer)
 	router.GET(baseURL+"/web/private/customers/:id", wrapper.GetCustomer)

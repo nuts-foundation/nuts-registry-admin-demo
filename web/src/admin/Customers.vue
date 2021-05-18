@@ -21,7 +21,7 @@
       <tr>
         <th class="thead">Customer ID</th>
         <th class="thead">Name</th>
-        <th class="thead">Town</th>
+        <th class="thead">City</th>
         <th class="thead">Published</th>
       </tr>
       </thead>
@@ -33,7 +33,7 @@
           {{ customer.id }}
         </td>
         <td class="tcell">{{ customer.name }}</td>
-        <td class="tcell">{{ customer.town }}</td>
+        <td class="tcell">{{ customer.city }}</td>
         <td class="tcell">{{ customer.active }}</td>
       </tr>
       </tbody>

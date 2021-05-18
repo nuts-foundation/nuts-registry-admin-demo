@@ -85,7 +85,7 @@ paths:
                   type: boolean
                 name:
                   type: string
-                town:
+                city:
                   type: string
       responses:
         200:
@@ -94,6 +94,33 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Customer"
+
+  /web/private/credentials/organizations:
+    post:
+      operationId: searchOrganizations
+      description: Searches for organizations
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - city
+              properties:
+                name:
+                  type: string
+                city:
+                  type: string
+      responses:
+        200:
+          description: List containing credentials that match the query.
+          content:
+            application/json:
+              schema:
+                type: object
+
   /web/private/service-provider:
     get:
       operationId: getServiceProvider
@@ -224,7 +251,7 @@ components:
         name:
           type: string
           example: "Good Care Org - Driebergen"
-        town:
+        city:
           type: string
           description: Used for issueing the NutsOrgCredential
           example: "Hengelo"
@@ -253,7 +280,7 @@ components:
         name:
           type: string
           description: Internal name for this customer.
-        town:
+        city:
           type: string
           description: Locality for this customer.
         domain:

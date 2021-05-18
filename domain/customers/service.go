@@ -13,7 +13,7 @@ type Service struct {
 	Repository Repository
 }
 
-func (s Service) ConnectCustomer(id, name, town string, serviceProviderID did.DID) (*domain.Customer, error) {
+func (s Service) ConnectCustomer(id, name, city string, serviceProviderID did.DID) (*domain.Customer, error) {
 	selfControl := false
 	capabilityInvocation := false
 	controllers := []string{serviceProviderID.String()}
@@ -34,7 +34,7 @@ func (s Service) ConnectCustomer(id, name, town string, serviceProviderID did.DI
 		Did:  didDoc.ID.String(),
 		Id:   id,
 		Name: name,
-		Town: &town,
+		City: &city,
 	}
 
 	return s.Repository.NewCustomer(customer)

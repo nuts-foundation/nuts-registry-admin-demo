@@ -28,7 +28,7 @@ export default {
     return {
       customer: {
         name: '',
-        town: ''
+        city: ''
       },
       formErrors: [],
       apiError: '',
@@ -57,8 +57,8 @@ export default {
         return this.saveCustomer()
       }
 
-      if (this.active && !this.customer.town) {
-        this.formErrors.push("To be active a town is required")
+      if (this.active && !this.customer.city) {
+        this.formErrors.push("To be active a city is required")
       }
 
       if (!this.customer.name) {
