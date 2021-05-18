@@ -152,7 +152,7 @@ func (s Service) getIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
 	return sp, nil
 }
 
-func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx context.Context, credentialType string) (*http.Response, error)) ([]ssi.URI, error) {
+func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx context.Context, credentialType string, reqEditors ...vcrApi.RequestEditorFn) (*http.Response, error)) ([]ssi.URI, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	response, err := clientFn(ctx, credential)
 	defer cancel()

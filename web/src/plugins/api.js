@@ -50,6 +50,10 @@ export default {
                 if (response.status === 204) {
                   return Promise.resolve(response)
                 }
+                  // Handle 201 since it might not have content and the response.json() will fail.
+                  if (response.status === 201) {
+                    return Promise.resolve(response)
+                  }
                 return Promise.reject(reason)
               })
           })

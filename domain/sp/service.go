@@ -26,15 +26,11 @@ func (svc Service) Get() (*domain.ServiceProvider, error) {
 		return nil, nil
 	}
 	sp := &domain.ServiceProvider{Id: spDID.String()}
-	contactInformation, err := svc.DIDManClient.GetContactInformation(sp.Id)
-	if err != nil {
-		return nil, unwrapAPIError(err)
+	if err = svc.enrichWithContactInfo(sp); err != nil {
+		return nil, err
 	}
-	if contactInformation != nil {
-		sp.Email = contactInformation.Email
-		sp.Name = contactInformation.Name
-		sp.Phone = contactInformation.Phone
-		sp.Website = contactInformation.Website
+	if err = svc.enrichWithEndpoints(sp); err != nil {
+		return nil, err
 	}
 	return sp, nil
 }
@@ -61,6 +57,48 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 		return nil, fmt.Errorf("unable to update DID contact info: %w", unwrapAPIError(err))
 	}
 	return &sp, nil
+}
+
+func (svc Service) RegisterEndpoint(endpoint domain.Endpoint) error {
+	spDID, err := svc.Repository.Get()
+	if err != nil {
+		return err
+	}
+	return svc.DIDManClient.AddEndpoint(spDID.String(), endpoint.Type, endpoint.Url)
+}
+
+func (svc Service) enrichWithContactInfo(sp *domain.ServiceProvider) error {
+	contactInformation, err := svc.DIDManClient.GetContactInformation(sp.Id)
+	if err != nil {
+		return unwrapAPIError(err)
+	}
+	if contactInformation != nil {
+		sp.Email = contactInformation.Email
+		sp.Name = contactInformation.Name
+		sp.Phone = contactInformation.Phone
+		sp.Website = contactInformation.Website
+	}
+	return nil
+}
+
+func (svc Service) enrichWithEndpoints(sp *domain.ServiceProvider) error {
+	document, _, err := svc.VDRClient.Get(sp.Id)
+	if err != nil {
+		return unwrapAPIError(err)
+	}
+	for _, svc := range document.Service {
+		var endpoint string
+		_ = svc.UnmarshalServiceEndpoint(&endpoint)
+		if endpoint != "" {
+			id := svc.ID.String()
+			sp.Endpoints = append(sp.Endpoints, domain.Endpoint{
+				Id:   &id,
+				Type: svc.Type,
+				Url:  endpoint,
+			})
+		}
+	}
+	return nil
 }
 
 func unwrapAPIError(err error) error {

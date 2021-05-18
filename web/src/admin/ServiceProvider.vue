@@ -51,6 +51,33 @@
     </div>
   </form>
 
+  <div class="flex justify-between mb-6">
+    <h2 class="page-subtitle">Endpoints</h2>
+    <button
+        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
+        @click="$router.push({name: 'admin.newEndpoint'})">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+      Add
+    </button>
+  </div>
+
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+    <tr>
+      <th class="thead">Type</th>
+      <th class="thead">URL</th>
+    </tr>
+    </thead>
+    <tbody class="tbody">
+    <tr class="hover:bg-gray-100" v-for="endpoint in serviceProvider.endpoints">
+      <td class="tcell">{{ endpoint.type }}</td>
+      <td class="tcell">{{ endpoint.url }}</td>
+    </tr>
+    </tbody>
+  </table>
+  <router-view name="modal" @statusUpdate="updateStatus"></router-view>
 </template>
 
 <script>
@@ -63,7 +90,8 @@ export default {
         id: '',
         name: '',
         email: '',
-        phone: ''
+        phone: '',
+        endpoints: [],
       }
     }
   },
@@ -72,6 +100,9 @@ export default {
     this.fetchData()
   },
   methods: {
+    updateStatus(event) {
+      this.$emit("statusUpdate", event)
+    },
     updateServiceProvider() {
       this.$api.post("web/private/service-provider", this.serviceProvider)
           .then(responseData => {
