@@ -29,11 +29,7 @@
         <label for="website-input">Service Provider website</label>
         <input id="website-input" v-model="serviceProvider.website" type="text">
       </div>
-
-      <button v-if="!serviceProvider.id" class="btn-submit" @click="createServiceProvider">Create Service Provider
-      </button>
-      <button v-if="!!serviceProvider.id" class="btn-submit" @click="updateServiceProvider">Update Service Provider
-      </button>
+      <button v-if="!!serviceProvider.id" class="btn-submit" @click="updateServiceProvider">Update Service Provider</button>
       <div v-if="!!feedbackMsg"
            :class="{ 'bg-green-300': responseState === 'success', 'bg-red-300': responseState === 'error'}"
            class="py-2 px-4 border rounded-md text-white">
@@ -104,26 +100,12 @@ export default {
       this.$emit("statusUpdate", event)
     },
     updateServiceProvider() {
-      this.$api.post("web/private/service-provider", this.serviceProvider)
-          .then(responseData => {
-            this.responseState = 'success'
-            this.$emit("statusUpdate", "Service Provider Saved")
-            this.serviceProvider = responseData
-            this.feedbackMsg = ''
-          })
-          .catch(reason => {
-            console.error("failure", reason)
-            this.responseState = 'error'
-            this.feedbackMsg = reason
-          })
-    },
-    createServiceProvider() {
       this.$api.put("web/private/service-provider", this.serviceProvider)
           .then(responseData => {
             this.responseState = 'success'
-            this.feedbackMsg = ''
             this.$emit("statusUpdate", "Service Provider Saved")
             this.serviceProvider = responseData
+            this.feedbackMsg = ''
           })
           .catch(reason => {
             console.error("failure", reason)

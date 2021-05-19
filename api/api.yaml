@@ -105,25 +105,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServiceProvider"
-    post:
-      operationId: createServiceProvider
-      description: Create a new service provider
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ServiceProvider"
-      responses:
-        201:
-          description: The resulting created service provider
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ServiceProvider"
     put:
       operationId: updateServiceProvider
-      description: Update a new service provider
+      description: Update or create a new service provider
       requestBody:
         required: true
         content:
