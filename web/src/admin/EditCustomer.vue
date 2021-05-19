@@ -45,7 +45,6 @@ export default {
       },
       immediate: true
     }
-
   },
   methods: {
     checkForm() {

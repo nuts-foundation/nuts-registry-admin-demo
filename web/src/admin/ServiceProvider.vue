@@ -1,12 +1,13 @@
 <template>
   <h1 class="page-title">Service Provider Configuration</h1>
   <p>A Service Provider offers (Nuts) services to its customers.</p>
-  <p>Here you can create or update the contact information of your Service Provider.</p>
+  <p>Here you can update the contact information of your Service Provider.</p>
   <form class="vertical-form">
 
-    <div class="space-y-4">
-      <div v-if="!!serviceProvider.id">
-        ID: {{ serviceProvider.id }}
+    <div class="space-y-4 w-full">
+      <div v-if="serviceProvider.id">
+        <label for="did-input">DID</label>
+        <input id="did-input" type="text" disabled v-model="serviceProvider.id">
       </div>
 
       <div>
@@ -27,9 +28,10 @@
 
       <div>
         <label for="website-input">Service Provider website</label>
-        <input id="website-input" v-model="serviceProvider.website" type="text">
+        <input id="website-input" v-model="serviceProvider.website" type="url">
       </div>
-      <button v-if="!!serviceProvider.id" class="btn-submit" @click="updateServiceProvider">Update Service Provider</button>
+      <button v-if="!!serviceProvider.id" class="btn-submit" @click="updateServiceProvider">Update Service Provider
+      </button>
       <div v-if="!!feedbackMsg"
            :class="{ 'bg-green-300': responseState === 'success', 'bg-red-300': responseState === 'error'}"
            class="py-2 px-4 border rounded-md text-white">
@@ -52,27 +54,39 @@
     <button
         class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
         @click="$router.push({name: 'admin.newEndpoint'})">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
       </svg>
       Add
     </button>
   </div>
 
-  <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
-    <tr>
-      <th class="thead">Type</th>
-      <th class="thead">URL</th>
-    </tr>
-    </thead>
-    <tbody class="tbody">
-    <tr class="hover:bg-gray-100" v-for="endpoint in serviceProvider.endpoints">
-      <td class="tcell">{{ endpoint.type }}</td>
-      <td class="tcell">{{ endpoint.url }}</td>
-    </tr>
-    </tbody>
-  </table>
+  <div class="shadow overflow-hidden border-gray-200 rounded">
+    <table v-if="serviceProvider.endpoints.length > 0" class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+      <tr>
+        <th class="thead">Type</th>
+        <th class="thead">URL</th>
+        <th class="thead">Delete</th>
+      </tr>
+      </thead>
+      <tbody class="tbody">
+      <tr class="hover:bg-gray-100" v-for="endpoint in serviceProvider.endpoints">
+        <td class="tcell">{{ endpoint.type }}</td>
+        <td class="tcell">{{ endpoint.url }}</td>
+        <td class="tcell">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500"
+               @click="removeEndpoint(endpoint.id)" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
   <router-view name="modal" @statusUpdate="updateStatus"></router-view>
 </template>
 
@@ -94,6 +108,15 @@ export default {
   emits: ["statusUpdate"],
   created() {
     this.fetchData()
+  },
+  watch: {
+    "$route.params": {
+      handler(toParams, previousParams) {
+        // Fetch data when the route change (e.g. from the modal back to the list)
+        this.fetchData()
+      },
+      immediate: true
+    }
   },
   methods: {
     updateStatus(event) {
@@ -125,7 +148,29 @@ export default {
             this.responseState = 'error'
             this.feedbackMsg = reason
           })
+    },
+    removeEndpoint(id) {
+      this.$api.delete(`web/private/service-provider/endpoints/${escape(id)}`, id)
+          .then(response => {
+            this.$emit("statusUpdate", "Endpoint deleted")
+          })
+          .catch(reason => {
+            console.error("failure", reason)
+          })
+          .finally(() => {
+            this.fetchData()
+          })
     }
   }
 }
 </script>
+<style>
+
+.thead {
+  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
+}
+
+.tcell {
+  @apply px-6 py-4 text-left;
+}
+</style>

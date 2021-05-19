@@ -135,6 +135,21 @@ paths:
       responses:
         201:
           description: The resulting created endpoint.
+  /web/private/service-provider/endpoints/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Endpoint id
+        required: true
+        example:
+          - "did:nuts:123#abc"
+        schema:
+          type: string
+    delete:
+      operationId: deleteEndpoint
+      responses:
+        200:
+          description: The endpoint has been deleted
 
   /web/private/credentials/issuers:
     get:

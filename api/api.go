@@ -95,6 +95,18 @@ func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
 	return ctx.NoContent(http.StatusCreated)
 }
 
+func (w Wrapper) DeleteEndpoint(ctx echo.Context, idStr string) error {
+	id, err := ssi.ParseURI(idStr)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("invalid endpoint id: %w", err))
+	}
+
+	if err := w.SPService.DeleteEndpoint(*id); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return ctx.NoContent(200)
+}
+
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 	connectReq := domain.ConnectCustomerRequest{}
 	if err := ctx.Bind(&connectReq); err != nil {
@@ -196,4 +208,3 @@ func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string,
 	}
 	return ctx.JSON(200, issuerTrust)
 }
-
