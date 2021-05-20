@@ -1,6 +1,6 @@
 <template>
   <h1 class="page-title">Login</h1>
-  <form class="my-4 flex justify-center">
+  <form class="my-4 flex justify-center" @submit.stop.prevent="login">
     <div class="space-y-4">
 
       <div>
@@ -25,7 +25,6 @@
       </div>
       <p v-if="!!loginError" class="p-3 bg-red-100 rounded-md">{{ loginError }}</p>
       <button
-          @click="login($event)"
           class="w-full btn-submit"
       >Login
       </button>
@@ -54,10 +53,7 @@ export default {
     }
   },
   methods: {
-    login(event) {
-      if (event) {
-        event.preventDefault()
-      }
+    login() {
       this.$api.post('web/auth', this.credentials)
           .then(responseData => {
             console.log("success!")
