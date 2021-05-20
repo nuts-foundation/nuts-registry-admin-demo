@@ -1,38 +1,41 @@
 <template>
-  <div class="mt-12">
-    <logo></logo>
-    <h1 class="page-title">Login</h1>
-  </div>
-  <form class="my-4 flex justify-center" @submit.stop.prevent="login">
-    <div class="space-y-4">
+  <div class="flex justify-center">
 
-      <div>
-        <label for="username_input" class="block text-sm font-medium text-gray-700">Username</label>
-        <input id="username_input"
-               v-model="credentials.username"
-               type="text"
-               placeholder="Username"
-               class="flex-1 py-2 px-4 block border border-gray-300 rounded-md"
-        />
-      </div>
+    <div class="mt-12 border rounded-md max-w-7xl p-8 flex flex-col">
+      <logo class="mx-auto my-2"></logo>
+      <h1 class="text-3xl py-2">Nuts Registry Admin</h1>
+      <form class="my-4 flex justify-center" @submit.stop.prevent="login">
+        <div class="space-y-4">
 
-      <div>
-        <label for="password_input" class="block text-sm font-medium text-gray-700">Password</label>
-        <input
-            id="password_input"
-            v-model="credentials.password"
-            type="password"
-            placeholder="Password"
-            class="flex-1 py-2 px-4 block border border-gray-300 rounded-md"
-        />
-      </div>
-      <p v-if="!!loginError" class="p-3 bg-red-100 rounded-md">{{ loginError }}</p>
-      <button
-          class="w-full btn-submit"
-      >Login
-      </button>
+          <div>
+            <label for="username_input" class="block text-sm font-medium text-gray-700">Username</label>
+            <input id="username_input"
+                   v-model="credentials.username"
+                   type="text"
+                   placeholder="Username"
+                   class="flex-1 py-2 px-4 block border border-gray-300 rounded-md"
+            />
+          </div>
+
+          <div>
+            <label for="password_input" class="block text-sm font-medium text-gray-700">Password</label>
+            <input
+                id="password_input"
+                v-model="credentials.password"
+                type="password"
+                placeholder="Password"
+                class="flex-1 py-2 px-4 block border border-gray-300 rounded-md"
+            />
+          </div>
+          <p v-if="!!loginError" class="p-2 text-center bg-red-100 rounded-md">{{ loginError }}</p>
+          <button
+              class="w-full btn-submit"
+          >Login
+          </button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </template>
 
 <script>

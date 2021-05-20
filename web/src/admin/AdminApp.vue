@@ -2,10 +2,10 @@
   <div class="flex">
     <!-- Navigation -->
     <nav class="min-h-screen sticky top-0 w-96 border border-r-1 border-gray-200">
-      <div class="flex justify-center">
+      <div class="flex justify-center pt-6">
         <logo></logo>
       </div>
-      <h1 class="my-12 text-2xl text-center">Registry Admin</h1>
+      <h1 class="mt-4 mb-12 text-2xl text-center">Registry Admin</h1>
       <div class="grid grid-cols-1">
         <router-link
             :to="{name: 'admin.serviceProvider'}"

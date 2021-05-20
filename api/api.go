@@ -33,7 +33,7 @@ func (w Wrapper) CreateSession(ctx echo.Context) error {
 	}
 
 	if !w.Auth.CheckCredentials(sessionRequest.Username, sessionRequest.Password) {
-		return echo.NewHTTPError(http.StatusForbidden, "invalid sessionRequest")
+		return echo.NewHTTPError(http.StatusForbidden, "invalid credentials")
 	}
 
 	token, err := w.Auth.CreateJWT(sessionRequest.Username)
