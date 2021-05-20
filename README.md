@@ -37,3 +37,14 @@ $ docker run -p 1303:1303 nutsfoundation/nuts-registry-admin-demo
 ## Configuration
 When running in Docker without a config file mounted at `/app/server.config.yaml` it will use the default configuration.
 In this case the default username will be `demo@nuts.nl`. The password is generated and printed in the log on startup.
+
+## Technology Stack
+
+Frontend framework is vue.js 3.x
+
+Icons are from https://heroicons.com
+
+CSS framework is https://tailwindcss.com
+
+
+
