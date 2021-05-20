@@ -26,7 +26,7 @@ func (svc Service) Get() (*domain.ServiceProvider, error) {
 	if spDID == nil {
 		return nil, nil
 	}
-	sp := &domain.ServiceProvider{Id: spDID.String()}
+	sp := &domain.ServiceProvider{Id: spDID.String(), Endpoints: []domain.Endpoint{}}
 	if err = svc.enrichWithContactInfo(sp); err != nil {
 		return nil, err
 	}
