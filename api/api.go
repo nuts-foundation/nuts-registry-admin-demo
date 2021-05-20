@@ -98,13 +98,13 @@ func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
 func (w Wrapper) DeleteEndpoint(ctx echo.Context, idStr string) error {
 	id, err := ssi.ParseURI(idStr)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("invalid endpoint id: %w", err))
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("invalid endpoint ID: %w", err))
 	}
 
 	if err := w.SPService.DeleteEndpoint(*id); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.NoContent(200)
+	return ctx.NoContent(http.StatusNoContent)
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {

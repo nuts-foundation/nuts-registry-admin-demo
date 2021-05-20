@@ -148,7 +148,7 @@ paths:
     delete:
       operationId: deleteEndpoint
       responses:
-        200:
+        204:
           description: The endpoint has been deleted
 
   /web/private/credentials/issuers:
