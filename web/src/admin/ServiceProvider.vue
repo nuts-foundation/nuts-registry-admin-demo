@@ -49,7 +49,7 @@
     </div>
   </form>
 
-  <div class="flex justify-between mb-6">
+  <div class="flex justify-between mb-6" v-if="serviceProvider.id">
     <h2 class="page-subtitle">Endpoints</h2>
     <button
         class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
