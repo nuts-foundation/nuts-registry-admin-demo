@@ -4,6 +4,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -47,7 +48,7 @@ type Config struct {
 
 type Credentials struct {
 	Username string `koanf:"username"`
-	Password string `koanf:"password"`
+	Password string `koanf:"password" json:"-"` // json omit tag to avoid having it printed in server log
 }
 
 func (c Credentials) Empty() bool {
@@ -67,13 +68,9 @@ func (c Config) Print(writer io.Writer) error {
 	if _, err := fmt.Fprintln(writer, "========== CONFIG: =========="); err != nil {
 		return err
 	}
-	if _, err := fmt.Fprintf(writer, "HTTP Port: %d\n", c.HTTPPort); err != nil {
-		return err
-	}
-	if _, err := fmt.Fprintf(writer, "Nuts Node Address: %s\n", c.NutsNodeAddress); err != nil {
-		return err
-	}
-	if _, err := fmt.Fprintf(writer, "DBFile: %s\n", c.DBFile); err != nil {
+	var pr Config = c
+	data, _ := json.MarshalIndent(pr, "", "  ")
+	if _, err := fmt.Println(writer, string(data)); err != nil {
 		return err
 	}
 	if _, err := fmt.Fprintln(writer, "========= END CONFIG ========="); err != nil {
