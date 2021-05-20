@@ -1,8 +1,6 @@
 package customers
 
 import (
-	"net"
-
 	"github.com/nuts-foundation/go-did/did"
 	nutsApi "github.com/nuts-foundation/nuts-node/vdr/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
@@ -24,10 +22,7 @@ func (s Service) ConnectCustomer(id, name, city string, serviceProviderID did.DI
 		CapabilityInvocation: &capabilityInvocation,
 	})
 	if err != nil {
-		if _, ok := err.(net.Error); ok {
-			return nil, domain.ErrNutsNodeUnreachable
-		}
-		return nil, err
+		return nil, domain.UnwrapAPIError(err)
 	}
 
 	customer := domain.Customer{
