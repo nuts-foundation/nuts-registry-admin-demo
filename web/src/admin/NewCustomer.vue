@@ -30,7 +30,7 @@ export default {
       customer: {
         id: '',
         name: '',
-        town: '',
+        city: '',
       }
     }
   },

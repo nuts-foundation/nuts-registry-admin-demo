@@ -117,9 +117,9 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, "name and id must be provided")
 	}
 
-	town := ""
-	if connectReq.Town != nil {
-		town = *connectReq.Town
+	city := ""
+	if connectReq.City != nil {
+		city = *connectReq.City
 	}
 
 	serviceProvider, err := w.SPService.Get()
@@ -131,7 +131,7 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("service provider not correctly configured: DID is invalid: %w", err))
 	}
 
-	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, town, *spID)
+	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, city, *spID)
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
@@ -142,7 +142,7 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 	req := struct {
 		Name   string
 		Active bool
-		Town   string
+		City   string
 	}{}
 	if err := ctx.Bind(&req); err != nil {
 		return err
@@ -154,8 +154,8 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 
 	customer, err := w.CustomerService.Repository.Update(id, func(c domain.Customer) (*domain.Customer, error) {
 		c.Name = req.Name
-		if len(req.Town) >= 0 {
-			c.Town = &req.Town
+		if len(req.City) >= 0 {
+			c.City = &req.City
 		}
 		if err := w.CredentialService.ManageNutsOrgCredential(c, req.Active); err != nil {
 			return nil, err
@@ -207,4 +207,16 @@ func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string,
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return ctx.JSON(200, issuerTrust)
+}
+
+func (w Wrapper) SearchOrganizations(ctx echo.Context) error {
+	params := domain.SearchOrganizationsJSONBody{}
+	if err := ctx.Bind(&params); err != nil {
+		return err
+	}
+	result, err := w.CredentialService.SearchOrganizations(params.Name, params.City)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err)
+	}
+	return ctx.JSON(200, result)
 }

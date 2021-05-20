@@ -11,6 +11,7 @@ import ServiceProvider from './admin/ServiceProvider.vue'
 import NewEndpoint from './admin/NewEndpoint.vue'
 import NewCustomer from './admin/NewCustomer.vue'
 import EditCustomer from './admin/EditCustomer.vue'
+import OrganizationRegistry from './admin/OrganizationRegistry.vue'
 import ManageVCs from './admin/ManageVCs.vue'
 import Api from './plugins/api'
 
@@ -76,6 +77,11 @@ const routes = [
         path:'manage-vcs',
         name: 'admin.manageVCs',
         component: ManageVCs
+      },
+      {
+        path:'organization-registry',
+        name: 'admin.organizationRegistry',
+        component: OrganizationRegistry
       }
     ],
     meta: {requiresAuth: true}

@@ -13,8 +13,8 @@
       <input type="text" v-model="value.name" id="customerNameInput">
     </div>
     <div>
-      <label for="customerTownInput">Town:</label>
-      <input type="text" v-model="value.town" id="customerTownInput">
+      <label for="customerCityInput">City:</label>
+      <input type="text" v-model="value.city" id="customerCityInput">
     </div>
     <div v-if="mode==='edit'">
       <label class="flex justify-start items-start" for="customerActiveInput">
