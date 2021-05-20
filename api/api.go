@@ -71,22 +71,10 @@ func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
 	return ctx.JSON(200, serviceProvider)
 }
 
-func (w Wrapper) CreateServiceProvider(ctx echo.Context) error {
-	serviceProvider := domain.ServiceProvider{}
-	if err := ctx.Bind(&serviceProvider); err != nil {
-		return err
-	}
-	res, err := w.SPService.CreateOrUpdate(serviceProvider)
-	if err != nil {
-		return err
-	}
-	return ctx.JSON(201, res)
-}
-
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	serviceProvider := domain.ServiceProvider{}
 	if err := ctx.Bind(&serviceProvider); err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return err
 	}
 	res, err := w.SPService.CreateOrUpdate(serviceProvider)
 	if err != nil {
@@ -105,6 +93,18 @@ func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return ctx.NoContent(http.StatusCreated)
+}
+
+func (w Wrapper) DeleteEndpoint(ctx echo.Context, idStr string) error {
+	id, err := ssi.ParseURI(idStr)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("invalid endpoint ID: %w", err))
+	}
+
+	if err := w.SPService.DeleteEndpoint(*id); err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return ctx.NoContent(http.StatusNoContent)
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
@@ -208,4 +208,3 @@ func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string,
 	}
 	return ctx.JSON(200, issuerTrust)
 }
-
