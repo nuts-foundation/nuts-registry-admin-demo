@@ -9,8 +9,8 @@
       <input type="text" v-model="query.name" id="nameInput" v-on:input="search" v-on:focusout="search">
     </div>
     <div>
-      <label for="townInput">City:</label>
-      <input type="text" v-model="query.city" id="townInput" v-on:input="search" v-on:focusout="search">
+      <label for="cityInput">City:</label>
+      <input type="text" v-model="query.city" id="cityInput" v-on:input="search" v-on:focusout="search">
     </div>
   </form>
 
@@ -61,7 +61,7 @@ export default {
         this.results = []
         return
       }
-      this.$api.post('web/private/credentials/organizations', this.query)
+      this.$api.post('web/private/organizations', this.query)
           .then(data => this.results = data)
           .catch(response => {
             this.fetchError = response.statusText

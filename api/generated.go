@@ -23,9 +23,6 @@ type ServerInterface interface {
 	// (GET /web/private/credentials/issuers)
 	GetCredentialIssuers(ctx echo.Context) error
 
-	// (POST /web/private/credentials/organizations)
-	SearchOrganizations(ctx echo.Context) error
-
 	// (GET /web/private/customers)
 	GetCustomers(ctx echo.Context) error
 
@@ -37,6 +34,9 @@ type ServerInterface interface {
 
 	// (PUT /web/private/customers/{id})
 	UpdateCustomer(ctx echo.Context, id string) error
+
+	// (POST /web/private/organizations)
+	SearchOrganizations(ctx echo.Context) error
 
 	// (GET /web/private/service-provider)
 	GetServiceProvider(ctx echo.Context) error
@@ -98,15 +98,6 @@ func (w *ServerInterfaceWrapper) GetCredentialIssuers(ctx echo.Context) error {
 	return err
 }
 
-// SearchOrganizations converts echo context to params.
-func (w *ServerInterfaceWrapper) SearchOrganizations(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshalled arguments
-	err = w.Handler.SearchOrganizations(ctx)
-	return err
-}
-
 // GetCustomers converts echo context to params.
 func (w *ServerInterfaceWrapper) GetCustomers(ctx echo.Context) error {
 	var err error
@@ -154,6 +145,15 @@ func (w *ServerInterfaceWrapper) UpdateCustomer(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.UpdateCustomer(ctx, id)
+	return err
+}
+
+// SearchOrganizations converts echo context to params.
+func (w *ServerInterfaceWrapper) SearchOrganizations(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.SearchOrganizations(ctx)
 	return err
 }
 
@@ -224,11 +224,11 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
 	router.PUT(baseURL+"/web/private/credential/:type/issuer/:did", wrapper.UpdateCredentialIssuer)
 	router.GET(baseURL+"/web/private/credentials/issuers", wrapper.GetCredentialIssuers)
-	router.POST(baseURL+"/web/private/credentials/organizations", wrapper.SearchOrganizations)
 	router.GET(baseURL+"/web/private/customers", wrapper.GetCustomers)
 	router.POST(baseURL+"/web/private/customers", wrapper.ConnectCustomer)
 	router.GET(baseURL+"/web/private/customers/:id", wrapper.GetCustomer)
 	router.PUT(baseURL+"/web/private/customers/:id", wrapper.UpdateCustomer)
+	router.POST(baseURL+"/web/private/organizations", wrapper.SearchOrganizations)
 	router.GET(baseURL+"/web/private/service-provider", wrapper.GetServiceProvider)
 	router.POST(baseURL+"/web/private/service-provider", wrapper.CreateServiceProvider)
 	router.PUT(baseURL+"/web/private/service-provider", wrapper.UpdateServiceProvider)

@@ -109,12 +109,6 @@ type CreateSessionJSONBody CreateSessionRequest
 // UpdateCredentialIssuerJSONBody defines parameters for UpdateCredentialIssuer.
 type UpdateCredentialIssuerJSONBody CredentialIssuer
 
-// SearchOrganizationsJSONBody defines parameters for SearchOrganizations.
-type SearchOrganizationsJSONBody struct {
-	City string `json:"city"`
-	Name string `json:"name"`
-}
-
 // ConnectCustomerJSONBody defines parameters for ConnectCustomer.
 type ConnectCustomerJSONBody ConnectCustomerRequest
 
@@ -123,6 +117,12 @@ type UpdateCustomerJSONBody struct {
 	Active bool    `json:"active"`
 	City   *string `json:"city,omitempty"`
 	Name   string  `json:"name"`
+}
+
+// SearchOrganizationsJSONBody defines parameters for SearchOrganizations.
+type SearchOrganizationsJSONBody struct {
+	City string `json:"city"`
+	Name string `json:"name"`
 }
 
 // CreateServiceProviderJSONBody defines parameters for CreateServiceProvider.
@@ -140,14 +140,14 @@ type CreateSessionJSONRequestBody CreateSessionJSONBody
 // UpdateCredentialIssuerJSONRequestBody defines body for UpdateCredentialIssuer for application/json ContentType.
 type UpdateCredentialIssuerJSONRequestBody UpdateCredentialIssuerJSONBody
 
-// SearchOrganizationsJSONRequestBody defines body for SearchOrganizations for application/json ContentType.
-type SearchOrganizationsJSONRequestBody SearchOrganizationsJSONBody
-
 // ConnectCustomerJSONRequestBody defines body for ConnectCustomer for application/json ContentType.
 type ConnectCustomerJSONRequestBody ConnectCustomerJSONBody
 
 // UpdateCustomerJSONRequestBody defines body for UpdateCustomer for application/json ContentType.
 type UpdateCustomerJSONRequestBody UpdateCustomerJSONBody
+
+// SearchOrganizationsJSONRequestBody defines body for SearchOrganizations for application/json ContentType.
+type SearchOrganizationsJSONRequestBody SearchOrganizationsJSONBody
 
 // CreateServiceProviderJSONRequestBody defines body for CreateServiceProvider for application/json ContentType.
 type CreateServiceProviderJSONRequestBody CreateServiceProviderJSONBody
