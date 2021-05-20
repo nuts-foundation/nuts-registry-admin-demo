@@ -43,12 +43,18 @@ type Config struct {
 	HTTPPort        int         `koanf:"port"`
 	NutsNodeAddress string      `koanf:"nutsnodeaddr"`
 	CustomersFile   string      `koanf:"customersfile"`
+	Branding        Branding    `koanf:"branding"`
 	sessionKey      *ecdsa.PrivateKey
 }
 
 type Credentials struct {
 	Username string `koanf:"username"`
 	Password string `koanf:"password" json:"-"` // json omit tag to avoid having it printed in server log
+}
+
+type Branding struct {
+	// Logo defines a path that points to a file on disk to be used as logo, to be displayed in the application.
+	Logo string `koanf:"logo"`
 }
 
 func (c Credentials) Empty() bool {

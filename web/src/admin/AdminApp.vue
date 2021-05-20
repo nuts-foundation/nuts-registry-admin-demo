@@ -1,9 +1,11 @@
 <template>
   <div class="flex">
+    <!-- Navigation -->
     <nav class="min-h-screen sticky top-0 w-96 border border-r-1 border-gray-200">
-      <!-- Navigation -->
-      <h1 class="my-24 text-2xl text-center">registry admin</h1>
-
+      <div class="flex justify-center">
+        <logo></logo>
+      </div>
+      <h1 class="my-12 text-2xl text-center">Registry Admin</h1>
       <div class="grid grid-cols-1">
         <router-link
             :to="{name: 'admin.serviceProvider'}"
@@ -69,9 +71,10 @@
 
 <script>
 import StatusBar from "../components/StatusBar.vue";
+import Logo from "../components/Logo.vue";
 
 export default {
-  components: {StatusBar},
+  components: {StatusBar, Logo},
   data() {
     return {
       eventMessage: ''

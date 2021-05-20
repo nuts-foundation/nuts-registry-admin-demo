@@ -1,5 +1,8 @@
 <template>
-  <h1 class="page-title">Login</h1>
+  <div class="mt-12">
+    <logo></logo>
+    <h1 class="page-title">Login</h1>
+  </div>
   <form class="my-4 flex justify-center" @submit.stop.prevent="login">
     <div class="space-y-4">
 
@@ -33,7 +36,10 @@
 </template>
 
 <script>
+import Logo from './components/Logo.vue'
+
 export default {
+  components: {Logo},
   data() {
     return {
       loginError: "",
