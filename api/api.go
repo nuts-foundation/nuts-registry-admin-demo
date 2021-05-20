@@ -21,6 +21,11 @@ type Wrapper struct {
 	CredentialService credentials.Service
 }
 
+func (w Wrapper) CheckSession(ctx echo.Context) error {
+	// If this function is reached, it means the session is still valid
+	return ctx.NoContent(http.StatusNoContent)
+}
+
 func (w Wrapper) CreateSession(ctx echo.Context) error {
 	sessionRequest := domain.CreateSessionRequest{}
 	if err := ctx.Bind(&sessionRequest); err != nil {
