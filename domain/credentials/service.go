@@ -64,11 +64,13 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 }
 
 func (s Service) GetCredentials(customer domain.Customer) ([]domain.OrganizationConceptCredential, error) {
-	// not enough info, return
-	if customer.City == nil {
-		return []domain.OrganizationConceptCredential{}, nil
+	searchBody := vcrApi.SearchJSONRequestBody{
+		Params: []vcrApi.KeyValuePair{
+			{Key: "subject", Value: customer.Did},
+		},
 	}
-	return s.SearchOrganizations(customer.Name, *customer.City)
+
+	return s.search(searchBody)
 }
 
 func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationConceptCredential, error) {
@@ -78,7 +80,9 @@ func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationCo
 			{Key: "organization.city", Value: city},
 		},
 	}
-
+	return s.search(searchBody)
+}
+func (s Service)search(searchBody vcrApi.SearchJSONRequestBody) ([]domain.OrganizationConceptCredential, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	response, err := s.client().Search(
