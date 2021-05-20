@@ -125,6 +125,7 @@ func main() {
 	// Check if we use live mode from the file system or using embedded files
 	useFS := len(os.Args) > 1 && os.Args[1] == "live"
 	assetHandler := http.FileServer(getFileSystem(useFS))
+	e.GET("/branding/logo", (&api.LogoHandler{FilePath: config.Branding.Logo}).Handle)
 	e.GET("/*", echo.WrapHandler(assetHandler))
 
 	// Start server
