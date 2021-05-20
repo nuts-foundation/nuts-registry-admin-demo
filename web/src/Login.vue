@@ -25,7 +25,7 @@
       </div>
       <p v-if="!!loginError" class="p-3 bg-red-100 rounded-md">{{ loginError }}</p>
       <button
-          @click="onSubmit"
+          @click="login($event)"
           class="w-full btn-submit"
       >Login
       </button>
@@ -54,7 +54,10 @@ export default {
     }
   },
   methods: {
-    onSubmit() {
+    login(event) {
+      if (event) {
+        event.preventDefault()
+      }
       this.$api.post('web/auth', this.credentials)
           .then(responseData => {
             console.log("success!")
