@@ -82,7 +82,7 @@ func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationCo
 	}
 	return s.search(searchBody)
 }
-func (s Service)search(searchBody vcrApi.SearchJSONRequestBody) ([]domain.OrganizationConceptCredential, error) {
+func (s Service) search(searchBody vcrApi.SearchJSONRequestBody) ([]domain.OrganizationConceptCredential, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	response, err := s.client().Search(
