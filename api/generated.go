@@ -242,4 +242,3 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.DELETE(baseURL+"/web/private/service-provider/endpoints/:id", wrapper.DeleteEndpoint)
 
 }
-
