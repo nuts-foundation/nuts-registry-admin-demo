@@ -125,9 +125,6 @@ type SearchOrganizationsJSONBody struct {
 	Name string `json:"name"`
 }
 
-// CreateServiceProviderJSONBody defines parameters for CreateServiceProvider.
-type CreateServiceProviderJSONBody ServiceProvider
-
 // UpdateServiceProviderJSONBody defines parameters for UpdateServiceProvider.
 type UpdateServiceProviderJSONBody ServiceProvider
 
@@ -148,9 +145,6 @@ type UpdateCustomerJSONRequestBody UpdateCustomerJSONBody
 
 // SearchOrganizationsJSONRequestBody defines body for SearchOrganizations for application/json ContentType.
 type SearchOrganizationsJSONRequestBody SearchOrganizationsJSONBody
-
-// CreateServiceProviderJSONRequestBody defines body for CreateServiceProvider for application/json ContentType.
-type CreateServiceProviderJSONRequestBody CreateServiceProviderJSONBody
 
 // UpdateServiceProviderJSONRequestBody defines body for UpdateServiceProvider for application/json ContentType.
 type UpdateServiceProviderJSONRequestBody UpdateServiceProviderJSONBody

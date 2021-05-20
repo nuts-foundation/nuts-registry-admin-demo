@@ -17,6 +17,9 @@ type ServerInterface interface {
 	// (POST /web/auth)
 	CreateSession(ctx echo.Context) error
 
+	// (GET /web/private)
+	CheckSession(ctx echo.Context) error
+
 	// (PUT /web/private/credential/{type}/issuer/{did})
 	UpdateCredentialIssuer(ctx echo.Context, pType string, did string) error
 
@@ -62,6 +65,15 @@ func (w *ServerInterfaceWrapper) CreateSession(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshalled arguments
 	err = w.Handler.CreateSession(ctx)
+	return err
+}
+
+// CheckSession converts echo context to params.
+func (w *ServerInterfaceWrapper) CheckSession(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.CheckSession(ctx)
 	return err
 }
 
@@ -229,6 +241,7 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	}
 
 	router.POST(baseURL+"/web/auth", wrapper.CreateSession)
+	router.GET(baseURL+"/web/private", wrapper.CheckSession)
 	router.PUT(baseURL+"/web/private/credential/:type/issuer/:did", wrapper.UpdateCredentialIssuer)
 	router.GET(baseURL+"/web/private/credentials/issuers", wrapper.GetCredentialIssuers)
 	router.GET(baseURL+"/web/private/customers", wrapper.GetCustomers)
@@ -242,4 +255,3 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.DELETE(baseURL+"/web/private/service-provider/endpoints/:id", wrapper.DeleteEndpoint)
 
 }
-

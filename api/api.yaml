@@ -23,6 +23,16 @@ paths:
         '403':
           description: Invalid credentials
 
+  /web/private:
+    get:
+      description: Checks whether the current session is valid. If not, the client should authenticate before calling other API operations.
+      operationId: checkSession
+      responses:
+        '204':
+          description: The session is valid.
+        '400':
+          description: The session is invalid.
+
   /web/private/customers:
     get:
       operationId: getCustomers

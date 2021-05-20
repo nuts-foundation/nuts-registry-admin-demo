@@ -59,12 +59,15 @@ export default {
     }
   },
   methods: {
+    redirectAfterLogin() {
+      this.$router.push("/admin/")
+    },
     login() {
       this.$api.post('web/auth', this.credentials)
           .then(responseData => {
             console.log("success!")
             localStorage.setItem("session", responseData.token)
-            this.$router.push("/admin/")
+            this.redirectAfterLogin()
           })
           .catch(response => {
             console.error("failure", response)
@@ -75,6 +78,14 @@ export default {
             }
           })
     }
+  },
+  mounted() {
+    // Check if session still valid, if so just redirect to application
+    this.$api.get('web/private')
+        .then(() => this.redirectAfterLogin())
+        .catch(() => {
+          // session is invalid, need to authenticate
+        })
   }
 }
 </script>
