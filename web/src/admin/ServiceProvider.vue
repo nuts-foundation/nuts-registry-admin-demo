@@ -30,9 +30,9 @@
         <label for="website-input">Service Provider website</label>
         <input id="website-input" v-model="serviceProvider.website" type="url">
       </div>
-      <button v-if="!!serviceProvider.id" class="btn-submit" @click="updateServiceProvider">Update Service Provider
+      <button class="btn-submit" @click="updateServiceProvider">Update Service Provider
       </button>
-      <div v-if="!!feedbackMsg"
+      <div v-if="feedbackMsg"
            :class="{ 'bg-green-300': responseState === 'success', 'bg-red-300': responseState === 'error'}"
            class="py-2 px-4 border rounded-md text-white">
         <svg v-if="responseState === 'success'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none"
