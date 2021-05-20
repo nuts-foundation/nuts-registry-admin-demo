@@ -10,6 +10,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
@@ -82,7 +83,17 @@ func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationCo
 	}
 	return s.search(searchBody)
 }
+
 func (s Service) search(searchBody vcrApi.SearchJSONRequestBody) ([]domain.OrganizationConceptCredential, error) {
+	i := 0
+	for _, param := range searchBody.Params {
+		if len(strings.TrimSpace(param.Value)) > 0 {
+			searchBody.Params[i] = param
+			i++
+		}
+	}
+	searchBody.Params = searchBody.Params[:i]
+
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
 	response, err := s.client().Search(
