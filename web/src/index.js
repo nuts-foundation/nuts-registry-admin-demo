@@ -36,7 +36,7 @@ const routes = [
       {
         path: '',
         name: 'admin.home',
-        redirect: '/admin/customers'
+        redirect: '/admin/service-provider'
       },
       {
         path: 'customers',
