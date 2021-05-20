@@ -1,15 +1,15 @@
 <template>
   <h1 class="text-3xl">Care Organisation Registry</h1>
   <p v-if="fetchError" class="m-4">Could not fetch care organizations: {{ fetchError }}</p>
-  <p>Search for registered care organizations with trusted credentials:</p>
+  <p>Search for registered care organizations (which's credentials are trusted):</p>
   <form class="space-y-3">
     <div>
       <label for="nameInput">Name:</label>
       <input type="text" v-model="query.name" id="nameInput" v-on:input="search" v-on:focusout="search">
     </div>
     <div>
-      <label for="townInput">City:</label>
-      <input type="text" v-model="query.city" id="townInput" v-on:input="search" v-on:focusout="search">
+      <label for="cityInput">City:</label>
+      <input type="text" v-model="query.city" id="cityInput" v-on:input="search" v-on:focusout="search">
     </div>
   </form>
   <div class="space-y-3">
@@ -54,7 +54,7 @@ export default {
         this.results = []
         return
       }
-      this.$api.post('web/private/credentials/organizations', this.query)
+      this.$api.post('web/private/organizations', this.query)
           .then(data => this.results = data)
           .catch(response => {
             this.fetchError = response.statusText

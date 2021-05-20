@@ -95,7 +95,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Customer"
 
-  /web/private/credentials/organizations:
+  /web/private/organizations:
     post:
       operationId: searchOrganizations
       description: Searches for organizations
@@ -115,7 +115,7 @@ paths:
                   type: string
       responses:
         200:
-          description: List containing credentials that match the query.
+          description: List organizations that match the query.
           content:
             application/json:
               schema:
