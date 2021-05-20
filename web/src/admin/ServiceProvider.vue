@@ -63,7 +63,7 @@
   </div>
 
   <div class="shadow overflow-hidden border-gray-200 rounded">
-    <table v-if="serviceProvider.endpoints.length > 0" class="min-w-full divide-y divide-gray-200">
+    <table v-if="serviceProvider.endpoints && serviceProvider.endpoints.length > 0" class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
       <tr>
         <th class="thead">Type</th>
