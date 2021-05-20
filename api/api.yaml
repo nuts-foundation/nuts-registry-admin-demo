@@ -132,25 +132,9 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServiceProvider"
-    post:
-      operationId: createServiceProvider
-      description: Create a new service provider
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/ServiceProvider"
-      responses:
-        201:
-          description: The resulting created service provider
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ServiceProvider"
     put:
       operationId: updateServiceProvider
-      description: Update a new service provider
+      description: Update or create a new service provider
       requestBody:
         required: true
         content:
@@ -178,6 +162,21 @@ paths:
       responses:
         201:
           description: The resulting created endpoint.
+  /web/private/service-provider/endpoints/{id}:
+    parameters:
+      - name: id
+        in: path
+        description: Endpoint id
+        required: true
+        example:
+          - "did:nuts:123#abc"
+        schema:
+          type: string
+    delete:
+      operationId: deleteEndpoint
+      responses:
+        204:
+          description: The endpoint has been deleted
 
   /web/private/credentials/issuers:
     get:

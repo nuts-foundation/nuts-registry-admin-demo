@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 
+	ssi "github.com/nuts-foundation/go-did"
 	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
 	vdrAPI "github.com/nuts-foundation/nuts-node/vdr/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
@@ -22,7 +23,7 @@ func (svc Service) Get() (*domain.ServiceProvider, error) {
 	if err != nil {
 		return nil, err
 	}
-	if spDID == nil{
+	if spDID == nil {
 		return nil, nil
 	}
 	sp := &domain.ServiceProvider{Id: spDID.String()}
@@ -65,6 +66,11 @@ func (svc Service) RegisterEndpoint(endpoint domain.Endpoint) error {
 		return err
 	}
 	return svc.DIDManClient.AddEndpoint(spDID.String(), endpoint.Type, endpoint.Url)
+
+}
+
+func (svc Service) DeleteEndpoint(id ssi.URI) error {
+	return svc.DIDManClient.DeleteService(id)
 }
 
 func (svc Service) enrichWithContactInfo(sp *domain.ServiceProvider) error {
