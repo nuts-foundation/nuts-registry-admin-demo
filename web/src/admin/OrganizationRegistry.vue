@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-3xl">Care Organisation Registry</h1>
+  <h1 class="text-3xl">Care organization registry</h1>
   <p v-if="fetchError" class="m-4">Could not fetch care organizations: {{ fetchError }}</p>
   <p>Search the Nuts Network for care organizations:</p>
 
