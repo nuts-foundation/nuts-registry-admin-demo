@@ -1,6 +1,6 @@
 <template>
   <div class="flex justify-between mb-6">
-    <h1 class="text-3xl">Your Care Organisations</h1>
+    <h1 class="text-3xl">Your care organizations</h1>
     <button
         class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
         @click="$router.push({name: 'admin.newCustomer'})" >
