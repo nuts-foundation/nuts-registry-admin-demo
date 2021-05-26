@@ -68,11 +68,21 @@ type Customer struct {
 // CustomersResponse defines model for CustomersResponse.
 type CustomersResponse []Customer
 
-// An endpoint registered on a DID Document.
+// Endpoint defines model for Endpoint.
 type Endpoint struct {
+	// Embedded struct due to allOf(#/components/schemas/EndpointID)
+	EndpointID `yaml:",inline"`
+	// Embedded struct due to allOf(#/components/schemas/EndpointProperties)
+	EndpointProperties `yaml:",inline"`
+}
 
-	// ID of the endpoint which is calculated on creation.
-	Id *string `json:"id,omitempty"`
+// ID of the endpoint which is calculated on creation.
+type EndpointID struct {
+	Id string `json:"id"`
+}
+
+// EndpointProperties defines model for EndpointProperties.
+type EndpointProperties struct {
 
 	// Type of the endpoint.
 	Type string `json:"type"`
@@ -81,14 +91,14 @@ type Endpoint struct {
 	Url string `json:"url"`
 }
 
+// Endpoints defines model for Endpoints.
+type Endpoints []Endpoint
+
 // A service provider is a controller of other DID documents
 type ServiceProvider struct {
 
 	// Email address available for other service providers in the network for getting support
 	Email string `json:"email"`
-
-	// Endpoints published by the service provider.
-	Endpoints []Endpoint `json:"endpoints"`
 
 	// The DID of the service provider
 	Id string `json:"id"`
@@ -129,7 +139,7 @@ type SearchOrganizationsJSONBody struct {
 type UpdateServiceProviderJSONBody ServiceProvider
 
 // RegisterEndpointJSONBody defines parameters for RegisterEndpoint.
-type RegisterEndpointJSONBody Endpoint
+type RegisterEndpointJSONBody EndpointProperties
 
 // CreateSessionJSONRequestBody defines body for CreateSession for application/json ContentType.
 type CreateSessionJSONRequestBody CreateSessionJSONBody

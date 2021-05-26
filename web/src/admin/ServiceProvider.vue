@@ -49,8 +49,9 @@
     </div>
   </form>
 
-  <div class="flex justify-between mb-6" v-if="serviceProvider.id">
+  <div class="flex justify-between mb-6 border-t pt-6" v-if="serviceProvider.id">
     <h2 class="page-subtitle">Endpoints</h2>
+    <p>An endpoint is a simple registration of a named URL. It can be used as a building block for Services.</p>
     <button
         class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
         @click="$router.push({name: 'admin.newEndpoint'})">
@@ -63,7 +64,7 @@
   </div>
 
   <div class="shadow overflow-hidden border-gray-200 rounded">
-    <table v-if="serviceProvider.endpoints.length > 0" class="min-w-full divide-y divide-gray-200">
+    <table v-if="endpoints.length > 0" class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
       <tr>
         <th class="thead">Type</th>
@@ -101,8 +102,8 @@ export default {
         name: '',
         email: '',
         phone: '',
-        endpoints: [],
-      }
+      },
+      endpoints: [],
     }
   },
   emits: ["statusUpdate"],
@@ -148,6 +149,13 @@ export default {
             this.responseState = 'error'
             this.feedbackMsg = reason
           })
+      this.$api.get("web/private/service-provider/endpoints")
+      .then(responseData => {
+        this.endpoints = responseData
+      })
+      .catch(reason => {
+        console.log("error while fetching endpoints: ", reason)
+      })
     },
     deleteEndpoint(id) {
       this.$api.delete(`web/private/service-provider/endpoints/${escape(id)}`, id)

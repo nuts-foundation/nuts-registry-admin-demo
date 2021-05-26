@@ -160,6 +160,16 @@ paths:
                 $ref: "#/components/schemas/ServiceProvider"
 
   /web/private/service-provider/endpoints:
+    get:
+      operationId: getEndpoints
+      description: Get a list of all endpoints
+      responses:
+        200:
+          description: The resulting list of endoints
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoints"
     post:
       operationId: registerEndpoint
       description: Register endpoint URL on service provider's DID.
@@ -168,10 +178,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Endpoint"
+              $ref: "#/components/schemas/EndpointProperties"
       responses:
         201:
           description: The resulting created endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoint"
+
   /web/private/service-provider/endpoints/{id}:
     parameters:
       - name: id
@@ -308,7 +323,6 @@ components:
         - phone
         - email
         - website
-        - endpoints
       properties:
         id:
           description: The DID of the service provider
@@ -326,27 +340,34 @@ components:
         website:
           description: Publicly reachable website address of the service provider
           type: string
-        endpoints:
-          description: Endpoints published by the service provider.
-          type: array
-          items:
-            $ref: "#/components/schemas/Endpoint"
-    Endpoint:
+    EndpointProperties:
       type: object
-      description: An endpoint registered on a DID Document.
       required:
         - type
         - url
       properties:
-        id:
-          description: ID of the endpoint which is calculated on creation.
-          type: string
         type:
           description: Type of the endpoint.
           type: string
         url:
           description: URL of the endpoint.
           type: string
+    EndpointID:
+      description: ID of the endpoint which is calculated on creation.
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    Endpoint:
+      allOf:
+        - $ref: "#/components/schemas/EndpointID"
+        - $ref: "#/components/schemas/EndpointProperties"
+    Endpoints:
+      type: array
+      items:
+        $ref: "#/components/schemas/Endpoint"
     CredentialIssuers:
       type: object
       additionalProperties:

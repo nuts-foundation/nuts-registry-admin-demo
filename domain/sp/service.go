@@ -26,11 +26,8 @@ func (svc Service) Get() (*domain.ServiceProvider, error) {
 	if spDID == nil {
 		return nil, nil
 	}
-	sp := &domain.ServiceProvider{Id: spDID.String(), Endpoints: []domain.Endpoint{}}
+	sp := &domain.ServiceProvider{Id: spDID.String()}
 	if err = svc.enrichWithContactInfo(sp); err != nil {
-		return nil, err
-	}
-	if err = svc.enrichWithEndpoints(sp); err != nil {
 		return nil, err
 	}
 	return sp, nil
@@ -60,7 +57,7 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 	return &sp, nil
 }
 
-func (svc Service) RegisterEndpoint(endpoint domain.Endpoint) error {
+func (svc Service) RegisterEndpoint(endpoint domain.EndpointProperties) error {
 	spDID, err := svc.Repository.Get()
 	if err != nil {
 		return err
@@ -87,24 +84,27 @@ func (svc Service) enrichWithContactInfo(sp *domain.ServiceProvider) error {
 	return nil
 }
 
-func (svc Service) enrichWithEndpoints(sp *domain.ServiceProvider) error {
+func (svc Service) Endpoints(sp domain.ServiceProvider) (domain.Endpoints, error) {
 	document, _, err := svc.VDRClient.Get(sp.Id)
 	if err != nil {
-		return unwrapAPIError(err)
+		return nil, unwrapAPIError(err)
 	}
+	endpoints := domain.Endpoints{}
 	for _, svc := range document.Service {
 		var endpoint string
 		_ = svc.UnmarshalServiceEndpoint(&endpoint)
 		if endpoint != "" {
 			id := svc.ID.String()
-			sp.Endpoints = append(sp.Endpoints, domain.Endpoint{
-				Id:   &id,
-				Type: svc.Type,
-				Url:  endpoint,
+			endpoints = append(endpoints, domain.Endpoint{
+				EndpointID: domain.EndpointID{Id: id},
+				EndpointProperties: domain.EndpointProperties{
+					Type: svc.Type,
+					Url:  endpoint,
+				},
 			})
 		}
 	}
-	return nil
+	return endpoints, nil
 }
 
 func unwrapAPIError(err error) error {

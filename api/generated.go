@@ -47,6 +47,9 @@ type ServerInterface interface {
 	// (PUT /web/private/service-provider)
 	UpdateServiceProvider(ctx echo.Context) error
 
+	// (GET /web/private/service-provider/endpoints)
+	GetEndpoints(ctx echo.Context) error
+
 	// (POST /web/private/service-provider/endpoints)
 	RegisterEndpoint(ctx echo.Context) error
 
@@ -187,6 +190,15 @@ func (w *ServerInterfaceWrapper) UpdateServiceProvider(ctx echo.Context) error {
 	return err
 }
 
+// GetEndpoints converts echo context to params.
+func (w *ServerInterfaceWrapper) GetEndpoints(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetEndpoints(ctx)
+	return err
+}
+
 // RegisterEndpoint converts echo context to params.
 func (w *ServerInterfaceWrapper) RegisterEndpoint(ctx echo.Context) error {
 	var err error
@@ -251,7 +263,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/web/private/organizations", wrapper.SearchOrganizations)
 	router.GET(baseURL+"/web/private/service-provider", wrapper.GetServiceProvider)
 	router.PUT(baseURL+"/web/private/service-provider", wrapper.UpdateServiceProvider)
+	router.GET(baseURL+"/web/private/service-provider/endpoints", wrapper.GetEndpoints)
 	router.POST(baseURL+"/web/private/service-provider/endpoints", wrapper.RegisterEndpoint)
 	router.DELETE(baseURL+"/web/private/service-provider/endpoints/:id", wrapper.DeleteEndpoint)
 
 }
+
