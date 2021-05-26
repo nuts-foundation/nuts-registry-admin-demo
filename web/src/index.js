@@ -14,6 +14,7 @@ import EditCustomer from './admin/EditCustomer.vue'
 import OrganizationRegistry from './admin/OrganizationRegistry.vue'
 import ManageVCs from './admin/ManageVCs.vue'
 import Api from './plugins/api'
+import NewCompoundService from "./admin/NewCompoundService.vue";
 
 const routes = [
   {path: '/', component: Login},
@@ -69,6 +70,13 @@ const routes = [
             name: 'admin.newEndpoint',
             components: {
               modal: NewEndpoint
+            }
+          },
+          {
+            path: 'services/new',
+            name: 'admin.newCompoundService',
+            components: {
+              modal: NewCompoundService
             }
           },
         ]

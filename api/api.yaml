@@ -159,6 +159,34 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServiceProvider"
 
+  /web/private/service-provider/services:
+    get:
+      operationId: getServices
+      description: Get a list of offered services by the Service Provider
+      responses:
+        200:
+          description: Successfull response with a list of services
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Services"
+    post:
+      operationId: addService
+      description: Add a new compound servie to this service provider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceProperties"
+      responses:
+        200:
+          description: The newly created compound service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
   /web/private/service-provider/endpoints:
     get:
       operationId: getEndpoints
@@ -384,3 +412,31 @@ components:
           type: boolean
         serviceProvider:
           $ref: "#/components/schemas/ServiceProvider"
+    Services:
+      type: array
+      items:
+        $ref: "#/components/schemas/Service"
+    ServiceID:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    ServiceProperties:
+      type: object
+      required:
+        - name
+        - endpoints
+      properties:
+        name:
+          description: name of the endpoint. May be freely choosen.
+          type: string
+        endpoints:
+          description: A map containing service references.
+          example: { 'auth': 'did:nuts:1312321?type=oauth-prod' }
+          type: object
+    Service:
+      allOf:
+        - $ref: "#/components/schemas/ServiceID"
+        - $ref: "#/components/schemas/ServiceProperties"

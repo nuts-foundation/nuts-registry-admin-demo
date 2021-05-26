@@ -107,6 +107,18 @@ func (svc Service) Endpoints(sp domain.ServiceProvider) (domain.Endpoints, error
 	return endpoints, nil
 }
 
+func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service, error) {
+	spDID, err := svc.Repository.Get()
+	if err != nil {
+		return nil, err
+	}
+	endpoints := make(map[string]string, len(service.Endpoints))
+	for key, val := range service.Endpoints {
+		endpoints[key] = val.(string)
+	}
+	return nil, svc.DIDManClient.AddCompoundService(spDID.String(), service.Name, endpoints)
+}
+
 func unwrapAPIError(err error) error {
 	if _, ok := err.(net.Error); ok {
 		return domain.ErrNutsNodeUnreachable

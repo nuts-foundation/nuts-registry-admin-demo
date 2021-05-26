@@ -20,7 +20,6 @@ func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
 	return ctx.JSON(200, serviceProvider)
 }
 
-
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	serviceProvider := domain.ServiceProvider{}
 	if err := ctx.Bind(&serviceProvider); err != nil {
@@ -69,4 +68,25 @@ func (w Wrapper) GetEndpoints(ctx echo.Context) error {
 		return echo.NewHTTPError(500, err.Error())
 	}
 	return ctx.JSON(200, endpoints)
+}
+
+func (w Wrapper) GetServices(ctx echo.Context) error {
+	service := domain.Services{domain.Service{
+		ServiceID: domain.ServiceID{Id: "123"},
+		ServiceProperties: domain.ServiceProperties{
+			Endpoints: map[string]interface{}{"auth": "123"},
+			Name:      "eOverdracht",
+		},
+	}}
+	return ctx.JSON(200, service)
+}
+
+func (w Wrapper) AddService(ctx echo.Context) error {
+	service := domain.ServiceProperties{}
+	ctx.Bind(&service)
+	addedService, err := w.SPService.AddService(service)
+	if err != nil {
+		return echo.NewHTTPError(500, err.Error())
+	}
+	return ctx.JSON(200, addedService)
 }

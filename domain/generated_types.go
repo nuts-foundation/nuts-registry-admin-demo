@@ -94,6 +94,29 @@ type EndpointProperties struct {
 // Endpoints defines model for Endpoints.
 type Endpoints []Endpoint
 
+// Service defines model for Service.
+type Service struct {
+	// Embedded struct due to allOf(#/components/schemas/ServiceID)
+	ServiceID `yaml:",inline"`
+	// Embedded struct due to allOf(#/components/schemas/ServiceProperties)
+	ServiceProperties `yaml:",inline"`
+}
+
+// ServiceID defines model for ServiceID.
+type ServiceID struct {
+	Id string `json:"id"`
+}
+
+// ServiceProperties defines model for ServiceProperties.
+type ServiceProperties struct {
+
+	// A map containing service references.
+	Endpoints map[string]interface{} `json:"endpoints"`
+
+	// name of the endpoint. May be freely choosen.
+	Name string `json:"name"`
+}
+
 // A service provider is a controller of other DID documents
 type ServiceProvider struct {
 
@@ -112,6 +135,9 @@ type ServiceProvider struct {
 	// Publicly reachable website address of the service provider
 	Website string `json:"website"`
 }
+
+// Services defines model for Services.
+type Services []Service
 
 // CreateSessionJSONBody defines parameters for CreateSession.
 type CreateSessionJSONBody CreateSessionRequest
@@ -141,6 +167,9 @@ type UpdateServiceProviderJSONBody ServiceProvider
 // RegisterEndpointJSONBody defines parameters for RegisterEndpoint.
 type RegisterEndpointJSONBody EndpointProperties
 
+// AddServiceJSONBody defines parameters for AddService.
+type AddServiceJSONBody ServiceProperties
+
 // CreateSessionJSONRequestBody defines body for CreateSession for application/json ContentType.
 type CreateSessionJSONRequestBody CreateSessionJSONBody
 
@@ -161,6 +190,9 @@ type UpdateServiceProviderJSONRequestBody UpdateServiceProviderJSONBody
 
 // RegisterEndpointJSONRequestBody defines body for RegisterEndpoint for application/json ContentType.
 type RegisterEndpointJSONRequestBody RegisterEndpointJSONBody
+
+// AddServiceJSONRequestBody defines body for AddService for application/json ContentType.
+type AddServiceJSONRequestBody AddServiceJSONBody
 
 // Getter for additional properties for CredentialIssuers. Returns the specified
 // element and whether it was found

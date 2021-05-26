@@ -73,9 +73,49 @@
       </tr>
       </thead>
       <tbody class="tbody">
-      <tr class="hover:bg-gray-100" v-for="endpoint in serviceProvider.endpoints">
+      <tr class="hover:bg-gray-100" v-for="endpoint in endpoints">
         <td class="tcell">{{ endpoint.type }}</td>
         <td class="tcell">{{ endpoint.url }}</td>
+        <td class="tcell">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500"
+               @click="deleteEndpoint(endpoint.id)" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex justify-between mb-6 border-t pt-6" v-if="serviceProvider.id">
+    <h2 class="page-subtitle">Services</h2>
+    <p>A service is set of endpoints which can be offered to customers.</p>
+    <button
+        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
+        @click="$router.push({name: 'admin.newCompoundService'})">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24"
+           stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+      Add
+    </button>
+  </div>
+
+  <div class="shadow overflow-hidden border-gray-200 rounded">
+    <table v-if="services.length > 0" class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+      <tr>
+        <th class="thead">Service name</th>
+        <th class="thead">Endpoints</th>
+        <th class="thead">Delete</th>
+      </tr>
+      </thead>
+      <tbody class="tbody">
+      <tr class="hover:bg-gray-100" v-for="service in services">
+        <td class="tcell">{{ service.name }}</td>
+        <td class="tcell"><p v-for="endpoint in service.endpoints">{{endpoint}}</p></td>
         <td class="tcell">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500"
                @click="deleteEndpoint(endpoint.id)" fill="none" viewBox="0 0 24 24"
@@ -104,12 +144,10 @@ export default {
         phone: '',
       },
       endpoints: [],
+      services: [],
     }
   },
   emits: ["statusUpdate"],
-  created() {
-    this.fetchData()
-  },
   watch: {
     "$route.params": {
       handler(toParams, previousParams) {
@@ -149,13 +187,22 @@ export default {
             this.responseState = 'error'
             this.feedbackMsg = reason
           })
+
       this.$api.get("web/private/service-provider/endpoints")
-      .then(responseData => {
-        this.endpoints = responseData
-      })
-      .catch(reason => {
-        console.log("error while fetching endpoints: ", reason)
-      })
+          .then(responseData => {
+            this.endpoints = responseData
+          })
+          .catch(reason => {
+            console.log("error while fetching endpoints: ", reason)
+          })
+
+      this.$api.get("web/private/service-provider/services")
+          .then(responseData => {
+            this.services = responseData
+          })
+          .catch(reason => {
+            console.log("error while fetching services: ", reason)
+          })
     },
     deleteEndpoint(id) {
       this.$api.delete(`web/private/service-provider/endpoints/${escape(id)}`, id)

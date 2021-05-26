@@ -55,6 +55,12 @@ type ServerInterface interface {
 
 	// (DELETE /web/private/service-provider/endpoints/{id})
 	DeleteEndpoint(ctx echo.Context, id string) error
+
+	// (GET /web/private/service-provider/services)
+	GetServices(ctx echo.Context) error
+
+	// (POST /web/private/service-provider/services)
+	AddService(ctx echo.Context) error
 }
 
 // ServerInterfaceWrapper converts echo contexts to parameters.
@@ -224,6 +230,24 @@ func (w *ServerInterfaceWrapper) DeleteEndpoint(ctx echo.Context) error {
 	return err
 }
 
+// GetServices converts echo context to params.
+func (w *ServerInterfaceWrapper) GetServices(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetServices(ctx)
+	return err
+}
+
+// AddService converts echo context to params.
+func (w *ServerInterfaceWrapper) AddService(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.AddService(ctx)
+	return err
+}
+
 // This is a simple interface which specifies echo.Route addition functions which
 // are present on both echo.Echo and echo.Group, since we want to allow using
 // either of them for path registration
@@ -266,6 +290,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/web/private/service-provider/endpoints", wrapper.GetEndpoints)
 	router.POST(baseURL+"/web/private/service-provider/endpoints", wrapper.RegisterEndpoint)
 	router.DELETE(baseURL+"/web/private/service-provider/endpoints/:id", wrapper.DeleteEndpoint)
+	router.GET(baseURL+"/web/private/service-provider/services", wrapper.GetServices)
+	router.POST(baseURL+"/web/private/service-provider/services", wrapper.AddService)
 
 }
 
