@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -91,7 +90,7 @@ func (s Service) search(searchBody vcrApi.SearchJSONRequestBody) ([]domain.Organ
 		searchBody,
 	)
 	if err != nil {
-		return nil, unwrapAPIError(err)
+		return nil, domain.UnwrapAPIError(err)
 	}
 
 	body, _ := io.ReadAll(response.Body)
@@ -144,7 +143,7 @@ func (s Service) getIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
 	}
 	contactInformation, err := s.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
-		return nil, unwrapAPIError(err)
+		return nil, domain.UnwrapAPIError(err)
 	}
 	if contactInformation != nil {
 		sp.Email = contactInformation.Email
@@ -160,9 +159,6 @@ func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx con
 	response, err := clientFn(ctx, credential)
 	defer cancel()
 	if err != nil {
-		if _, ok := err.(net.Error); ok {
-			return nil, domain.ErrNutsNodeUnreachable
-		}
 		return nil, err
 	}
 
@@ -270,23 +266,16 @@ func (s Service) ManageIssuerTrust(credentialType string, issuerID ssi.URI, trus
 		return nil, fmt.Errorf("expected status 204: %s", response.Status)
 	}
 
-	if err != nil {
-		return nil, unwrapAPIError(err)
+	if err != nil{
+		return nil, domain.UnwrapAPIError(err)
 	}
 
 	sp, err := s.getIssuer(issuerID)
 	if err != nil {
-		return nil, unwrapAPIError(err)
+		return nil, domain.UnwrapAPIError(err)
 	}
 	return &domain.CredentialIssuer{
 		ServiceProvider: *sp,
 		Trusted:         trusted,
 	}, nil
-}
-
-func unwrapAPIError(err error) error {
-	if _, ok := err.(net.Error); ok {
-		return domain.ErrNutsNodeUnreachable
-	}
-	return err
 }
