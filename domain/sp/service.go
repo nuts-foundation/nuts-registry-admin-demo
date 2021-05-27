@@ -106,6 +106,27 @@ func (svc Service) Endpoints(sp domain.ServiceProvider) (domain.Endpoints, error
 	}
 	return endpoints, nil
 }
+func (svc Service) GetServices() (domain.Services, error) {
+	spDID, err := svc.Repository.Get()
+	if err != nil {
+		return nil, err
+	}
+	services, err := svc.DIDManClient.GetCompoundServices(spDID.String())
+	if err != nil {
+		return nil, err
+	}
+	compoundServices := domain.Services{}
+	for _, service := range services {
+		compoundServices = append(compoundServices,  domain.Service{
+			ServiceID:         domain.ServiceID{Id: service.Id},
+			ServiceProperties: domain.ServiceProperties{
+				Endpoints: service.Endpoint,
+				Name:      service.Type,
+			},
+		})
+	}
+	return compoundServices, nil
+}
 
 func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service, error) {
 	spDID, err := svc.Repository.Get()
@@ -116,7 +137,18 @@ func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service
 	for key, val := range service.Endpoints {
 		endpoints[key] = val.(string)
 	}
-	return nil, svc.DIDManClient.AddCompoundService(spDID.String(), service.Name, endpoints)
+	cs, err := svc.DIDManClient.AddCompoundService(spDID.String(), service.Name, endpoints)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Service{
+		ServiceID:         domain.ServiceID{Id: cs.Id},
+		ServiceProperties: domain.ServiceProperties{
+			Endpoints: cs.Endpoint,
+			Name:      cs.Type,
+		},
+	}, nil
 }
 
 func unwrapAPIError(err error) error {

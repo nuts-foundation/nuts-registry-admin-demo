@@ -71,14 +71,11 @@ func (w Wrapper) GetEndpoints(ctx echo.Context) error {
 }
 
 func (w Wrapper) GetServices(ctx echo.Context) error {
-	service := domain.Services{domain.Service{
-		ServiceID: domain.ServiceID{Id: "123"},
-		ServiceProperties: domain.ServiceProperties{
-			Endpoints: map[string]interface{}{"auth": "123"},
-			Name:      "eOverdracht",
-		},
-	}}
-	return ctx.JSON(200, service)
+	services, err := w.SPService.GetServices()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	return ctx.JSON(http.StatusOK, services)
 }
 
 func (w Wrapper) AddService(ctx echo.Context) error {
@@ -86,7 +83,7 @@ func (w Wrapper) AddService(ctx echo.Context) error {
 	ctx.Bind(&service)
 	addedService, err := w.SPService.AddService(service)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, addedService)
+	return ctx.JSON(http.StatusOK, addedService)
 }
