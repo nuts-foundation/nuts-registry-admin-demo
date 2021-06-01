@@ -115,10 +115,10 @@
       <tbody class="tbody">
       <tr class="hover:bg-gray-100" v-for="service in services">
         <td class="tcell">{{ service.name }}</td>
-        <td class="tcell"><p v-for="endpoint in service.endpoints">{{endpoint}}</p></td>
+        <td class="tcell"><p v-for="(endpoint, name) in service.serviceEndpoint">{{name}} &#8594; did:SP-DID?type={{endpoint.split('=')[1]}}</p></td>
         <td class="tcell">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500"
-               @click="deleteEndpoint(endpoint.id)" fill="none" viewBox="0 0 24 24"
+               @click="deleteEndpoint(service.id)" fill="none" viewBox="0 0 24 24"
                stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                   d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>

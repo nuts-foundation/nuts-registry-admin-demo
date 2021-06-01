@@ -110,11 +110,11 @@ type ServiceID struct {
 // ServiceProperties defines model for ServiceProperties.
 type ServiceProperties struct {
 
-	// A map containing service references.
-	Endpoints map[string]interface{} `json:"endpoints"`
-
 	// name of the endpoint. May be freely choosen.
 	Name string `json:"name"`
+
+	// A map containing service references.
+	ServiceEndpoint map[string]interface{} `json:"serviceEndpoint"`
 }
 
 // A service provider is a controller of other DID documents

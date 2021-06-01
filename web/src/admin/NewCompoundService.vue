@@ -26,7 +26,7 @@
             <th>Type</th>
             <th colspan="2">Endpoint name</th>
           </tr>
-          <tr v-for="(endpointRef, name) in service.endpoints">
+          <tr v-for="(endpointRef, name) in service.serviceEndpoint">
             <td>{{ name }}</td>
             <td>{{ endpointRef.split('=')[1] }}</td>
             <td>
@@ -74,7 +74,7 @@ export default {
       formErrors: [],
       service: {
         name: '',
-        endpoints: {}
+        serviceEndpoint: {}
       },
       newEndpointType: "",
       allEndpoints: {},
@@ -115,7 +115,7 @@ export default {
       }
       let did = endpointID.split("#")[0]
 
-      this.service.endpoints[type] = `${did}?type=${endpoint.type}`
+      this.service.serviceEndpoint[type] = `${did}?type=${endpoint.type}`
       this.selectedEndpoint = ""
       this.newEndpointType = ""
       delete this.availableEndpoints[endpointID]
@@ -126,7 +126,7 @@ export default {
       if (!endpoint) {
         return
       }
-      delete this.service.endpoints[name]
+      delete this.service.serviceEndpoint[name]
       this.availableEndpoints[endpoint.id] = endpoint
     },
     checkForm(e) {
@@ -134,7 +134,7 @@ export default {
       this.formErrors.length = 0
       this.apiError = ''
 
-      if (this.service.name && Object.keys(this.service.endpoints).length > 0) {
+      if (this.service.name && Object.keys(this.service.serviceEndpoint).length > 0) {
         return this.confirm()
       }
 
@@ -142,7 +142,7 @@ export default {
         this.formErrors.push("Name required")
       }
 
-      if (!Object.keys(this.service.endpoints).length > 0) {
+      if (!Object.keys(this.service.serviceEndpoint).length > 0) {
         this.formErrors.push("At least one endpoint required")
       }
 

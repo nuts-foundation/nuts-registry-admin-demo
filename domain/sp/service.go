@@ -120,7 +120,7 @@ func (svc Service) GetServices() (domain.Services, error) {
 		compoundServices = append(compoundServices,  domain.Service{
 			ServiceID:         domain.ServiceID{Id: service.Id},
 			ServiceProperties: domain.ServiceProperties{
-				Endpoints: service.Endpoint,
+				ServiceEndpoint: service.ServiceEndpoint,
 				Name:      service.Type,
 			},
 		})
@@ -133,8 +133,8 @@ func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service
 	if err != nil {
 		return nil, err
 	}
-	endpoints := make(map[string]string, len(service.Endpoints))
-	for key, val := range service.Endpoints {
+	endpoints := make(map[string]string, len(service.ServiceEndpoint))
+	for key, val := range service.ServiceEndpoint {
 		endpoints[key] = val.(string)
 	}
 	cs, err := svc.DIDManClient.AddCompoundService(spDID.String(), service.Name, endpoints)
@@ -145,7 +145,7 @@ func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service
 	return &domain.Service{
 		ServiceID:         domain.ServiceID{Id: cs.Id},
 		ServiceProperties: domain.ServiceProperties{
-			Endpoints: cs.Endpoint,
+			ServiceEndpoint: cs.ServiceEndpoint,
 			Name:      cs.Type,
 		},
 	}, nil

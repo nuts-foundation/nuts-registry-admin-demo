@@ -427,12 +427,12 @@ components:
       type: object
       required:
         - name
-        - endpoints
+        - serviceEndpoint
       properties:
         name:
           description: name of the endpoint. May be freely choosen.
           type: string
-        endpoints:
+        serviceEndpoint:
           description: A map containing service references.
           example: { 'auth': 'did:nuts:1312321?type=oauth-prod' }
           type: object
