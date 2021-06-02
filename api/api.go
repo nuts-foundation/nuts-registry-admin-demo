@@ -66,18 +66,13 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
-	connectReq := domain.ConnectCustomerRequest{}
-	if err := ctx.Bind(&connectReq); err != nil {
+	customer := &domain.Customer{}
+	if err := ctx.Bind(customer); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	if len(connectReq.Id) == 0 || len(connectReq.Name) == 0 {
+	if len(customer.Id) == 0 || len(customer.Name) == 0 {
 		return echo.NewHTTPError(http.StatusBadRequest, "name and id must be provided")
-	}
-
-	city := ""
-	if connectReq.City != nil {
-		city = *connectReq.City
 	}
 
 	serviceProvider, err := w.SPService.Get()
@@ -89,7 +84,7 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("service provider not correctly configured: DID is invalid: %w", err))
 	}
 
-	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, city, *spID)
+	customer, err = w.CustomerService.ConnectCustomer(*customer, *spID)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
@@ -109,6 +104,7 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 	customer, err := w.CustomerService.Repository.Update(id, func(c domain.Customer) (*domain.Customer, error) {
 		c.Name = req.Name
 		c.City = req.City
+		c.Domain = req.Domain
 		if err := w.CredentialService.ManageNutsOrgCredential(c, req.Active); err != nil {
 			return nil, err
 		}

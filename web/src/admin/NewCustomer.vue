@@ -31,6 +31,8 @@ export default {
         id: '',
         name: '',
         city: '',
+        domain: '',
+        active: false
       }
     }
   },
