@@ -38,6 +38,15 @@ type ServerInterface interface {
 	// (PUT /web/private/customers/{id})
 	UpdateCustomer(ctx echo.Context, id string) error
 
+	// (GET /web/private/customers/{id}/services)
+	GetServicesForCustomer(ctx echo.Context, id string) error
+
+	// (POST /web/private/customers/{id}/services)
+	EnableCustomerService(ctx echo.Context, id string) error
+
+	// (DELETE /web/private/customers/{id}/services/{type})
+	DisableCustomerService(ctx echo.Context, id string, pType string) error
+
 	// (POST /web/private/organizations)
 	SearchOrganizations(ctx echo.Context) error
 
@@ -169,6 +178,62 @@ func (w *ServerInterfaceWrapper) UpdateCustomer(ctx echo.Context) error {
 	return err
 }
 
+// GetServicesForCustomer converts echo context to params.
+func (w *ServerInterfaceWrapper) GetServicesForCustomer(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.GetServicesForCustomer(ctx, id)
+	return err
+}
+
+// EnableCustomerService converts echo context to params.
+func (w *ServerInterfaceWrapper) EnableCustomerService(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.EnableCustomerService(ctx, id)
+	return err
+}
+
+// DisableCustomerService converts echo context to params.
+func (w *ServerInterfaceWrapper) DisableCustomerService(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "id", runtime.ParamLocationPath, ctx.Param("id"), &id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter id: %s", err))
+	}
+
+	// ------------- Path parameter "type" -------------
+	var pType string
+
+	err = runtime.BindStyledParameterWithLocation("simple", false, "type", runtime.ParamLocationPath, ctx.Param("type"), &pType)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter type: %s", err))
+	}
+
+	// Invoke the callback with all the unmarshalled arguments
+	err = w.Handler.DisableCustomerService(ctx, id, pType)
+	return err
+}
+
 // SearchOrganizations converts echo context to params.
 func (w *ServerInterfaceWrapper) SearchOrganizations(ctx echo.Context) error {
 	var err error
@@ -284,6 +349,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.POST(baseURL+"/web/private/customers", wrapper.ConnectCustomer)
 	router.GET(baseURL+"/web/private/customers/:id", wrapper.GetCustomer)
 	router.PUT(baseURL+"/web/private/customers/:id", wrapper.UpdateCustomer)
+	router.GET(baseURL+"/web/private/customers/:id/services", wrapper.GetServicesForCustomer)
+	router.POST(baseURL+"/web/private/customers/:id/services", wrapper.EnableCustomerService)
+	router.DELETE(baseURL+"/web/private/customers/:id/services/:type", wrapper.DisableCustomerService)
 	router.POST(baseURL+"/web/private/organizations", wrapper.SearchOrganizations)
 	router.GET(baseURL+"/web/private/service-provider", wrapper.GetServiceProvider)
 	router.PUT(baseURL+"/web/private/service-provider", wrapper.UpdateServiceProvider)

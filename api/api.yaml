@@ -105,6 +105,80 @@ paths:
               schema:
                 $ref: "#/components/schemas/Customer"
 
+  /web/private/customers/{id}/services:
+    parameters:
+      - name: id
+        in: path
+        description: internal customer id
+        required: true
+        example:
+          - "C12"
+        schema:
+          type: string
+    get:
+      operationId: getServicesForCustomer
+      responses:
+        200:
+          description: A list of services enabled for this customer.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Services"
+    post:
+      operationId: enableCustomerService
+      description: |
+        Enable a service for a customer by adding a reference to a service.
+        This allows for administring the compound service on the Saas provider and referencing the service from the customer.
+        Note that there can only be one service of the same type per customer DID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - did
+              properties:
+                type:
+                  type: string
+                  example: "eOverdracht"
+                did:
+                  type: string
+                  example: "did:nuts:123"
+                  description: The did wich contains the referenced service.
+      responses:
+        200:
+          description: After the ref is succesfully added, it returns the a DID service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
+  /web/private/customers/{id}/services/{type}:
+    parameters:
+      - name: id
+        in: path
+        description: internal customer id
+        required: true
+        example:
+          - "C12"
+        schema:
+          type: string
+      - name: type
+        in: path
+        description: The type of the service
+        required: true
+        example:
+          - "eOverdracht"
+        schema:
+          type: string
+    delete:
+      operationId: disableCustomerService
+      responses:
+        204:
+          description: Succesfully removed service
+
   /web/private/organizations:
     post:
       operationId: searchOrganizations

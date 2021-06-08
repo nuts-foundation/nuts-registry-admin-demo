@@ -62,8 +62,8 @@ func (svc Service) RegisterEndpoint(endpoint domain.EndpointProperties) error {
 	if err != nil {
 		return err
 	}
-	return svc.DIDManClient.AddEndpoint(spDID.String(), endpoint.Type, endpoint.Url)
-
+	_, err = svc.DIDManClient.AddEndpoint(spDID.String(), endpoint.Type, endpoint.Url)
+	return err
 }
 
 func (svc Service) DeleteEndpoint(id ssi.URI) error {

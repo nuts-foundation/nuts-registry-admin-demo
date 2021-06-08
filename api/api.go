@@ -97,11 +97,7 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 }
 
 func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
-	req := struct {
-		Name   string
-		Active bool
-		City   string
-	}{}
+	req := domain.Customer{}
 	if err := ctx.Bind(&req); err != nil {
 		return err
 	}
@@ -112,9 +108,7 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 
 	customer, err := w.CustomerService.Repository.Update(id, func(c domain.Customer) (*domain.Customer, error) {
 		c.Name = req.Name
-		if len(req.City) >= 0 {
-			c.City = &req.City
-		}
+		c.City = req.City
 		if err := w.CredentialService.ManageNutsOrgCredential(c, req.Active); err != nil {
 			return nil, err
 		}
@@ -139,6 +133,7 @@ func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
 	if err != nil {
 		return echo.NewHTTPError(500, err.Error())
 	}
+
 	customer.Active = len(credentialsForCustomer) > 0
 	return ctx.JSON(200, customer)
 }
@@ -177,4 +172,28 @@ func (w Wrapper) SearchOrganizations(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 	return ctx.JSON(200, result)
+}
+
+func (w Wrapper) GetServicesForCustomer(ctx echo.Context, customerID string) error {
+	services, err := w.CustomerService.GetServices(customerID)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(http.StatusOK, services)
+}
+
+func (w Wrapper) EnableCustomerService(ctx echo.Context, customerID string) error {
+	req := domain.EnableCustomerServiceJSONRequestBody{}
+	if err := ctx.Bind(&req); err != nil {
+		return err
+	}
+
+	if err := w.CustomerService.EnableService(customerID, req.Did, req.Type); err != nil {
+		return err
+	}
+	return ctx.NoContent(http.StatusNoContent)
+}
+
+func (w Wrapper) DisableCustomerService(ctx echo.Context, customerID string, pType string) error {
+	panic("implement me")
 }

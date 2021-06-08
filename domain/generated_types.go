@@ -155,6 +155,14 @@ type UpdateCustomerJSONBody struct {
 	Name   string  `json:"name"`
 }
 
+// EnableCustomerServiceJSONBody defines parameters for EnableCustomerService.
+type EnableCustomerServiceJSONBody struct {
+
+	// The did wich contains the referenced service.
+	Did  string `json:"did"`
+	Type string `json:"type"`
+}
+
 // SearchOrganizationsJSONBody defines parameters for SearchOrganizations.
 type SearchOrganizationsJSONBody struct {
 	City string `json:"city"`
@@ -181,6 +189,9 @@ type ConnectCustomerJSONRequestBody ConnectCustomerJSONBody
 
 // UpdateCustomerJSONRequestBody defines body for UpdateCustomer for application/json ContentType.
 type UpdateCustomerJSONRequestBody UpdateCustomerJSONBody
+
+// EnableCustomerServiceJSONRequestBody defines body for EnableCustomerService for application/json ContentType.
+type EnableCustomerServiceJSONRequestBody EnableCustomerServiceJSONBody
 
 // SearchOrganizationsJSONRequestBody defines body for SearchOrganizations for application/json ContentType.
 type SearchOrganizationsJSONRequestBody SearchOrganizationsJSONBody
