@@ -194,6 +194,9 @@ func (w Wrapper) EnableCustomerService(ctx echo.Context, customerID string) erro
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-func (w Wrapper) DisableCustomerService(ctx echo.Context, customerID string, pType string) error {
-	panic("implement me")
+func (w Wrapper) DisableCustomerService(ctx echo.Context, customerID string, serviceType string) error {
+	if err := w.CustomerService.DisableService(customerID, serviceType); err != nil {
+		return err
+	}
+	return ctx.NoContent(http.StatusNoContent)
 }

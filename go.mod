@@ -10,7 +10,7 @@ require (
 	github.com/mitchellh/copystructure v1.1.2 // indirect
 	github.com/mitchellh/mapstructure v1.4.1 // indirect
 	github.com/nuts-foundation/go-did v0.0.0-20210406065435-ed072ef7b317
-	github.com/nuts-foundation/nuts-node v0.0.0-20210601143725-23ee0d16cc61
+	github.com/nuts-foundation/nuts-node v0.0.0-20210608081436-e93a2470f61c
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/pflag v1.0.5

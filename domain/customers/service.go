@@ -62,12 +62,12 @@ func (s Service) EnableService(customerID string, spDID string, serviceType stri
 }
 
 func (s Service) DisableService(customerID, serviceType string) error {
-	_, err := s.Repository.FindByID(customerID)
+	customer, err := s.Repository.FindByID(customerID)
 	if err != nil {
 		return err
 	}
 	// Add Delete endpoint to didman un the nuts-node
-	panic("implement")
+	return s.DIDManClient.DeleteEndpoint(customer.Did, serviceType)
 }
 
 func (s Service) ManageServices(customerDIDStr string, serviceIDStr []string) ([]did.Service, error) {
