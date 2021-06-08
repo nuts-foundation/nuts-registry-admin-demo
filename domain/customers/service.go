@@ -48,11 +48,7 @@ func (s Service) EnableService(customerID string, spDID string, serviceType stri
 	if err != nil {
 		return err
 	}
-	ref := spDID + "?type=" + serviceType
-
-	// TODO: form checks:
-	// ServiceType unique for customer doc?
-	// Service type present on serviceProvider doc?
+	ref := "ref://" + spDID + "serviceEndpoints?type=" + serviceType
 
 	_, err = s.DIDManClient.AddEndpoint(customer.Did, serviceType, ref)
 	if err != nil {
