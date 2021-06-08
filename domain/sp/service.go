@@ -2,7 +2,6 @@ package sp
 
 import (
 	"fmt"
-	"net"
 
 	ssi "github.com/nuts-foundation/go-did"
 	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
@@ -38,7 +37,7 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 		// Service Provider not registered yet, so create a DID
 		didDoc, err := svc.VDRClient.Create(vdrAPI.DIDCreateRequest{})
 		if err != nil {
-			return nil, unwrapAPIError(err)
+			return nil, domain.UnwrapAPIError(err)
 		}
 		sp.Id = didDoc.ID.String()
 		if err := svc.Repository.Set(sp.Id); err != nil {
@@ -52,7 +51,7 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 		Phone:   sp.Phone,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("unable to update DID contact info: %w", unwrapAPIError(err))
+		return nil, fmt.Errorf("unable to update DID contact info: %w", domain.UnwrapAPIError(err))
 	}
 	return &sp, nil
 }
@@ -73,7 +72,7 @@ func (svc Service) DeleteEndpoint(id ssi.URI) error {
 func (svc Service) enrichWithContactInfo(sp *domain.ServiceProvider) error {
 	contactInformation, err := svc.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
-		return unwrapAPIError(err)
+		return domain.UnwrapAPIError(err)
 	}
 	if contactInformation != nil {
 		sp.Email = contactInformation.Email
@@ -87,7 +86,7 @@ func (svc Service) enrichWithContactInfo(sp *domain.ServiceProvider) error {
 func (svc Service) Endpoints(sp domain.ServiceProvider) (domain.Endpoints, error) {
 	document, _, err := svc.VDRClient.Get(sp.Id)
 	if err != nil {
-		return nil, unwrapAPIError(err)
+		return nil, domain.UnwrapAPIError(err)
 	}
 	endpoints := domain.Endpoints{}
 	for _, svc := range document.Service {
@@ -151,9 +150,3 @@ func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service
 	}, nil
 }
 
-func unwrapAPIError(err error) error {
-	if _, ok := err.(net.Error); ok {
-		return domain.ErrNutsNodeUnreachable
-	}
-	return err
-}

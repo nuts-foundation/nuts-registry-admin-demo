@@ -5,7 +5,7 @@
 
   <form class="space-x-3 flex">
     <div>
-      <label for="nameInput">Name:</label>
+      <label for="nameInput">Name (required):</label>
       <input type="text" v-model="query.name" id="nameInput" v-on:input="search" v-on:focusout="search">
     </div>
     <div>
@@ -57,7 +57,7 @@ export default {
   emits: ["statusUpdate"],
   methods: {
     search() {
-      if (this.query.name === "" && this.query.city === "") {
+      if (this.query.name === "") {
         this.results = []
         return
       }

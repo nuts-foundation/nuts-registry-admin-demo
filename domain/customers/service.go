@@ -2,8 +2,6 @@ package customers
 
 import (
 	"fmt"
-	"net"
-
 	"github.com/nuts-foundation/go-did/did"
 	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
 	nutsApi "github.com/nuts-foundation/nuts-node/vdr/api/v1"
@@ -27,10 +25,7 @@ func (s Service) ConnectCustomer(id, name, city string, serviceProviderID did.DI
 		CapabilityInvocation: &capabilityInvocation,
 	})
 	if err != nil {
-		if _, ok := err.(net.Error); ok {
-			return nil, domain.ErrNutsNodeUnreachable
-		}
-		return nil, err
+		return nil, domain.UnwrapAPIError(err)
 	}
 
 	customer := domain.Customer{
