@@ -12,12 +12,12 @@ import (
 func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
 	serviceProvider, err := w.SPService.Get()
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	if serviceProvider == nil {
-		return ctx.NoContent(404)
+		return ctx.NoContent(http.StatusNotFound)
 	}
-	return ctx.JSON(200, serviceProvider)
+	return ctx.JSON(http.StatusOK, serviceProvider)
 }
 
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
@@ -27,9 +27,9 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	}
 	res, err := w.SPService.CreateOrUpdate(serviceProvider)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, res)
+	return ctx.JSON(http.StatusOK, res)
 }
 
 func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
@@ -58,16 +58,16 @@ func (w Wrapper) DeleteEndpoint(ctx echo.Context, idStr string) error {
 func (w Wrapper) GetEndpoints(ctx echo.Context) error {
 	serviceProvider, err := w.SPService.Get()
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	if serviceProvider == nil {
-		return ctx.NoContent(404)
+		return ctx.NoContent(http.StatusNotFound)
 	}
-	endpoints, err := w.SPService.Endpoints(*serviceProvider)
+	endpoints, err := w.SPService.GetEndpoints(*serviceProvider)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, endpoints)
+	return ctx.JSON(http.StatusOK, endpoints)
 }
 
 func (w Wrapper) GetServices(ctx echo.Context) error {

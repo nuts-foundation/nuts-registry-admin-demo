@@ -41,19 +41,19 @@ func (w Wrapper) CreateSession(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	return ctx.JSON(200, domain.CreateSessionResponse{Token: string(token)})
+	return ctx.JSON(http.StatusOK, domain.CreateSessionResponse{Token: string(token)})
 }
 
 func (w Wrapper) GetCustomers(ctx echo.Context) error {
 	allCustomers, err := w.CustomerService.Repository.All()
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	for i, c := range allCustomers {
 		credentialsForCustomer, err := w.CredentialService.GetCredentials(c)
 		if err != nil {
-			return echo.NewHTTPError(500, err.Error())
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 		allCustomers[i].Active = len(credentialsForCustomer) > 0
 	}
@@ -62,13 +62,13 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 	for _, c := range allCustomers {
 		response = append(response, c)
 	}
-	return ctx.JSON(200, response)
+	return ctx.JSON(http.StatusOK, response)
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 	connectReq := domain.ConnectCustomerRequest{}
 	if err := ctx.Bind(&connectReq); err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	if len(connectReq.Id) == 0 || len(connectReq.Name) == 0 {
@@ -91,9 +91,9 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 
 	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, city, *spID)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, customer)
+	return ctx.JSON(http.StatusOK, customer)
 }
 
 func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
@@ -115,35 +115,35 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 		return &c, nil
 	})
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, customer)
+	return ctx.JSON(http.StatusOK, customer)
 }
 
 func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
 	customer, err := w.CustomerService.Repository.FindByID(id)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	if customer == nil {
-		return ctx.NoContent(404)
+		return ctx.NoContent(http.StatusNotFound)
 	}
 
 	credentialsForCustomer, err := w.CredentialService.GetCredentials(*customer)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	customer.Active = len(credentialsForCustomer) > 0
-	return ctx.JSON(200, customer)
+	return ctx.JSON(http.StatusOK, customer)
 }
 
 func (w Wrapper) GetCredentialIssuers(ctx echo.Context) error {
 	res, err := w.CredentialService.GetCredentialIssuers([]string{"NutsOrganizationCredential"})
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, res)
+	return ctx.JSON(http.StatusOK, res)
 }
 
 func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string, didStr string) error {
@@ -159,7 +159,7 @@ func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string,
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(200, issuerTrust)
+	return ctx.JSON(http.StatusOK, issuerTrust)
 }
 
 func (w Wrapper) SearchOrganizations(ctx echo.Context) error {
@@ -171,7 +171,7 @@ func (w Wrapper) SearchOrganizations(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(200, result)
+	return ctx.JSON(http.StatusOK, result)
 }
 
 func (w Wrapper) GetServicesForCustomer(ctx echo.Context, customerID string) error {
