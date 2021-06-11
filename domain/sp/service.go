@@ -83,7 +83,7 @@ func (svc Service) enrichWithContactInfo(sp *domain.ServiceProvider) error {
 	return nil
 }
 
-func (svc Service) Endpoints(sp domain.ServiceProvider) (domain.Endpoints, error) {
+func (svc Service) GetEndpoints(sp domain.ServiceProvider) (domain.Endpoints, error) {
 	document, _, err := svc.VDRClient.Get(sp.Id)
 	if err != nil {
 		return nil, domain.UnwrapAPIError(err)
