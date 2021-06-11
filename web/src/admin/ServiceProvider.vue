@@ -162,12 +162,13 @@ export default {
       this.$emit("statusUpdate", event)
     },
     updateServiceProvider() {
+      this.feedbackMsg = ''
+
       this.$api.put("web/private/service-provider", this.serviceProvider)
           .then(responseData => {
             this.responseState = 'success'
             this.$emit("statusUpdate", "Service Provider Saved")
             this.serviceProvider = responseData
-            this.feedbackMsg = ''
           })
           .catch(reason => {
             console.error("failure", reason)
@@ -176,10 +177,11 @@ export default {
           })
     },
     fetchData() {
+      this.feedbackMsg = ''
+
       this.$api.get("web/private/service-provider")
           .then(responseData => {
             this.responseState = 'success'
-            this.feedbackMsg = ''
             this.serviceProvider = responseData
           })
           .catch(reason => {
@@ -201,16 +203,22 @@ export default {
             this.services = responseData
           })
           .catch(reason => {
-            console.log("error while fetching services: ", reason)
+            console.error("failure", reason)
+            this.responseState = 'error'
+            this.feedbackMsg = reason
           })
     },
     deleteEndpoint(id) {
+      this.feedbackMsg = ''
+
       this.$api.delete(`web/private/service-provider/endpoints/${escape(id)}`, id)
           .then(response => {
             this.$emit("statusUpdate", "Endpoint deleted")
           })
           .catch(reason => {
             console.error("failure", reason)
+            this.responseState = 'error'
+            this.feedbackMsg = reason
           })
           .finally(() => {
             this.fetchData()

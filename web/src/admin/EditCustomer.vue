@@ -89,10 +89,8 @@ export default {
     },
     toggleService(id, event) {
       let newState = event.target.checked
-      console.log("toggle", id, event.target.checked)
       let service = this.availableServices.find(v => v.id == id)
       if (!service) {
-        console.warn("service not found")
         return
       }
       if (newState) {
@@ -112,7 +110,6 @@ export default {
       }
     },
     fetchCustomer(id) {
-      console.log("id: ", id)
       this.$api.get(`web/private/customers/${id}`)
           .then((customer) => {
             this.customer = {
@@ -139,13 +136,11 @@ export default {
             this.availableServices = responseData
           })
           .catch(reason => {
+            this.apiError = reason.statusText
             console.log("error while fetching services: ", reason)
           })
     },
     saveCustomer() {
-      console.log("service to add:   ", this.servicesToAdd)
-      console.log("service to remove:", this.servicesToRemove)
-
       this.$api.put(`web/private/customers/${this.customer.id}`, this.customer)
           .then((customer) => {
             this.customer = customer
