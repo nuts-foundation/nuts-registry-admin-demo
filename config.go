@@ -44,7 +44,9 @@ type Config struct {
 	NutsNodeAddress string      `koanf:"nutsnodeaddr"`
 	CustomersFile   string      `koanf:"customersfile"`
 	Branding        Branding    `koanf:"branding"`
-	sessionKey      *ecdsa.PrivateKey
+	// PreconfiguredServiceProvider contains info for automatically registering the Service Provider, if no Service Provider has been registered yet.
+	PreconfiguredServiceProvider ServiceProviderInfo `koanf:"serviceprovider"`
+	sessionKey                   *ecdsa.PrivateKey
 }
 
 type Credentials struct {
@@ -55,6 +57,13 @@ type Credentials struct {
 type Branding struct {
 	// Logo defines a path that points to a file on disk to be used as logo, to be displayed in the application.
 	Logo string `koanf:"logo"`
+}
+
+type ServiceProviderInfo struct {
+	Name    string `koanf:"name"`
+	Email   string `koanf:"email"`
+	Phone   string `koanf:"phone"`
+	Website string `koanf:"website"`
 }
 
 func (c Credentials) Empty() bool {

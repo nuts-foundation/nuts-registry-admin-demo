@@ -6,6 +6,8 @@ import (
 	"embed"
 	"encoding/hex"
 	"fmt"
+	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
+	"github.com/sirupsen/logrus"
 	"io/fs"
 	"log"
 	"net/http"
@@ -128,8 +130,32 @@ func main() {
 	e.GET("/branding/logo", (&api.LogoHandler{FilePath: config.Branding.Logo}).Handle)
 	e.GET("/*", echo.WrapHandler(assetHandler))
 
+	// If service provider info is configured and no service provider is registered yet, we'll automatically register it (for convenience).
+	if err := registerPreconfiguredServiceProvider(config.PreconfiguredServiceProvider, spService); err != nil {
+		log.Fatalf("Unable to register preconfigured service provider: %v", err)
+	}
+
 	// Start server
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.HTTPPort)))
+}
+
+func registerPreconfiguredServiceProvider(info ServiceProviderInfo, service sp.Service) error {
+	if len(info.Name) == 0 {
+		return nil
+	}
+	existing, err := service.Get()
+	if err != nil || existing != nil {
+		// Already registered, or an error occurred.
+		return err
+	}
+	logrus.Infof("Automatically registering service provider: %v", info)
+	_, err = service.CreateOrUpdate(domain.ServiceProvider{
+		Name:    info.Name,
+		Email:   info.Email,
+		Phone:   info.Phone,
+		Website: info.Website,
+	})
+	return err
 }
 
 func generateDefaultAccount(config Config) api.UserAccount {
