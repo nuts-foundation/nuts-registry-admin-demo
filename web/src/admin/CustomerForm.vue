@@ -17,7 +17,7 @@
       <input type="text" v-model="value.city" id="customerCityInput">
     </div>
     <div>
-      <label for="customerCityInput">Domain:</label>
+      <label for="customerDomainInput">Domain:</label>
       <input type="text" v-model="value.domain" id="customerDomainInput">
     </div>
     <div v-if="mode==='edit'">
