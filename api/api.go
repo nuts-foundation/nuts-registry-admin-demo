@@ -179,6 +179,7 @@ func (w Wrapper) GetServicesForCustomer(ctx echo.Context, customerID string) err
 	if err != nil {
 		return err
 	}
+	// make sure the response is always initialized to ensure [] instead of null json
 	response := make([]did.Service, len(services))
 	for i, s := range services {
 		response[i] = s
