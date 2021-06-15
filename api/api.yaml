@@ -105,6 +105,80 @@ paths:
               schema:
                 $ref: "#/components/schemas/Customer"
 
+  /web/private/customers/{id}/services:
+    parameters:
+      - name: id
+        in: path
+        description: internal customer id
+        required: true
+        example:
+          - "C12"
+        schema:
+          type: string
+    get:
+      operationId: getServicesForCustomer
+      responses:
+        200:
+          description: A list of services enabled for this customer.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Services"
+    post:
+      operationId: enableCustomerService
+      description: |
+        Enable a service for a customer by adding a reference to a service.
+        This allows for administring the compound service on the Saas provider and referencing the service from the customer.
+        Note that there can only be one service of the same type per customer DID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - did
+              properties:
+                type:
+                  type: string
+                  example: "eOverdracht"
+                did:
+                  type: string
+                  example: "did:nuts:123"
+                  description: The did wich contains the referenced service.
+      responses:
+        200:
+          description: After the ref is succesfully added, it returns the a DID service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
+  /web/private/customers/{id}/services/{type}:
+    parameters:
+      - name: id
+        in: path
+        description: internal customer id
+        required: true
+        example:
+          - "C12"
+        schema:
+          type: string
+      - name: type
+        in: path
+        description: The type of the service
+        required: true
+        example:
+          - "eOverdracht"
+        schema:
+          type: string
+    delete:
+      operationId: disableCustomerService
+      responses:
+        204:
+          description: Succesfully removed service
+
   /web/private/organizations:
     post:
       operationId: searchOrganizations
@@ -159,7 +233,45 @@ paths:
               schema:
                 $ref: "#/components/schemas/ServiceProvider"
 
+  /web/private/service-provider/services:
+    get:
+      operationId: getServices
+      description: Get a list of offered services by the Service Provider
+      responses:
+        200:
+          description: Successfull response with a list of services
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Services"
+    post:
+      operationId: addService
+      description: Add a new compound servie to this service provider
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ServiceProperties"
+      responses:
+        200:
+          description: The newly created compound service
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Service"
+
   /web/private/service-provider/endpoints:
+    get:
+      operationId: getEndpoints
+      description: Get a list of all endpoints
+      responses:
+        200:
+          description: The resulting list of endoints
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoints"
     post:
       operationId: registerEndpoint
       description: Register endpoint URL on service provider's DID.
@@ -168,10 +280,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Endpoint"
+              $ref: "#/components/schemas/EndpointProperties"
       responses:
         201:
           description: The resulting created endpoint.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoint"
+
   /web/private/service-provider/endpoints/{id}:
     parameters:
       - name: id
@@ -308,7 +425,6 @@ components:
         - phone
         - email
         - website
-        - endpoints
       properties:
         id:
           description: The DID of the service provider
@@ -326,27 +442,34 @@ components:
         website:
           description: Publicly reachable website address of the service provider
           type: string
-        endpoints:
-          description: Endpoints published by the service provider.
-          type: array
-          items:
-            $ref: "#/components/schemas/Endpoint"
-    Endpoint:
+    EndpointProperties:
       type: object
-      description: An endpoint registered on a DID Document.
       required:
         - type
         - url
       properties:
-        id:
-          description: ID of the endpoint which is calculated on creation.
-          type: string
         type:
           description: Type of the endpoint.
           type: string
         url:
           description: URL of the endpoint.
           type: string
+    EndpointID:
+      description: ID of the endpoint which is calculated on creation.
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    Endpoint:
+      allOf:
+        - $ref: "#/components/schemas/EndpointID"
+        - $ref: "#/components/schemas/EndpointProperties"
+    Endpoints:
+      type: array
+      items:
+        $ref: "#/components/schemas/Endpoint"
     CredentialIssuers:
       type: object
       additionalProperties:
@@ -363,3 +486,31 @@ components:
           type: boolean
         serviceProvider:
           $ref: "#/components/schemas/ServiceProvider"
+    Services:
+      type: array
+      items:
+        $ref: "#/components/schemas/Service"
+    ServiceID:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+    ServiceProperties:
+      type: object
+      required:
+        - name
+        - serviceEndpoint
+      properties:
+        name:
+          description: name of the endpoint. May be freely choosen.
+          type: string
+        serviceEndpoint:
+          description: A map containing service references.
+          example: { 'auth': 'did:nuts:1312321?type=oauth-prod' }
+          type: object
+    Service:
+      allOf:
+        - $ref: "#/components/schemas/ServiceID"
+        - $ref: "#/components/schemas/ServiceProperties"

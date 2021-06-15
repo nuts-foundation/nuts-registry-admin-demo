@@ -41,19 +41,19 @@ func (w Wrapper) CreateSession(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
 
-	return ctx.JSON(200, domain.CreateSessionResponse{Token: string(token)})
+	return ctx.JSON(http.StatusOK, domain.CreateSessionResponse{Token: string(token)})
 }
 
 func (w Wrapper) GetCustomers(ctx echo.Context) error {
 	allCustomers, err := w.CustomerService.Repository.All()
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	for i, c := range allCustomers {
 		credentialsForCustomer, err := w.CredentialService.GetCredentials(c)
 		if err != nil {
-			return echo.NewHTTPError(500, err.Error())
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 		allCustomers[i].Active = len(credentialsForCustomer) > 0
 	}
@@ -62,60 +62,13 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 	for _, c := range allCustomers {
 		response = append(response, c)
 	}
-	return ctx.JSON(200, response)
-}
-
-func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
-	serviceProvider, err := w.SPService.Get()
-	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
-	}
-	if serviceProvider == nil {
-		return ctx.NoContent(404)
-	}
-	return ctx.JSON(200, serviceProvider)
-}
-
-func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
-	serviceProvider := domain.ServiceProvider{}
-	if err := ctx.Bind(&serviceProvider); err != nil {
-		return err
-	}
-	res, err := w.SPService.CreateOrUpdate(serviceProvider)
-	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
-	}
-	return ctx.JSON(200, res)
-}
-
-func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
-	ep := domain.Endpoint{}
-	if err := ctx.Bind(&ep); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-	err := w.SPService.RegisterEndpoint(ep)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-	return ctx.NoContent(http.StatusCreated)
-}
-
-func (w Wrapper) DeleteEndpoint(ctx echo.Context, idStr string) error {
-	id, err := ssi.ParseURI(idStr)
-	if err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, fmt.Errorf("invalid endpoint ID: %w", err))
-	}
-
-	if err := w.SPService.DeleteEndpoint(*id); err != nil {
-		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
-	}
-	return ctx.NoContent(http.StatusNoContent)
+	return ctx.JSON(http.StatusOK, response)
 }
 
 func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 	connectReq := domain.ConnectCustomerRequest{}
 	if err := ctx.Bind(&connectReq); err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
 	if len(connectReq.Id) == 0 || len(connectReq.Name) == 0 {
@@ -138,17 +91,13 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 
 	customer, err := w.CustomerService.ConnectCustomer(connectReq.Id, connectReq.Name, city, *spID)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, customer)
+	return ctx.JSON(http.StatusOK, customer)
 }
 
 func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
-	req := struct {
-		Name   string
-		Active bool
-		City   string
-	}{}
+	req := domain.Customer{}
 	if err := ctx.Bind(&req); err != nil {
 		return err
 	}
@@ -159,43 +108,42 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 
 	customer, err := w.CustomerService.Repository.Update(id, func(c domain.Customer) (*domain.Customer, error) {
 		c.Name = req.Name
-		if len(req.City) >= 0 {
-			c.City = &req.City
-		}
+		c.City = req.City
 		if err := w.CredentialService.ManageNutsOrgCredential(c, req.Active); err != nil {
 			return nil, err
 		}
 		return &c, nil
 	})
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, customer)
+	return ctx.JSON(http.StatusOK, customer)
 }
 
 func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
 	customer, err := w.CustomerService.Repository.FindByID(id)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	if customer == nil {
-		return ctx.NoContent(404)
+		return ctx.NoContent(http.StatusNotFound)
 	}
 
 	credentialsForCustomer, err := w.CredentialService.GetCredentials(*customer)
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+
 	customer.Active = len(credentialsForCustomer) > 0
-	return ctx.JSON(200, customer)
+	return ctx.JSON(http.StatusOK, customer)
 }
 
 func (w Wrapper) GetCredentialIssuers(ctx echo.Context) error {
 	res, err := w.CredentialService.GetCredentialIssuers([]string{"NutsOrganizationCredential"})
 	if err != nil {
-		return echo.NewHTTPError(500, err.Error())
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	return ctx.JSON(200, res)
+	return ctx.JSON(http.StatusOK, res)
 }
 
 func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string, didStr string) error {
@@ -211,7 +159,7 @@ func (w Wrapper) UpdateCredentialIssuer(ctx echo.Context, CredentialType string,
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(200, issuerTrust)
+	return ctx.JSON(http.StatusOK, issuerTrust)
 }
 
 func (w Wrapper) SearchOrganizations(ctx echo.Context) error {
@@ -223,5 +171,37 @@ func (w Wrapper) SearchOrganizations(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err)
 	}
-	return ctx.JSON(200, result)
+	return ctx.JSON(http.StatusOK, result)
+}
+
+func (w Wrapper) GetServicesForCustomer(ctx echo.Context, customerID string) error {
+	services, err := w.CustomerService.GetServices(customerID)
+	if err != nil {
+		return err
+	}
+	// make sure the response is always initialized to ensure [] instead of null json
+	response := make([]did.Service, len(services))
+	for i, s := range services {
+		response[i] = s
+	}
+	return ctx.JSON(http.StatusOK, response)
+}
+
+func (w Wrapper) EnableCustomerService(ctx echo.Context, customerID string) error {
+	req := domain.EnableCustomerServiceJSONRequestBody{}
+	if err := ctx.Bind(&req); err != nil {
+		return err
+	}
+
+	if err := w.CustomerService.EnableService(customerID, req.Did, req.Type); err != nil {
+		return err
+	}
+	return ctx.NoContent(http.StatusNoContent)
+}
+
+func (w Wrapper) DisableCustomerService(ctx echo.Context, customerID string, serviceType string) error {
+	if err := w.CustomerService.DisableService(customerID, serviceType); err != nil {
+		return err
+	}
+	return ctx.NoContent(http.StatusNoContent)
 }

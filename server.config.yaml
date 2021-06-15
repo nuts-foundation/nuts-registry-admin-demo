@@ -3,3 +3,5 @@ credentials:
   password: "demo"
 port: 1303
 nutsNodeAddr: "http://localhost:1323"
+branding:
+  logo: "logo.png"

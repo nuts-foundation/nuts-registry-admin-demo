@@ -68,11 +68,21 @@ type Customer struct {
 // CustomersResponse defines model for CustomersResponse.
 type CustomersResponse []Customer
 
-// An endpoint registered on a DID Document.
+// Endpoint defines model for Endpoint.
 type Endpoint struct {
+	// Embedded struct due to allOf(#/components/schemas/EndpointID)
+	EndpointID `yaml:",inline"`
+	// Embedded struct due to allOf(#/components/schemas/EndpointProperties)
+	EndpointProperties `yaml:",inline"`
+}
 
-	// ID of the endpoint which is calculated on creation.
-	Id *string `json:"id,omitempty"`
+// ID of the endpoint which is calculated on creation.
+type EndpointID struct {
+	Id string `json:"id"`
+}
+
+// EndpointProperties defines model for EndpointProperties.
+type EndpointProperties struct {
 
 	// Type of the endpoint.
 	Type string `json:"type"`
@@ -81,14 +91,37 @@ type Endpoint struct {
 	Url string `json:"url"`
 }
 
+// Endpoints defines model for Endpoints.
+type Endpoints []Endpoint
+
+// Service defines model for Service.
+type Service struct {
+	// Embedded struct due to allOf(#/components/schemas/ServiceID)
+	ServiceID `yaml:",inline"`
+	// Embedded struct due to allOf(#/components/schemas/ServiceProperties)
+	ServiceProperties `yaml:",inline"`
+}
+
+// ServiceID defines model for ServiceID.
+type ServiceID struct {
+	Id string `json:"id"`
+}
+
+// ServiceProperties defines model for ServiceProperties.
+type ServiceProperties struct {
+
+	// name of the endpoint. May be freely choosen.
+	Name string `json:"name"`
+
+	// A map containing service references.
+	ServiceEndpoint map[string]interface{} `json:"serviceEndpoint"`
+}
+
 // A service provider is a controller of other DID documents
 type ServiceProvider struct {
 
 	// Email address available for other service providers in the network for getting support
 	Email string `json:"email"`
-
-	// Endpoints published by the service provider.
-	Endpoints []Endpoint `json:"endpoints"`
 
 	// The DID of the service provider
 	Id string `json:"id"`
@@ -102,6 +135,9 @@ type ServiceProvider struct {
 	// Publicly reachable website address of the service provider
 	Website string `json:"website"`
 }
+
+// Services defines model for Services.
+type Services []Service
 
 // CreateSessionJSONBody defines parameters for CreateSession.
 type CreateSessionJSONBody CreateSessionRequest
@@ -119,6 +155,14 @@ type UpdateCustomerJSONBody struct {
 	Name   string  `json:"name"`
 }
 
+// EnableCustomerServiceJSONBody defines parameters for EnableCustomerService.
+type EnableCustomerServiceJSONBody struct {
+
+	// The did wich contains the referenced service.
+	Did  string `json:"did"`
+	Type string `json:"type"`
+}
+
 // SearchOrganizationsJSONBody defines parameters for SearchOrganizations.
 type SearchOrganizationsJSONBody struct {
 	City string `json:"city"`
@@ -129,7 +173,10 @@ type SearchOrganizationsJSONBody struct {
 type UpdateServiceProviderJSONBody ServiceProvider
 
 // RegisterEndpointJSONBody defines parameters for RegisterEndpoint.
-type RegisterEndpointJSONBody Endpoint
+type RegisterEndpointJSONBody EndpointProperties
+
+// AddServiceJSONBody defines parameters for AddService.
+type AddServiceJSONBody ServiceProperties
 
 // CreateSessionJSONRequestBody defines body for CreateSession for application/json ContentType.
 type CreateSessionJSONRequestBody CreateSessionJSONBody
@@ -143,6 +190,9 @@ type ConnectCustomerJSONRequestBody ConnectCustomerJSONBody
 // UpdateCustomerJSONRequestBody defines body for UpdateCustomer for application/json ContentType.
 type UpdateCustomerJSONRequestBody UpdateCustomerJSONBody
 
+// EnableCustomerServiceJSONRequestBody defines body for EnableCustomerService for application/json ContentType.
+type EnableCustomerServiceJSONRequestBody EnableCustomerServiceJSONBody
+
 // SearchOrganizationsJSONRequestBody defines body for SearchOrganizations for application/json ContentType.
 type SearchOrganizationsJSONRequestBody SearchOrganizationsJSONBody
 
@@ -151,6 +201,9 @@ type UpdateServiceProviderJSONRequestBody UpdateServiceProviderJSONBody
 
 // RegisterEndpointJSONRequestBody defines body for RegisterEndpoint for application/json ContentType.
 type RegisterEndpointJSONRequestBody RegisterEndpointJSONBody
+
+// AddServiceJSONRequestBody defines body for AddService for application/json ContentType.
+type AddServiceJSONRequestBody AddServiceJSONBody
 
 // Getter for additional properties for CredentialIssuers. Returns the specified
 // element and whether it was found

@@ -11,6 +11,8 @@ import (
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 )
 
+var ErrNotFound = errors.New("not found")
+
 type Repository interface {
 	NewCustomer(customer domain.Customer) (*domain.Customer, error)
 	FindByID(id string) (*domain.Customer, error)
@@ -70,7 +72,7 @@ func (db *flatFileRepo) FindByID(id string) (*domain.Customer, error) {
 		}
 	}
 
-	return nil, errors.New("not found")
+	return nil, fmt.Errorf("could not FindCustomerByID with id: %s, reason: %w", id, ErrNotFound)
 }
 
 func (db *flatFileRepo) Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
@@ -99,7 +101,7 @@ func (db *flatFileRepo) Update(id string, updateFn func(c domain.Customer) (*dom
 		}
 	}
 
-	return nil, errors.New("not found")
+	return nil, fmt.Errorf("could update customer with id: %s, reason: %w", id, ErrNotFound)
 }
 
 // WriteAll writes all records to the file, truncating the file if it exists
