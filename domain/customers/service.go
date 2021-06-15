@@ -39,7 +39,7 @@ func (s Service) ConnectCustomer(id, name, city string, serviceProviderID did.DI
 	return s.Repository.NewCustomer(customer)
 }
 
-const refTemplate = "ref://%s/serviceEndpoint?type=%s"
+const refTemplate = "ref:%s/serviceEndpoint?type=%s"
 
 // EnableService enables a service for a customer adding a reference by type to the compoundService
 // to the customers DID document.

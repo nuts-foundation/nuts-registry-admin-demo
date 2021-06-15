@@ -179,7 +179,11 @@ func (w Wrapper) GetServicesForCustomer(ctx echo.Context, customerID string) err
 	if err != nil {
 		return err
 	}
-	return ctx.JSON(http.StatusOK, services)
+	response := make([]did.Service, len(services))
+	for i, s := range services {
+		response[i] = s
+	}
+	return ctx.JSON(http.StatusOK, response)
 }
 
 func (w Wrapper) EnableCustomerService(ctx echo.Context, customerID string) error {
