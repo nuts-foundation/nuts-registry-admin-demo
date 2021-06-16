@@ -64,7 +64,7 @@ func (s Service) DisableService(customerID, serviceType string) error {
 	if err != nil {
 		return err
 	}
-	return s.DIDManClient.DeleteEndpoint(customer.Did, serviceType)
+	return s.DIDManClient.DeleteEndpointsByType(customer.Did, serviceType)
 }
 
 // GetServices returns all the enabled services for a customer.
