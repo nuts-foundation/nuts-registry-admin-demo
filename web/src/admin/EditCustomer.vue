@@ -48,6 +48,8 @@ export default {
       customer: {
         name: '',
         city: '',
+        domain: '',
+        active: false
       },
       availableServices: [],
       enabledServices: [],

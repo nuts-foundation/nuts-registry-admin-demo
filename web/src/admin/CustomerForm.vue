@@ -16,6 +16,10 @@
       <label for="customerCityInput">City:</label>
       <input type="text" v-model="value.city" id="customerCityInput">
     </div>
+    <div>
+      <label for="customerDomainInput">Domain:</label>
+      <input type="text" v-model="value.domain" id="customerDomainInput">
+    </div>
     <div v-if="mode==='edit'">
       <label class="flex justify-start items-start" for="customerActiveInput">
         <div

@@ -66,7 +66,7 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 func (s Service) GetCredentials(customer domain.Customer) ([]domain.OrganizationConceptCredential, error) {
 	searchBody := vcrApi.SearchJSONRequestBody{
 		Params: []vcrApi.KeyValuePair{
-			{Key: "subject", Value: customer.Did},
+			{Key: "subject", Value: *customer.Did},
 		},
 	}
 
@@ -199,7 +199,7 @@ func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
 	issuerURI, _ := ssi.ParseURI(vendorDID.Id)
 	typeURI, _ := ssi.ParseURI("NutsOrganizationCredential")
 	var credentialSubject = make([]interface{}, 0)
-	credentialSubject = append(credentialSubject, domain.NutsOrganizationCredentialSubject{ID: customer.Did, Organization: domain.Organization{
+	credentialSubject = append(credentialSubject, domain.NutsOrganizationCredentialSubject{ID: *customer.Did, Organization: domain.Organization{
 		Name: customer.Name,
 		City: *customer.City,
 	}})

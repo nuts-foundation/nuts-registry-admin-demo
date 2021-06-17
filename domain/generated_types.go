@@ -10,15 +10,6 @@ import (
 	"github.com/pkg/errors"
 )
 
-// ConnectCustomerRequest defines model for ConnectCustomerRequest.
-type ConnectCustomerRequest struct {
-
-	// Used for issueing the NutsOrgCredential
-	City *string `json:"city,omitempty"`
-	Id   string  `json:"id"`
-	Name string  `json:"name"`
-}
-
 // CreateSessionRequest defines model for CreateSessionRequest.
 type CreateSessionRequest struct {
 	Password string `json:"password"`
@@ -53,7 +44,7 @@ type Customer struct {
 	City *string `json:"city,omitempty"`
 
 	// The customer DID.
-	Did string `json:"did"`
+	Did *string `json:"did,omitempty"`
 
 	// The email domain of the care providers employees, required for logging in.
 	Domain *string `json:"domain,omitempty"`
@@ -146,14 +137,10 @@ type CreateSessionJSONBody CreateSessionRequest
 type UpdateCredentialIssuerJSONBody CredentialIssuer
 
 // ConnectCustomerJSONBody defines parameters for ConnectCustomer.
-type ConnectCustomerJSONBody ConnectCustomerRequest
+type ConnectCustomerJSONBody Customer
 
 // UpdateCustomerJSONBody defines parameters for UpdateCustomer.
-type UpdateCustomerJSONBody struct {
-	Active bool    `json:"active"`
-	City   *string `json:"city,omitempty"`
-	Name   string  `json:"name"`
-}
+type UpdateCustomerJSONBody Customer
 
 // EnableCustomerServiceJSONBody defines parameters for EnableCustomerService.
 type EnableCustomerServiceJSONBody struct {

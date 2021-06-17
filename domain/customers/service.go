@@ -15,7 +15,7 @@ type Service struct {
 	DIDManClient didmanAPI.HTTPClient
 }
 
-func (s Service) ConnectCustomer(id, name, city string, serviceProviderID did.DID) (*domain.Customer, error) {
+func (s Service) ConnectCustomer(reqCustomer domain.Customer, serviceProviderID did.DID) (*domain.Customer, error) {
 	selfControl := false
 	capabilityInvocation := false
 	controllers := []string{serviceProviderID.String()}
@@ -29,11 +29,13 @@ func (s Service) ConnectCustomer(id, name, city string, serviceProviderID did.DI
 		return nil, domain.UnwrapAPIError(err)
 	}
 
+	did := didDoc.ID.String()
 	customer := domain.Customer{
-		Did:  didDoc.ID.String(),
-		Id:   id,
-		Name: name,
-		City: &city,
+		Did:  &did,
+		Id:   reqCustomer.Id,
+		Name: reqCustomer.Name,
+		City: reqCustomer.City,
+		Domain: reqCustomer.Domain,
 	}
 
 	return s.Repository.NewCustomer(customer)
@@ -50,7 +52,7 @@ func (s Service) EnableService(customerID string, spDID string, serviceType stri
 	}
 	ref := fmt.Sprintf(refTemplate, spDID, serviceType)
 
-	_, err = s.DIDManClient.AddEndpoint(customer.Did, serviceType, ref)
+	_, err = s.DIDManClient.AddEndpoint(*customer.Did, serviceType, ref)
 	if err != nil {
 		return fmt.Errorf("unable to add new service reference to DID Document: %w", err)
 	}
@@ -64,7 +66,7 @@ func (s Service) DisableService(customerID, serviceType string) error {
 	if err != nil {
 		return err
 	}
-	return s.DIDManClient.DeleteEndpointsByType(customer.Did, serviceType)
+	return s.DIDManClient.DeleteEndpointsByType(*customer.Did, serviceType)
 }
 
 // GetServices returns all the enabled services for a customer.
@@ -74,7 +76,7 @@ func (s Service) GetServices(customerID string) ([]did.Service, error) {
 		return nil, err
 	}
 
-	customerDIDDoc, _, err := s.VDRClient.Get(customer.Did)
+	customerDIDDoc, _, err := s.VDRClient.Get(*customer.Did)
 	if err != nil {
 		return nil, fmt.Errorf("unable to fetch customer DID Document: %w", err)
 	}
