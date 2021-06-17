@@ -16,19 +16,19 @@
       </div>
 
       <div>
-        <label for="email-input">Support email address</label>
+        <label for="email-input">Support email address (required)</label>
         <input id="email-input" v-model="serviceProvider.email" type="email" required>
       </div>
 
 
       <div>
-        <label for="phone-input">Emergency phone number</label>
+        <label for="phone-input">Phone number</label>
         <input id="phone-input" v-model="serviceProvider.phone" type="text">
       </div>
 
       <div>
         <label for="website-input">Service Provider website</label>
-        <input id="website-input" v-model="serviceProvider.website" type="url">
+        <input id="website-input" v-model="serviceProvider.website" type="text">
       </div>
       <button class="btn-submit" @click="updateServiceProvider">Update Service Provider
       </button>
@@ -142,6 +142,7 @@ export default {
         name: '',
         email: '',
         phone: '',
+        website: '',
       },
       endpoints: [],
       services: [],
