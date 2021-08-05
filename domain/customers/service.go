@@ -41,7 +41,7 @@ func (s Service) ConnectCustomer(reqCustomer domain.Customer, serviceProviderID 
 	return s.Repository.NewCustomer(customer)
 }
 
-const refTemplate = "ref:%s/serviceEndpoint?type=%s"
+const refTemplate = "%s/serviceEndpoint?type=%s"
 
 // EnableService enables a service for a customer adding a reference by type to the compoundService
 // to the customers DID document.
@@ -50,7 +50,13 @@ func (s Service) EnableService(customerID string, spDID string, serviceType stri
 	if err != nil {
 		return err
 	}
-	ref := fmt.Sprintf(refTemplate, spDID, serviceType)
+	parsedDID, err := did.ParseDIDURL(spDID)
+	if err != nil {
+		return err
+	}
+	parsedDID.Fragment = ""
+
+	ref := fmt.Sprintf(refTemplate, parsedDID.String(), serviceType)
 
 	_, err = s.DIDManClient.AddEndpoint(*customer.Did, serviceType, ref)
 	if err != nil {
