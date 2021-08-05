@@ -23,7 +23,7 @@
       </div>
       <div>
         <label for="endpointURLInput">URL:</label>
-        <input type="url" v-model="endpoint.url" id="endpointURLInput" required
+        <input type="text" v-model="endpoint.url" id="endpointURLInput" required
                placeholder="https://example.com">
       </div>
     </form>

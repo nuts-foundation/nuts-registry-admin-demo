@@ -15,7 +15,7 @@
       </ul>
     </div>
 
-    <form class="space-y-3" novalidate>
+    <form class="space-y-3" @submit.prevent novalidate>
       <div>
         <label for="endpointTypeInput">Name:</label>
         <input type="text" v-model="service.name" id="endpointTypeInput" required>
