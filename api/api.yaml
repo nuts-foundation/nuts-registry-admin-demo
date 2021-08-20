@@ -236,7 +236,7 @@ paths:
                 $ref: "#/components/schemas/Services"
     post:
       operationId: addService
-      description: Add a new compound servie to this service provider
+      description: Add a new compound service to this service provider.
       requestBody:
         required: true
         content:

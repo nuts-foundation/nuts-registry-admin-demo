@@ -109,7 +109,7 @@
       <tr>
         <th class="thead">Service name</th>
         <th class="thead">Endpoints</th>
-        <th class="thead">Delete</th>
+        <th class="thead">Actions</th>
       </tr>
       </thead>
       <tbody class="tbody">
@@ -117,7 +117,14 @@
         <td class="tcell">{{ service.name }}</td>
         <td class="tcell"><p v-for="(endpoint, name) in service.serviceEndpoint">{{name}} &#8594; did:SP-DID?type={{endpoint.split('=')[1]}}</p></td>
         <td class="tcell">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500"
+          <!-- Edit -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500 cursor-pointer inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+               @click="$router.push({name: 'admin.editCompoundService', params: {serviceID: service.id}})" >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          <!-- Delete -->
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500 cursor-pointer inline"
                @click="deleteEndpoint(service.id)" fill="none" viewBox="0 0 24 24"
                stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

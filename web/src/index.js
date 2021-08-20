@@ -14,7 +14,8 @@ import EditCustomer from './admin/EditCustomer.vue'
 import OrganizationRegistry from './admin/OrganizationRegistry.vue'
 import ManageVCs from './admin/ManageVCs.vue'
 import Api from './plugins/api'
-import NewCompoundService from "./admin/NewCompoundService.vue";
+import NewCompoundService from './admin/NewCompoundService.vue'
+import EditCompoundService from './admin/EditCompoundService.vue'
 
 const routes = [
   {path: '/', component: Login},
@@ -77,6 +78,13 @@ const routes = [
             name: 'admin.newCompoundService',
             components: {
               modal: NewCompoundService
+            }
+          },
+          {
+            path: 'services/:serviceID/edit',
+            name: 'admin.editCompoundService',
+            components: {
+              modal: EditCompoundService
             }
           },
         ]
