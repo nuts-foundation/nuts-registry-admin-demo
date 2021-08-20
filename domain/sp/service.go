@@ -133,7 +133,6 @@ func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service
 		return nil, err
 	}
 
-	// Add new service
 	endpoints := make(map[string]string, len(service.ServiceEndpoint))
 	for key, val := range service.ServiceEndpoint {
 		endpoints[key] = val.(string)
