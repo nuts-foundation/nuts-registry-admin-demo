@@ -210,20 +210,22 @@ export default {
           })
     },
     deleteEndpoint(id) {
-      this.feedbackMsg = ''
+      if (confirm('Are you sure you want to delete this endpoint/service?')) {
+        this.feedbackMsg = ''
 
-      this.$api.delete(`web/private/service-provider/endpoints/${escape(id)}`, id)
-          .then(response => {
-            this.$emit("statusUpdate", "Endpoint deleted")
-          })
-          .catch(reason => {
-            console.error("failure", reason)
-            this.responseState = 'error'
-            this.feedbackMsg = reason
-          })
-          .finally(() => {
-            this.fetchData()
-          })
+        this.$api.delete(`web/private/service-provider/endpoints/${escape(id)}`, id)
+            .then(response => {
+              this.$emit("statusUpdate", "Endpoint deleted")
+            })
+            .catch(reason => {
+              console.error("failure", reason)
+              this.responseState = 'error'
+              this.feedbackMsg = reason
+            })
+            .finally(() => {
+              this.fetchData()
+            })
+      }
     }
   }
 }
