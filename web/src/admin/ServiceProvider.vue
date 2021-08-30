@@ -51,9 +51,9 @@
 
   <div class="flex justify-between mb-6 border-t pt-6" v-if="serviceProvider.id">
     <h2 class="page-subtitle">Endpoints</h2>
-    <p>An endpoint is a simple registration of a named URL. It can be used as a building block for Services.</p>
+    <p class="pl-6 w-9/12 text-left">An endpoint is a simple registration of a named URL. It can be used as a building block for Services.</p>
     <button
-        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
+        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2 w-22"
         @click="$router.push({name: 'admin.newEndpoint'})">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24"
            stroke="currentColor">
@@ -91,9 +91,9 @@
 
   <div class="flex justify-between mb-6 border-t pt-6" v-if="serviceProvider.id">
     <h2 class="page-subtitle">Services</h2>
-    <p>A service is set of endpoints which can be offered to customers.</p>
+    <p class="pl-8 w-9/12">A service is set of endpoints which can be offered to customers.</p>
     <button
-        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
+        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2 w-22"
         @click="$router.push({name: 'admin.newCompoundService'})">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24"
            stroke="currentColor">
