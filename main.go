@@ -60,7 +60,9 @@ func main() {
 
 	e := echo.New()
 	e.HideBanner = true
-	e.Use(middleware.Logger())
+	loggerConfig := middleware.DefaultLoggerConfig
+	loggerConfig.Skipper = requestsStatusEndpoint
+	e.Use(middleware.LoggerWithConfig(loggerConfig))
 	//e.Debug = true
 	//e.Use(middleware.Recover())
 	e.Use(middleware.JWTWithConfig(middleware.JWTConfig{
@@ -127,6 +129,9 @@ func main() {
 	useFS := len(os.Args) > 1 && os.Args[1] == "live"
 	assetHandler := http.FileServer(getFileSystem(useFS))
 	e.GET("/branding/logo", (&api.LogoHandler{FilePath: config.Branding.Logo}).Handle)
+	e.GET("/status", func(context echo.Context) error {
+		return context.String(http.StatusOK, "OK")
+	})
 	e.GET("/*", echo.WrapHandler(assetHandler))
 
 	// Start server
@@ -171,4 +176,8 @@ func httpErrorHandler(err error, c echo.Context) {
 			c.Logger().Error(err)
 		}
 	}
+}
+
+func requestsStatusEndpoint(context echo.Context) bool {
+	return context.Request().RequestURI == "/status"
 }
