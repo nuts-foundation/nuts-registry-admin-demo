@@ -160,7 +160,7 @@ export default {
     "$route.params": {
       handler(toParams, previousParams) {
         // Fetch data when the route change (e.g. from the modal back to the list)
-        this.fetchData()
+        this.fetchServiceProvider()
       },
       immediate: true
     }
@@ -184,19 +184,23 @@ export default {
             this.feedbackMsg = reason
           })
     },
-    fetchData() {
+    fetchServiceProvider() {
       this.feedbackMsg = ''
 
       this.$api.get("web/private/service-provider")
           .then(responseData => {
             this.responseState = 'success'
             this.serviceProvider = responseData
+            this.fetchData()
           })
           .catch(reason => {
             console.error("failure", reason)
             this.responseState = 'error'
             this.feedbackMsg = reason
           })
+    },
+    fetchData() {
+      this.feedbackMsg = ''
 
       this.$api.get("web/private/service-provider/endpoints")
           .then(responseData => {
