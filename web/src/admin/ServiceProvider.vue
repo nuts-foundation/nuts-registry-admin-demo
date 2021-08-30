@@ -177,6 +177,7 @@ export default {
             this.responseState = 'success'
             this.$emit("statusUpdate", "Service Provider Saved")
             this.serviceProvider = responseData
+            this.feedbackMsg = ''
           })
           .catch(reason => {
             console.error("failure", reason)
