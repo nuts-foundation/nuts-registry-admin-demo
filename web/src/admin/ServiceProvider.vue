@@ -160,7 +160,7 @@ export default {
     "$route.params": {
       handler(toParams, previousParams) {
         // Fetch data when the route change (e.g. from the modal back to the list)
-        this.fetchData()
+        this.fetchServiceProvider()
       },
       immediate: true
     }
@@ -177,6 +177,22 @@ export default {
             this.responseState = 'success'
             this.$emit("statusUpdate", "Service Provider Saved")
             this.serviceProvider = responseData
+            this.feedbackMsg = ''
+          })
+          .catch(reason => {
+            console.error("failure", reason)
+            this.responseState = 'error'
+            this.feedbackMsg = reason
+          })
+    },
+    fetchServiceProvider() {
+      this.feedbackMsg = ''
+
+      this.$api.get("web/private/service-provider")
+          .then(responseData => {
+            this.responseState = 'success'
+            this.serviceProvider = responseData
+            this.fetchData()
           })
           .catch(reason => {
             console.error("failure", reason)
@@ -186,17 +202,6 @@ export default {
     },
     fetchData() {
       this.feedbackMsg = ''
-
-      this.$api.get("web/private/service-provider")
-          .then(responseData => {
-            this.responseState = 'success'
-            this.serviceProvider = responseData
-          })
-          .catch(reason => {
-            console.error("failure", reason)
-            this.responseState = 'error'
-            this.feedbackMsg = reason
-          })
 
       this.$api.get("web/private/service-provider/endpoints")
           .then(responseData => {

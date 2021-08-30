@@ -1,6 +1,7 @@
 package sp
 
 import (
+	"errors"
 	"fmt"
 
 	ssi "github.com/nuts-foundation/go-did"
@@ -109,6 +110,9 @@ func (svc Service) GetServices() (domain.Services, error) {
 	spDID, err := svc.Repository.Get()
 	if err != nil {
 		return nil, err
+	}
+	if spDID == nil {
+		return nil, errors.New("no service-provider registered")
 	}
 	services, err := svc.DIDManClient.GetCompoundServices(spDID.String())
 	if err != nil {
