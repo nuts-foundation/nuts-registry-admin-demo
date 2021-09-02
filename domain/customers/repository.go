@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"sync"
 
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
@@ -24,7 +25,7 @@ type flatFileRepo struct {
 	filepath string
 	mutex    sync.Mutex
 	// records is a cache
-	records map[int]domain.Customer
+	records map[string]domain.Customer
 }
 
 func NewFlatFileRepository(filepath string) *flatFileRepo {
@@ -37,7 +38,7 @@ func NewFlatFileRepository(filepath string) *flatFileRepo {
 	return &flatFileRepo{
 		filepath: filepath,
 		mutex:    sync.Mutex{},
-		records:  make(map[int]domain.Customer, 0),
+		records:  make(map[string]domain.Customer, 0),
 	}
 }
 
@@ -49,11 +50,11 @@ func (db *flatFileRepo) NewCustomer(customer domain.Customer) (*domain.Customer,
 	if err := db.ReadAll(); err != nil {
 		return nil, err
 	}
-	if _, ok := db.records[customer.Id]; ok {
+	if _, ok := db.records[strconv.Itoa(customer.Id)]; ok {
 		return nil, errors.New("customer already exists")
 	}
 
-	db.records[customer.Id] = customer
+	db.records[strconv.Itoa(customer.Id)] = customer
 
 	return &customer, db.WriteAll()
 }
