@@ -6,7 +6,7 @@
     </div>
     <div>
       <label for="customerIDInput">Internal ID:</label>
-      <input type="text" :disabled="mode==='edit'" v-model="value.id" id="customerIDInput">
+      <input type="number" :disabled="mode==='edit'" v-model="value.id" id="customerIDInput" min="0">
     </div>
     <div>
       <label for="customerNameInput">Name:</label>
