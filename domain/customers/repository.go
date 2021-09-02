@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"sync"
 
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
@@ -15,8 +16,8 @@ var ErrNotFound = errors.New("not found")
 
 type Repository interface {
 	NewCustomer(customer domain.Customer) (*domain.Customer, error)
-	FindByID(id string) (*domain.Customer, error)
-	Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error)
+	FindByID(id int) (*domain.Customer, error)
+	Update(id int, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error)
 	All() ([]domain.Customer, error)
 }
 
@@ -49,16 +50,16 @@ func (db *flatFileRepo) NewCustomer(customer domain.Customer) (*domain.Customer,
 	if err := db.ReadAll(); err != nil {
 		return nil, err
 	}
-	if _, ok := db.records[customer.Id]; ok {
+	if _, ok := db.records[strconv.Itoa(customer.Id)]; ok {
 		return nil, errors.New("customer already exists")
 	}
 
-	db.records[customer.Id] = customer
+	db.records[strconv.Itoa(customer.Id)] = customer
 
 	return &customer, db.WriteAll()
 }
 
-func (db *flatFileRepo) FindByID(id string) (*domain.Customer, error) {
+func (db *flatFileRepo) FindByID(id int) (*domain.Customer, error) {
 	if len(db.records) == 0 {
 		if err := db.ReadAll(); err != nil {
 			return nil, err
@@ -75,7 +76,7 @@ func (db *flatFileRepo) FindByID(id string) (*domain.Customer, error) {
 	return nil, fmt.Errorf("could not FindCustomerByID with id: %s, reason: %w", id, ErrNotFound)
 }
 
-func (db *flatFileRepo) Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
+func (db *flatFileRepo) Update(id int, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 

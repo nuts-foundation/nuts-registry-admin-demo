@@ -71,8 +71,12 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 
-	if len(customer.Id) == 0 || len(customer.Name) == 0 {
-		return echo.NewHTTPError(http.StatusBadRequest, "name and id must be provided")
+	if len(customer.Name) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "name must be provided")
+	}
+
+	if customer.Id < 1 {
+		return echo.NewHTTPError(http.StatusBadRequest, "id must be > 0")
 	}
 
 	serviceProvider, err := w.SPService.Get()
@@ -91,7 +95,7 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, customer)
 }
 
-func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
+func (w Wrapper) UpdateCustomer(ctx echo.Context, id int) error {
 	req := domain.Customer{}
 	if err := ctx.Bind(&req); err != nil {
 		return err
@@ -116,7 +120,7 @@ func (w Wrapper) UpdateCustomer(ctx echo.Context, id string) error {
 	return ctx.JSON(http.StatusOK, customer)
 }
 
-func (w Wrapper) GetCustomer(ctx echo.Context, id string) error {
+func (w Wrapper) GetCustomer(ctx echo.Context, id int) error {
 	customer, err := w.CustomerService.Repository.FindByID(id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -170,7 +174,7 @@ func (w Wrapper) SearchOrganizations(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, result)
 }
 
-func (w Wrapper) GetServicesForCustomer(ctx echo.Context, customerID string) error {
+func (w Wrapper) GetServicesForCustomer(ctx echo.Context, customerID int) error {
 	services, err := w.CustomerService.GetServices(customerID)
 	if err != nil {
 		return err
@@ -183,7 +187,7 @@ func (w Wrapper) GetServicesForCustomer(ctx echo.Context, customerID string) err
 	return ctx.JSON(http.StatusOK, response)
 }
 
-func (w Wrapper) EnableCustomerService(ctx echo.Context, customerID string) error {
+func (w Wrapper) EnableCustomerService(ctx echo.Context, customerID int) error {
 	req := domain.EnableCustomerServiceJSONRequestBody{}
 	if err := ctx.Bind(&req); err != nil {
 		return err
@@ -195,7 +199,7 @@ func (w Wrapper) EnableCustomerService(ctx echo.Context, customerID string) erro
 	return ctx.NoContent(http.StatusNoContent)
 }
 
-func (w Wrapper) DisableCustomerService(ctx echo.Context, customerID string, serviceType string) error {
+func (w Wrapper) DisableCustomerService(ctx echo.Context, customerID int, serviceType string) error {
 	if err := w.CustomerService.DisableService(customerID, serviceType); err != nil {
 		return err
 	}

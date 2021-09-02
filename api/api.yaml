@@ -66,9 +66,9 @@ paths:
         description: internal customer id
         required: true
         example:
-          - "C12"
+          - 1
         schema:
-          type: string
+          type: integer
     get:
       operationId: getCustomer
       responses:
@@ -102,9 +102,9 @@ paths:
         description: internal customer id
         required: true
         example:
-          - "C12"
+          - 1
         schema:
-          type: string
+          type: integer
     get:
       operationId: getServicesForCustomer
       responses:
@@ -152,9 +152,9 @@ paths:
         description: internal customer id
         required: true
         example:
-          - "C12"
+          - 1
         schema:
-          type: string
+          type: integer
       - name: type
         in: path
         description: The type of the service
@@ -369,9 +369,9 @@ components:
         - active
       properties:
         id:
-          type: string
+          type: integer
           description: The internal customer ID.
-          example: "C12"
+          example: 1
         did:
           type: string
           description: The customer DID.
