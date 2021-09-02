@@ -15,8 +15,8 @@ var ErrNotFound = errors.New("not found")
 
 type Repository interface {
 	NewCustomer(customer domain.Customer) (*domain.Customer, error)
-	FindByID(id string) (*domain.Customer, error)
-	Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error)
+	FindByID(id int) (*domain.Customer, error)
+	Update(id int, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error)
 	All() ([]domain.Customer, error)
 }
 
@@ -24,7 +24,7 @@ type flatFileRepo struct {
 	filepath string
 	mutex    sync.Mutex
 	// records is a cache
-	records map[string]domain.Customer
+	records map[int]domain.Customer
 }
 
 func NewFlatFileRepository(filepath string) *flatFileRepo {
@@ -37,7 +37,7 @@ func NewFlatFileRepository(filepath string) *flatFileRepo {
 	return &flatFileRepo{
 		filepath: filepath,
 		mutex:    sync.Mutex{},
-		records:  make(map[string]domain.Customer, 0),
+		records:  make(map[int]domain.Customer, 0),
 	}
 }
 
@@ -58,7 +58,7 @@ func (db *flatFileRepo) NewCustomer(customer domain.Customer) (*domain.Customer,
 	return &customer, db.WriteAll()
 }
 
-func (db *flatFileRepo) FindByID(id string) (*domain.Customer, error) {
+func (db *flatFileRepo) FindByID(id int) (*domain.Customer, error) {
 	if len(db.records) == 0 {
 		if err := db.ReadAll(); err != nil {
 			return nil, err
@@ -75,7 +75,7 @@ func (db *flatFileRepo) FindByID(id string) (*domain.Customer, error) {
 	return nil, fmt.Errorf("could not FindCustomerByID with id: %s, reason: %w", id, ErrNotFound)
 }
 
-func (db *flatFileRepo) Update(id string, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
+func (db *flatFileRepo) Update(id int, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
 	db.mutex.Lock()
 	defer db.mutex.Unlock()
 

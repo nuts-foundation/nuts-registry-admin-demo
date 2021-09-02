@@ -45,7 +45,7 @@ const refTemplate = "%s/serviceEndpoint?type=%s"
 
 // EnableService enables a service for a customer adding a reference by type to the compoundService
 // to the customers DID document.
-func (s Service) EnableService(customerID string, spDID string, serviceType string) error {
+func (s Service) EnableService(customerID int, spDID string, serviceType string) error {
 	customer, err := s.Repository.FindByID(customerID)
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func (s Service) EnableService(customerID string, spDID string, serviceType stri
 
 // DisableService disables a service for a customer by removing all references to a
 // compoundService of a certain type from the customers DID document.
-func (s Service) DisableService(customerID, serviceType string) error {
+func (s Service) DisableService(customerID int, serviceType string) error {
 	customer, err := s.Repository.FindByID(customerID)
 	if err != nil {
 		return err
@@ -76,7 +76,7 @@ func (s Service) DisableService(customerID, serviceType string) error {
 }
 
 // GetServices returns all the enabled services for a customer.
-func (s Service) GetServices(customerID string) ([]did.Service, error) {
+func (s Service) GetServices(customerID int) ([]did.Service, error) {
 	customer, err := s.Repository.FindByID(customerID)
 	if err != nil {
 		return nil, err
