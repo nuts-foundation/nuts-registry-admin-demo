@@ -54,7 +54,6 @@ export default {
       if (!this.customer.name) {
         this.formErrors.push("Name required")
       }
-
       e.preventDefault()
     },
     confirm() {
