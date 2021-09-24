@@ -71,6 +71,9 @@ func (svc Service) DeleteEndpoint(id ssi.URI) error {
 }
 
 func (svc Service) enrichWithContactInfo(sp *domain.ServiceProvider) error {
+	if sp.Id == "" {
+		return nil
+	}
 	contactInformation, err := svc.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
 		return domain.UnwrapAPIError(err)

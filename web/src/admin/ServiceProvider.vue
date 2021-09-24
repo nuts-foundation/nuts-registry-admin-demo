@@ -30,8 +30,8 @@
         <label for="website-input">Service Provider website</label>
         <input id="website-input" v-model="serviceProvider.website" type="text">
       </div>
-      <button class="btn-submit" @click="updateServiceProvider">Update Service Provider
-      </button>
+      <button class="btn-submit" @click="updateServiceProvider" v-if="serviceProvider.id">Update Service Provider</button>
+      <button class="btn-submit" @click="updateServiceProvider" v-if="!serviceProvider.id">Create Service Provider</button>
       <div v-if="feedbackMsg"
            :class="{ 'bg-green-300': responseState === 'success', 'bg-red-300': responseState === 'error'}"
            class="py-2 px-4 border rounded-md text-white">
@@ -195,9 +195,11 @@ export default {
             this.fetchData()
           })
           .catch(reason => {
-            console.error("failure", reason)
-            this.responseState = 'error'
-            this.feedbackMsg = reason
+            if (reason !== "Not Found") {
+              console.error("failure", reason)
+              this.responseState = 'error'
+              this.feedbackMsg = reason
+            }
           })
     },
     fetchData() {
