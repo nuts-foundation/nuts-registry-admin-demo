@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strings"
@@ -43,11 +43,19 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 	}
 
 	if shouldHaveCredential {
-		if len(credentials) > 0 {
-			// already has credential
-			return nil
-		} else {
-			err = s.IssueNutsOrgCredential(customer)
+		if customer.City == nil {
+			return fmt.Errorf("customer.City must be set for issuing a credential")
+		}
+		issue := true
+		for _, credential := range credentials {
+			if credential.Organization.Name == customer.Name && credential.Organization.City == *customer.City {
+				// Customer already has credential with given name/ & city, so we don't need to issue one.
+				issue = false
+				break
+			}
+		}
+		if issue {
+			err = s.issueNutsOrgCredential(customer)
 		}
 	} else {
 		if len(credentials) == 0 {
@@ -183,7 +191,7 @@ func (s Service) fetchCredentialIssuers(credential string, clientFn func(ctx con
 
 }
 
-func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
+func (s Service) issueNutsOrgCredential(customer domain.Customer) error {
 	vendorDID, err := s.SPService.Get()
 	if err != nil {
 		return err
@@ -192,9 +200,7 @@ func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
 		return err
 	}
 
-	if customer.City == nil {
-		return fmt.Errorf("customer.City must be set for issuing a credential")
-	}
+	logrus.Infof("Issuing NutsOrganizationCredential (did=%s,name=%s,city=%s)", *customer.Did, customer.Name, *customer.City)
 
 	issuerURI, _ := ssi.ParseURI(vendorDID.Id)
 	typeURI, _ := ssi.ParseURI("NutsOrganizationCredential")
@@ -208,7 +214,6 @@ func (s Service) IssueNutsOrgCredential(customer domain.Customer) error {
 		Issuer:            *issuerURI,
 		CredentialSubject: credentialSubject,
 	}
-	log.Printf("issue NutsOrgCredential requestBody :%+v", requestBody)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
