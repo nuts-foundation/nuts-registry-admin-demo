@@ -58,7 +58,7 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 		}
 	}
 	if err != nil {
-		return fmt.Errorf("unable to manage NutsOrgCredential for customer %s: %w", customer.Id, err)
+		return fmt.Errorf("unable to manage NutsOrgCredential for customer %d: %w", customer.Id, err)
 	}
 	return nil
 }
@@ -277,7 +277,7 @@ func (s Service) ManageIssuerTrust(credentialType string, issuerID ssi.URI, trus
 		return nil, fmt.Errorf("expected status 204: %s", response.Status)
 	}
 
-	if err != nil{
+	if err != nil {
 		return nil, domain.UnwrapAPIError(err)
 	}
 

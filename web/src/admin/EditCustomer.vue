@@ -153,7 +153,7 @@ export default {
             })
           })
           .catch((reason) => {
-            this.apiError = reason.statusText
+            this.apiError = reason
             console.log("failed:", reason)
           })
     },
