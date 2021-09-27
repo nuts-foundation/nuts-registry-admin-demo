@@ -1,71 +1,78 @@
 <template>
-  <h1 class="page-title">Service Provider Configuration</h1>
+  <h1 class="mb-4">Service Provider Configuration</h1>
+
   <p>A Service Provider offers (Nuts) services to its customers.</p>
   <p>Here you can update the contact information of your Service Provider.</p>
-  <form class="vertical-form">
 
-    <div class="space-y-4 w-full">
-      <div v-if="serviceProvider.id">
-        <label for="did-input">DID</label>
-        <input id="did-input" type="text" disabled v-model="serviceProvider.id">
-      </div>
+  <form>
+    <div class="mt-8 bg-white p-5 shadow-lg rounded-lg">
+      <div class="space-y-4 w-full">
+        <div v-if="feedbackMsg"
+             :class="{ 'bg-green-300': responseState === 'success', 'bg-red-300': responseState === 'error'}"
+             class="py-2 px-4 border rounded-md text-white">
+          <svg v-if="responseState === 'success'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+          <svg v-if="responseState === 'error'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none"
+               viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          {{ feedbackMsg }}
+        </div>
 
-      <div>
-        <label for="name-input">Name of the Service Provider</label>
-        <input id="name-input" v-model="serviceProvider.name" type="text">
-      </div>
+        <div v-if="serviceProvider.id">
+          <label for="did-input">DID</label>
+          <input id="did-input" type="text" disabled v-model="serviceProvider.id">
+        </div>
 
-      <div>
-        <label for="email-input">Support email address (required)</label>
-        <input id="email-input" v-model="serviceProvider.email" type="email" required>
-      </div>
+        <div>
+          <label for="name-input">Name of the Service Provider</label>
+          <input id="name-input" v-model="serviceProvider.name" type="text">
+        </div>
 
+        <div>
+          <label for="email-input">Support email address (required)</label>
+          <input id="email-input" v-model="serviceProvider.email" type="email" required>
+        </div>
 
-      <div>
-        <label for="phone-input">Phone number</label>
-        <input id="phone-input" v-model="serviceProvider.phone" type="text">
+        <div>
+          <label for="website-input">Service Provider website</label>
+          <input id="website-input" v-model="serviceProvider.website" type="text">
+        </div>
       </div>
+    </div>
 
-      <div>
-        <label for="website-input">Service Provider website</label>
-        <input id="website-input" v-model="serviceProvider.website" type="text">
-      </div>
-      <button class="btn-submit" @click="updateServiceProvider" v-if="serviceProvider.id">Update Service Provider</button>
-      <button class="btn-submit" @click="updateServiceProvider" v-if="!serviceProvider.id">Create Service Provider</button>
-      <div v-if="feedbackMsg"
-           :class="{ 'bg-green-300': responseState === 'success', 'bg-red-300': responseState === 'error'}"
-           class="py-2 px-4 border rounded-md text-white">
-        <svg v-if="responseState === 'success'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-        </svg>
-        <svg v-if="responseState === 'error'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none"
-             viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-        </svg>
-        {{ feedbackMsg }}
-      </div>
+    <div class="mt-4">
+      <button class="btn btn-primary" @click="updateServiceProvider" v-if="serviceProvider.id">Update Service Provider
+      </button>
+      <button class="btn btn-primary" @click="updateServiceProvider" v-if="!serviceProvider.id">Create Service
+        Provider
+      </button>
     </div>
   </form>
 
-  <div class="flex justify-between mb-6 border-t pt-6" v-if="serviceProvider.id">
-    <h2 class="page-subtitle">Endpoints</h2>
-    <p class="pl-6 w-9/12 text-left">An endpoint is a simple registration of a named URL. It can be used as a building block for Services.</p>
+  <div class="flex justify-between mt-14" v-if="serviceProvider.id">
+    <h2>Endpoints</h2>
+
+    <p class="pl-6 w-9/12 text-left">An endpoint is a simple registration of a named URL. It can be used as a building
+      block for Services.</p>
+
     <button
-        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2 w-22"
-        @click="$router.push({name: 'admin.newEndpoint'})">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        @click="$router.push({name: 'admin.newEndpoint'})"
+        class="float-right inline-flex items-center bg-nuts w-10 h-10 rounded-lg justify-center shadow-md"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#fff">
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
       </svg>
-      Add
     </button>
   </div>
 
-  <div class="shadow overflow-hidden border-gray-200 rounded">
-    <table v-if="endpoints.length > 0" class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+  <div v-if="endpoints.length > 0" class="mt-4 bg-white p-5 shadow-lg rounded-lg">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead>
       <tr>
         <th class="thead">Type</th>
         <th class="thead">URL</th>
@@ -89,23 +96,25 @@
     </table>
   </div>
 
-  <div class="flex justify-between mb-6 border-t pt-6" v-if="serviceProvider.id">
-    <h2 class="page-subtitle">Services</h2>
+  <div class="flex justify-between mt-14" v-if="serviceProvider.id">
+    <h2>Services</h2>
+
     <p class="pl-8 w-9/12">A service is set of endpoints which can be offered to customers.</p>
+
     <button
-        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2 w-22"
-        @click="$router.push({name: 'admin.newCompoundService'})">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        @click="$router.push({name: 'admin.newCompoundService'})"
+        class="float-right inline-flex items-center bg-nuts w-10 h-10 rounded-lg justify-center shadow-md"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#fff">
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
       </svg>
-      Add
     </button>
   </div>
 
-  <div class="shadow overflow-hidden border-gray-200 rounded">
-    <table v-if="services.length > 0" class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+  <div v-if="services.length > 0" class="mt-4 bg-white p-5 shadow-lg rounded-lg">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead>
       <tr>
         <th class="thead">Service name</th>
         <th class="thead">Endpoints</th>
@@ -115,16 +124,20 @@
       <tbody class="tbody">
       <tr class="hover:bg-gray-100" v-for="service in services">
         <td class="tcell">{{ service.name }}</td>
-        <td class="tcell"><p v-for="(endpoint, name) in service.serviceEndpoint">{{name}} &#8594; did:SP-DID?type={{endpoint.split('=')[1]}}</p></td>
+        <td class="tcell"><p v-for="(endpoint, name) in service.serviceEndpoint">{{ name }} &#8594;
+          did:SP-DID?type={{ endpoint.split('=')[1] }}</p></td>
         <td class="tcell">
           <!-- Edit -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500 cursor-pointer inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-               @click="$router.push({name: 'admin.editCompoundService', params: {serviceID: service.id}})" >
+          <svg xmlns="http://www.w3.org/2000/svg"
+               class="h-6 w-6 text-gray-300 hover:text-gray-500 cursor-pointer inline" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor"
+               @click="$router.push({name: 'admin.editCompoundService', params: {serviceID: service.id}})">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
           </svg>
           <!-- Delete -->
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-300 hover:text-gray-500 cursor-pointer inline"
+          <svg xmlns="http://www.w3.org/2000/svg"
+               class="h-6 w-6 text-gray-300 hover:text-gray-500 cursor-pointer inline"
                @click="deleteEndpoint(service.id)" fill="none" viewBox="0 0 24 24"
                stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
