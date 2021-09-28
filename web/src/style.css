@@ -87,7 +87,7 @@ input:focus {
 }
 
 .bg-nuts {
-    background-color: #D15949;
+    background-color: #1EAAE7;
 }
 
 .btn {
@@ -104,11 +104,11 @@ input:focus {
 
 .btn-primary {
     @apply text-white;
-    background-color: #D15949;
+    background-color: #1EAAE7;
 }
 
 .btn-primary:not(.btn-loading):hover {
-    background-color: #984435;
+    background-color: #1683af;
 }
 
 .btn-secondary {
@@ -126,7 +126,7 @@ input:focus {
 }
 
 .btn-primary.btn-loading:after {
-    background-color: #984435;
+    background-color: #11678a;
 }
 
 @keyframes progress-bar {
