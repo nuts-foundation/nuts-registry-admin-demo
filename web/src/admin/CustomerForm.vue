@@ -1,7 +1,7 @@
 <template>
   <form class="space-y-3">
     <div v-if="mode === 'edit'">
-      <label for="customerDIDInput">Nuts Network DID:</label>
+      <label for="customerDIDInput">Nuts Network DID</label>
       <input type="text" disabled v-model="value.did" id="customerDIDInput">
     </div>
     <div>
@@ -9,15 +9,15 @@
       <input type="number" :disabled="mode==='edit'" v-model.number="value.id" id="customerIDInput" min="1">
     </div>
     <div>
-      <label for="customerNameInput">Name:</label>
+      <label for="customerNameInput">Name</label>
       <input type="text" v-model="value.name" id="customerNameInput">
     </div>
     <div>
-      <label for="customerCityInput">City:</label>
+      <label for="customerCityInput">City</label>
       <input type="text" v-model="value.city" id="customerCityInput">
     </div>
     <div>
-      <label for="customerDomainInput">Domain:</label>
+      <label for="customerDomainInput">Domain</label>
       <input type="text" v-model="value.domain" id="customerDomainInput">
     </div>
     <div v-if="mode==='edit'">

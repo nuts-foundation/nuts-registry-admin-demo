@@ -1,12 +1,12 @@
 <template>
   <div class="flex justify-center">
 
-    <div class="mt-12 border rounded-md max-w-7xl p-8 flex flex-col">
+    <div class="mt-12 bg-white shadow-sm border rounded-md w-96 p-8 flex flex-col">
       <logo class="mx-auto my-2"></logo>
-      <h1 class="text-3xl py-2">Nuts Registry Admin</h1>
-      <form class="my-4 flex justify-center" @submit.stop.prevent="login">
-        <div class="space-y-4">
+      <h1>Nuts Registry Admin</h1>
 
+      <form class="w-full mt-4" @submit.stop.prevent="login">
+        <div class="space-y-4">
           <div>
             <label for="username_input" class="block text-sm font-medium text-gray-700">Username</label>
             <input id="username_input"
@@ -28,9 +28,8 @@
             />
           </div>
           <p v-if="!!loginError" class="p-2 text-center bg-red-100 rounded-md">{{ loginError }}</p>
-          <button
-              class="w-full btn-submit"
-          >Login
+          <button class="w-full btn btn-primary">
+            Login
           </button>
         </div>
       </form>

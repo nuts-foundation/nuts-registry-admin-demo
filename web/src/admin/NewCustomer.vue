@@ -12,8 +12,10 @@
         <li v-for="error in formErrors">* {{ error }}</li>
       </ul>
     </div>
-    <customer-form mode="new" :value="customer" @input="(newCustomer)=> {customer = newCustomer}"/>
 
+    <div class="mt-4">
+      <customer-form mode="new" :value="customer" @input="(newCustomer)=> {customer = newCustomer}"/>
+    </div>
   </modal-window>
 </template>
 

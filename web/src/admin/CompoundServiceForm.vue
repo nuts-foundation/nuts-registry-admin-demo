@@ -17,10 +17,10 @@
 
     <form class="space-y-3" @submit.prevent novalidate>
       <div>
-        <label for="endpointTypeInput">Name:</label>
+        <label for="endpointTypeInput">Name</label>
         <input type="text" v-model="service.name" id="endpointTypeInput" required>
       </div>
-      <label>Endpoints:</label>
+      <label>Endpoints</label>
       <table>
         <tr>
           <th>Type</th>
@@ -52,7 +52,7 @@
             </select>
           </td>
           <td>
-            <button class="btn-primary" @click="addEndpoint(newEndpointType, selectedEndpoint)">Add</button>
+            <button class="btn btn-primary btn-sm" @click="addEndpoint(newEndpointType, selectedEndpoint)">Add</button>
           </td>
         </tr>
       </table>

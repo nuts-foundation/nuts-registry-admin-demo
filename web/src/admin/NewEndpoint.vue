@@ -2,7 +2,7 @@
   <modal-window :cancelRoute="{name: 'admin.serviceProvider'}" :confirmFn="checkForm" confirmText="Register"
               title="Register endpoint URL" type="add">
 
-    <p class="mb-3 text-sm">
+    <p class="mb-4 text-sm">
       Here you can register an endpoint URL of your XIS on your Service Provider's DID,
       which can be used when enabling services for your customers.
     </p>
@@ -18,11 +18,11 @@
 
     <form class="space-y-3">
       <div>
-        <label for="endpointTypeInput">Type:</label>
+        <label for="endpointTypeInput">Type</label>
         <input type="text" v-model="endpoint.type" id="endpointTypeInput" required>
       </div>
       <div>
-        <label for="endpointURLInput">URL:</label>
+        <label for="endpointURLInput">URL</label>
         <input type="text" v-model="endpoint.url" id="endpointURLInput" required
                placeholder="https://example.com">
       </div>

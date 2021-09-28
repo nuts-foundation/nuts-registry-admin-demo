@@ -1,23 +1,24 @@
 <template>
   <div class="flex justify-between mb-6">
-    <h1 class="text-3xl">Your care organizations</h1>
+    <h1>Your care organizations</h1>
+
     <button
-        class="bg-blue-400 hover:bg-blue-500 text-white font-medium rounded-md px-3 py-2"
-        @click="$router.push({name: 'admin.newCustomer'})" >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 inline" fill="none" viewBox="0 0 24 24"
-           stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        @click="$router.push({name: 'admin.newCustomer'})"
+        class="float-right inline-flex items-center bg-nuts w-10 h-10 rounded-lg justify-center shadow-md"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#fff">
+        <path d="M0 0h24v24H0V0z" fill="none"/>
+        <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
       </svg>
-      Add
     </button>
   </div>
 
-  <div class="customer-container">
+  <div class="mt-8 bg-white p-5 shadow-lg rounded-lg">
     <p v-if="fetchError" class="m-4">Could not fetch customers: {{ fetchError }}</p>
     <div class="m-4" v-if="loading">Loading...</div>
     <div class="m-4" v-if="!loading && customers.length == 0 && !fetchError">No customers yet, add one!</div>
     <table v-if="customers.length > 0" class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+      <thead>
       <tr>
         <th class="thead">Customer ID</th>
         <th class="thead">Name</th>
@@ -89,23 +90,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-
-.thead {
-  @apply px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider;
-}
-
-.tcell {
-  @apply px-6 py-4 text-left;
-}
-
-.body {
-  @apply bg-white divide-y divide-gray-200;
-}
-
-.customer-container {
-  @apply shadow overflow-hidden border-gray-200 rounded;
-}
-
-</style>
