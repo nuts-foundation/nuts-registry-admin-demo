@@ -42,32 +42,37 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 		return err
 	}
 
-	if shouldHaveCredential {
-		if customer.City == nil {
-			return fmt.Errorf("customer.City must be set for issuing a credential")
-		}
-		issue := true
-		for _, credential := range credentials {
-			if credential.Organization.Name == customer.Name && credential.Organization.City == *customer.City {
-				// Customer already has credential with given name/ & city, so we don't need to issue one.
-				issue = false
-				break
+	if !shouldHaveCredential {
+		if len(credentials) > 0 {
+			if err := s.RevokeCredentials(credentials); err != nil {
+				return fmt.Errorf("unable to revoke NutsOrgCredentials for customer %d: %w", customer.Id, err)
 			}
 		}
-		if issue {
-			err = s.issueNutsOrgCredential(customer)
-		}
-	} else {
-		if len(credentials) == 0 {
-			// no credential to revoke
-			return nil
-		} else {
-			err = s.RevokeCredentials(credentials)
+
+		return nil
+	}
+
+	if customer.City == nil {
+		return fmt.Errorf("customer.City must be set for issuing a credential")
+	}
+
+	// Is there a single credential issued with the exact same organization / city name? Then we don't have to do anything
+	if len(credentials) == 1 &&
+		credentials[0].Organization.Name == customer.Name &&
+		credentials[0].Organization.City == *customer.City {
+		return nil
+	}
+
+	if len(credentials) > 0 {
+		if err := s.RevokeCredentials(credentials); err != nil {
+			return fmt.Errorf("unable to revoke NutsOrgCredentials for customer %d: %w", customer.Id, err)
 		}
 	}
-	if err != nil {
+
+	if err := s.issueNutsOrgCredential(customer); err != nil {
 		return fmt.Errorf("unable to manage NutsOrgCredential for customer %d: %w", customer.Id, err)
 	}
+
 	return nil
 }
 
