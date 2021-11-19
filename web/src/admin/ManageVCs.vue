@@ -19,39 +19,39 @@
 </template>
 
 <script>
-import FormCheckbox from "../components/FormCheckbox.vue";
+import FormCheckbox from '../components/FormCheckbox.vue'
 
 export default {
-  components: {FormCheckbox},
+  components: { FormCheckbox },
   emits: ['statusUpdate'],
-  data() {
+  data () {
     return {
       credentialIssuers: {},
       loading: true,
-      fetchError: ""
+      fetchError: ''
     }
   },
   methods: {
-    fetchIssuers() {
-      this.$api.get("web/private/credentials/issuers")
-          .then((response) => {
-            this.credentialIssuers = response
-          })
-          .catch((reason) => {
-            console.log("fetch failed: ", reason)
-            this.fetchError = reason
-          })
-          .finally(() => this.loading = false)
+    fetchIssuers () {
+      this.$api.get('web/private/credentials/issuers')
+        .then((response) => {
+          this.credentialIssuers = response
+        })
+        .catch((reason) => {
+          console.log('fetch failed: ', reason)
+          this.fetchError = reason
+        })
+        .finally(() => this.loading = false)
     },
-    toggleTrust(type, issuer) {
-      console.log("toggle", type, issuer)
-      this.$api.put(`web/private/credential/${type}/issuer/${encodeURIComponent(issuer.serviceProvider.id)}`, {trusted: issuer.trusted})
-          .then((response) => {
-          }).catch((reason => console.log("update status failed:", reason)))
-          .finally(this.fetchIssuers)
-    },
+    toggleTrust (type, issuer) {
+      console.log('toggle', type, issuer)
+      this.$api.put(`web/private/credential/${type}/issuer/${encodeURIComponent(issuer.serviceProvider.id)}`, { trusted: issuer.trusted })
+        .then((response) => {
+        }).catch(reason => console.log('update status failed:', reason))
+        .finally(this.fetchIssuers)
+    }
   },
-  mounted() {
+  mounted () {
     this.fetchIssuers()
   }
 }

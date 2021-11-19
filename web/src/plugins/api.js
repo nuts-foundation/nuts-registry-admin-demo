@@ -1,18 +1,17 @@
 export default {
   install: (app, apiOptions = {}) => {
-
-    let {defaultOptions} = apiOptions
+    const { defaultOptions } = apiOptions
 
     const authHeader = () => {
-      const sessionToken = localStorage.getItem("session")
+      const sessionToken = localStorage.getItem('session')
       if (sessionToken) {
-        return {'Authorization': `Bearer ${sessionToken}`}
+        return { Authorization: `Bearer ${sessionToken}` }
       }
       return {}
     }
-    let api = {}
+    const api = {}
 
-    let httpMethods = ['get', 'post', 'put', 'delete']
+    const httpMethods = ['get', 'post', 'put', 'delete']
     httpMethods.forEach((method) => {
       api[method] = (url, data = null, requestOptions = {}) => {
         const options = {
@@ -22,7 +21,7 @@ export default {
             'Content-Type': 'application/json',
             ...authHeader()
           },
-          ...requestOptions,
+          ...requestOptions
         }
         if (data) {
           options.body = JSON.stringify(data)
@@ -50,10 +49,10 @@ export default {
                 if (response.status === 204) {
                   return Promise.resolve(response)
                 }
-                  // Handle 201 since it might not have content and the response.json() will fail.
-                  if (response.status === 201) {
-                    return Promise.resolve(response)
-                  }
+                // Handle 201 since it might not have content and the response.json() will fail.
+                if (response.status === 201) {
+                  return Promise.resolve(response)
+                }
                 return Promise.reject(reason)
               })
           })

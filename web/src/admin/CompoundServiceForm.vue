@@ -62,69 +62,74 @@
 </template>
 
 <script>
-import ModalWindow from "../components/ModalWindow.vue";
+import ModalWindow from '../components/ModalWindow.vue'
 
 export default {
-  components: {ModalWindow},
+  components: { ModalWindow },
   props: {
     confirmText: String,
     confirmFn: Function,
     description: String,
     title: String,
     error: String,
-    allEndpoints: Object,
-    availableEndpoints: Object,
+    endpoints: Object,
     existingService: Object,
-    mode: String, // add | edit
+    mode: String // add | edit
   },
-  data() {
+  data () {
     return {
       formErrors: [],
-      selectedEndpoint: "",
-      newEndpointType: "",
+      selectedEndpoint: '',
+      newEndpointType: '',
+      availableEndpoints: [],
       service: this.existingService ?? {
         name: '',
         serviceEndpoint: {}
-      },
+      }
     }
   },
   watch: {
-    existingService: function(service) { this.service = service },
+    existingService: function (service) {
+      this.service = service
+    }
   },
   emits: ['input'],
+  mounted () {
+    this.availableEndpoints = this.endpoints
+  },
   methods: {
-    addEndpoint(type, endpointID) {
+    addEndpoint (type, endpointID) {
       if (!type) {
         return
       }
-      let endpoint = this.allEndpoints[endpointID]
+      const endpoint = this.endpoints[endpointID]
       if (!endpoint) {
         return
       }
-      let did = endpointID.split("#")[0]
+      const did = endpointID.split('#')[0]
 
       this.service.serviceEndpoint[type] = `${did}/serviceEndpoint?type=${endpoint.type}`
-      this.selectedEndpoint = ""
-      this.newEndpointType = ""
+      this.selectedEndpoint = ''
+      this.newEndpointType = ''
       delete this.availableEndpoints[endpointID]
     },
-    deleteEndpoint(name, ref) {
-      let type = ref.split("=")[1]
-      let endpoint = Object.values(this.allEndpoints).find((el) => el.type == type)
+    deleteEndpoint (name, ref) {
+      const type = ref.split('=')[1]
+      const endpoint = Object.values(this.endpoints).find((el) => el.type === type)
       if (!endpoint) {
         return
       }
       delete this.service.serviceEndpoint[name]
       this.availableEndpoints[endpoint.id] = endpoint
     },
-    checkForm(e) {
+    checkForm (e) {
       this.formErrors.length = 0
 
       if (!this.service.name) {
-        this.formErrors.push("Name required")
+        this.formErrors.push('Name required')
       }
       if (!Object.keys(this.service.serviceEndpoint).length > 0) {
-        this.formErrors.push("At least one endpoint required")
+        this.formErrors.push('At least one endpoint required')
       }
 
       if (this.formErrors.length === 0) {
@@ -132,7 +137,7 @@ export default {
       } else {
         e.preventDefault()
       }
-    },
+    }
   }
 }
 </script>

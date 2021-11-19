@@ -42,7 +42,7 @@ export default {
   },
   emits: ['input'],
   watch: {
-    value() {
+    value () {
       this.$emit('input', this.value)
     }
   }

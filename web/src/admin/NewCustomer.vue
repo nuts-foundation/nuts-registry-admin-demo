@@ -20,12 +20,12 @@
 </template>
 
 <script>
-import ModalWindow from "../components/ModalWindow.vue";
-import CustomerForm from "./CustomerForm.vue";
+import ModalWindow from '../components/ModalWindow.vue'
+import CustomerForm from './CustomerForm.vue'
 
 export default {
-  components: {ModalWindow, CustomerForm},
-  data() {
+  components: { ModalWindow, CustomerForm },
+  data () {
     return {
       apiError: '',
       formErrors: [],
@@ -38,9 +38,9 @@ export default {
       }
     }
   },
-  emits: ["statusUpdate"],
+  emits: ['statusUpdate'],
   methods: {
-    checkForm(e) {
+    checkForm (e) {
       // reset the errors
       this.formErrors.length = 0
       this.apiError = ''
@@ -50,21 +50,21 @@ export default {
       }
 
       if (!this.customer.id) {
-        this.formErrors.push("ID required")
+        this.formErrors.push('ID required')
       }
 
       if (!this.customer.name) {
-        this.formErrors.push("Name required")
+        this.formErrors.push('Name required')
       }
       e.preventDefault()
     },
-    confirm() {
+    confirm () {
       this.$api.post('web/private/customers', this.customer)
-          .then(response => {
-            this.$emit("statusUpdate", "Customer connected")
-            this.$router.push({name: 'admin.customers'})
-          })
-          .catch(response => this.apiError = response.statusText)
+        .then(response => {
+          this.$emit('statusUpdate', 'Customer connected')
+          this.$router.push({ name: 'admin.customers' })
+        })
+        .catch(response => this.apiError = response.statusText)
     }
   }
 }

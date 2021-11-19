@@ -15,8 +15,8 @@
 export default {
   name: 'formCheckbox',
   props: {
-    modelValue: Boolean,
+    modelValue: Boolean
   },
-  emits: ['update:modelValue'],
+  emits: ['update:modelValue']
 }
 </script>

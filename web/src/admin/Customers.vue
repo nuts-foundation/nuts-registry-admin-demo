@@ -46,46 +46,45 @@
 <script>
 
 export default {
-  data() {
+  data () {
     return {
-      fetchError: "",
+      fetchError: '',
       customers: [],
-      loading: true,
+      loading: true
     }
   },
-  created() {
+  created () {
     // watch the params of the route to fetch the data again
     this.$watch(
-        () => this.$route.params,
-        () => {
-          this.fetchData()
-        },
-        // fetch the data when the view is created and the data is
-        // already being observed
-        {immediate: true}
+      () => this.$route.params,
+      () => {
+        this.fetchData()
+      },
+      // fetch the data when the view is created and the data is
+      // already being observed
+      { immediate: true }
     )
   },
-  emits: ["statusUpdate"],
+  emits: ['statusUpdate'],
   methods: {
-    updateStatus(event) {
-      this.$emit("statusUpdate", event)
+    updateStatus (event) {
+      this.$emit('statusUpdate', event)
     },
-    openCustomer(customer) {
-      console.log("open customer", customer.name)
-
+    openCustomer (customer) {
+      console.log('open customer', customer.name)
     },
-    fetchData() {
+    fetchData () {
       this.$api.get('web/private/customers')
-          .then(data => this.customers = data)
-          .catch(response => {
-            console.error("failure", response)
-            if (response.status === 403) {
-              this.fetchError = "Invalid credentials"
-              return
-            }
-            this.fetchError = response
-          })
-          .finally(() => this.loading = false)
+        .then(data => this.customers = data)
+        .catch(response => {
+          console.error('failure', response)
+          if (response.status === 403) {
+            this.fetchError = 'Invalid credentials'
+            return
+          }
+          this.fetchError = response
+        })
+        .finally(() => this.loading = false)
     }
   }
 }

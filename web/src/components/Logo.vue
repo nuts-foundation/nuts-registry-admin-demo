@@ -10,17 +10,17 @@ img.logo {
 </style>
 <script>
 export default {
-  data() {
+  data () {
     return {
       show: null
     }
   },
   methods: {
-    load() {
+    load () {
       fetch('branding/logo').then((response) => this.show = response.ok)
-    },
+    }
   },
-  mounted() {
+  mounted () {
     this.load()
   }
 }

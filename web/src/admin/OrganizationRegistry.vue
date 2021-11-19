@@ -45,29 +45,29 @@
 <script>
 
 export default {
-  data() {
+  data () {
     return {
-      fetchError: "",
+      fetchError: '',
       results: [],
       query: {
-        name: "",
-        city: ""
-      },
+        name: '',
+        city: ''
+      }
     }
   },
-  emits: ["statusUpdate"],
+  emits: ['statusUpdate'],
   methods: {
-    search() {
-      if (this.query.name === "") {
+    search () {
+      if (this.query.name === '') {
         this.results = []
         return
       }
       this.$api.post('web/private/organizations', this.query)
-          .then(data => this.results = data)
-          .catch(response => {
-            this.fetchError = response.statusText
-            this.results = []
-          })
+        .then(data => this.results = data)
+        .catch(response => {
+          this.fetchError = response.statusText
+          this.results = []
+        })
     }
   }
 }

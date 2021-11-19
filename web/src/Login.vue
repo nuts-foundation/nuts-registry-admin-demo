@@ -41,10 +41,10 @@
 import Logo from './components/Logo.vue'
 
 export default {
-  components: {Logo},
-  data() {
+  components: { Logo },
+  data () {
     return {
-      loginError: "",
+      loginError: '',
       credentials: {
         username: 'demo@nuts.nl',
         password: ''
@@ -53,41 +53,41 @@ export default {
   },
   watch: {
     // Remove error when typing
-    'credentials.username'() {
-      this.loginError = ""
+    'credentials.username' () {
+      this.loginError = ''
     },
-    'credentials.password'() {
-      this.loginError = ""
+    'credentials.password' () {
+      this.loginError = ''
     }
   },
   methods: {
-    redirectAfterLogin() {
-      this.$router.push("/admin/")
+    redirectAfterLogin () {
+      this.$router.push('/admin/')
     },
-    login() {
+    login () {
       this.$api.post('web/auth', this.credentials)
-          .then(responseData => {
-            console.log("success!")
-            localStorage.setItem("session", responseData.token)
-            this.redirectAfterLogin()
-          })
-          .catch(response => {
-            console.error("failure", response)
-            if (response === "invalid credentials") {
-              this.loginError = "Invalid credentials"
-            } else {
-              this.loginError = response.statusText
-            }
-          })
+        .then(responseData => {
+          console.log('success!')
+          localStorage.setItem('session', responseData.token)
+          this.redirectAfterLogin()
+        })
+        .catch(response => {
+          console.error('failure', response)
+          if (response === 'invalid credentials') {
+            this.loginError = 'Invalid credentials'
+          } else {
+            this.loginError = response.statusText
+          }
+        })
     }
   },
-  mounted() {
+  mounted () {
     // Check if session still valid, if so just redirect to application
     this.$api.get('web/private')
-        .then(() => this.redirectAfterLogin())
-        .catch(() => {
-          // session is invalid, need to authenticate
-        })
+      .then(() => this.redirectAfterLogin())
+      .catch(() => {
+        // session is invalid, need to authenticate
+      })
   }
 }
 </script>
