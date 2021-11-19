@@ -83,6 +83,7 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("unable to fetch service provider ID: %w", err))
 	}
+
 	spID, err := did.ParseDID(serviceProvider.Id)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("service provider not correctly configured: DID is invalid: %w", err))
@@ -93,6 +94,34 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return ctx.JSON(http.StatusOK, customer)
+}
+
+func (w Wrapper) DeleteCustomer(ctx echo.Context, id int) error {
+	customer, err := w.CustomerService.Repository.FindByID(id)
+	if err != nil {
+		return err
+	}
+
+	serviceProvider, err := w.SPService.Get()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("unable to fetch service provider ID: %w", err))
+	}
+
+	spID, err := did.ParseDID(serviceProvider.Id)
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Errorf("service provider not correctly configured: DID is invalid: %w", err))
+	}
+
+	// Make sure all credentials related to this customer are revoked
+	if err := w.CredentialService.ManageNutsOrgCredential(*customer, false); err != nil {
+		return err
+	}
+
+	if err := w.CustomerService.DisconnectCustomer(*customer, *spID); err != nil {
+		return err
+	}
+
+	return ctx.NoContent(http.StatusNoContent)
 }
 
 func (w Wrapper) UpdateCustomer(ctx echo.Context, id int) error {

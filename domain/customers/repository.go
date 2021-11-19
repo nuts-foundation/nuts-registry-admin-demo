@@ -18,6 +18,7 @@ type Repository interface {
 	NewCustomer(customer domain.Customer) (*domain.Customer, error)
 	FindByID(id int) (*domain.Customer, error)
 	Update(id int, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error)
+	Delete(id int) error
 	All() ([]domain.Customer, error)
 }
 
@@ -74,6 +75,28 @@ func (db *flatFileRepo) FindByID(id int) (*domain.Customer, error) {
 	}
 
 	return nil, fmt.Errorf("could not FindCustomerByID with id: %s, reason: %w", id, ErrNotFound)
+}
+
+func (db *flatFileRepo) Delete(id int) error {
+	db.mutex.Lock()
+
+	if len(db.records) == 0 {
+		if err := db.ReadAll(); err != nil {
+			db.mutex.Unlock()
+			return err
+		}
+	}
+
+	for i, record := range db.records {
+		if record.Id == id {
+			delete(db.records, i)
+			break
+		}
+	}
+
+	db.mutex.Unlock()
+
+	return db.WriteAll()
 }
 
 func (db *flatFileRepo) Update(id int, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {

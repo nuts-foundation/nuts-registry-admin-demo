@@ -30,6 +30,7 @@ func (s Service) ConnectCustomer(reqCustomer domain.Customer, serviceProviderID 
 	}
 
 	did := didDoc.ID.String()
+
 	customer := domain.Customer{
 		Did:  &did,
 		Id:   reqCustomer.Id,
@@ -39,6 +40,14 @@ func (s Service) ConnectCustomer(reqCustomer domain.Customer, serviceProviderID 
 	}
 
 	return s.Repository.NewCustomer(customer)
+}
+
+func (s Service) DisconnectCustomer(customer domain.Customer, serviceProviderID did.DID) error {
+	if err := s.VDRClient.Deactivate(*customer.Did); err != nil {
+		return err
+	}
+
+	return s.Repository.Delete(customer.Id)
 }
 
 const refTemplate = "%s/serviceEndpoint?type=%s"

@@ -14,9 +14,10 @@
                    @input="(newCustomer)=> {customer = newCustomer}"
                    v-if="!loading"/>
     <div class="pt-3 space-y-1">
-      <p>Service configuration:</p>
+      <label>Service configuration:</label>
+
       <p class="text-sm" v-if="!this.availableServices.length">No services provided by the Service Provider.</p>
-      <label class="flex justify-start items-start" v-for="service in availableServices">
+      <div class="flex justify-start items-start" v-for="service in availableServices" :key="service.id">
         <div
             class="bg-white border rounded-md border-gray-300 w-6 h-6 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-blue-500">
           <input class="opacity-0 absolute" type="checkbox"
@@ -27,7 +28,7 @@
           </svg>
         </div>
         <div>{{ service.name }}</div>
-      </label>
+      </div>
     </div>
   </modal-window>
 </template>
@@ -158,12 +159,12 @@ export default {
           })
     },
     saveServices() {
-      let removePromises = this.servicesToRemove.map(v=> {
+      let removePromises = this.servicesToRemove.map(v => {
         return this.$api.delete(`web/private/customers/${this.customer.id}/services/${v.name}`)
       })
 
-      let addPromises = this.servicesToAdd.map(v=>{
-        return this.$api.post(`web/private/customers/${this.customer.id}/services`, {did: v.id, type: v.name} )
+      let addPromises = this.servicesToAdd.map(v => {
+        return this.$api.post(`web/private/customers/${this.customer.id}/services`, {did: v.id, type: v.name})
       })
 
       return Promise.all(addPromises.concat(removePromises))

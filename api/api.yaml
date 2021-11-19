@@ -78,6 +78,11 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Customer"
+    delete:
+      operationId: deleteCustomer
+      responses:
+        204:
+          description: when all was fine
     put:
       operationId: updateCustomer
       description: Update a customers name and activation status
