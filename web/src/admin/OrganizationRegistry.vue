@@ -26,7 +26,7 @@
       </tr>
       </thead>
       <tbody>
-      <tr v-for="result in results">
+      <tr v-for="(result, idx) in results" :key="`result-${idx}`">
         <td class="tcell">{{ result.organization.name }}</td>
         <td class="tcell">{{ result.organization.city }}</td>
       </tr>

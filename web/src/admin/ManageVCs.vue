@@ -5,10 +5,9 @@
     <p v-if="!!fetchError" class="m-4">Could not fetch credential issuers: {{ fetchError }}</p>
     <div class="m-4" v-if="loading">Loading...</div>
     <div class="m-4" v-if="!loading && Object.keys(credentialIssuers).length === 0 && !fetchError">No credential issuers yet.</div>
-    <div v-for="(issuers, type) in credentialIssuers">
+    <div v-for="(issuers, type) in credentialIssuers" :key="type">
       <div class="font-medium p-2">{{ type }}</div>
-
-      <ul v-for="issuer in issuers">
+      <ul v-for="issuer in issuers" :key="issuer.serviceProvider.id">
         <li class="flex justify-between p-2">
           <span>{{ issuer.serviceProvider.id }} - {{ issuer.serviceProvider.name }}</span>
           <form-checkbox v-model="issuer.trusted" @update:modelValue="toggleTrust(type, issuer)">Trusted</form-checkbox>

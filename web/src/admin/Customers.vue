@@ -29,13 +29,11 @@
       <tbody class="tbody">
       <tr class="hover:bg-gray-100 cursor-pointer"
           @click="$router.push({name: 'admin.editCustomer', params: {id: customer.id} })"
-          v-for="customer in customers">
-        <td class="tcell">
-          {{ customer.id }}
-        </td>
-        <td class="tcell">{{ customer.name }}</td>
-        <td class="tcell">{{ customer.city }}</td>
-        <td class="tcell">{{ customer.active }}</td>
+          v-for="{id, name, city, active} in customers" :key="id">
+        <td class="tcell">{{ id }}</td>
+        <td class="tcell">{{ name }}</td>
+        <td class="tcell">{{ city }}</td>
+        <td class="tcell">{{ active }}</td>
       </tr>
       </tbody>
     </table>

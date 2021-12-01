@@ -9,7 +9,7 @@
     <div class="p-3 bg-red-100 rounded-md" v-if="formErrors.length">
       <b>Please correct the following error(s):</b>
       <ul>
-        <li v-for="error in formErrors">* {{ error }}</li>
+        <li v-for="(error, idx) in formErrors" :key="`err-${idx}`">* {{ error }}</li>
       </ul>
     </div>
 
