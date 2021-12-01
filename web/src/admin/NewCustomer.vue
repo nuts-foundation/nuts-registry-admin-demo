@@ -1,6 +1,6 @@
 <template>
   <modal-window :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Connect Customer"
-              title="Connect existing customer" type="add">
+                title="Connect existing customer" type="add">
 
     <p class="mb-3 text-sm">Here you can link an existing customer to the Nuts network by creating a new Nuts DID.</p>
 
@@ -24,7 +24,10 @@ import ModalWindow from '../components/ModalWindow.vue'
 import CustomerForm from './CustomerForm.vue'
 
 export default {
-  components: { ModalWindow, CustomerForm },
+  components: {
+    ModalWindow,
+    CustomerForm
+  },
   data () {
     return {
       apiError: '',
@@ -64,7 +67,9 @@ export default {
           this.$emit('statusUpdate', 'Customer connected')
           this.$router.push({ name: 'admin.customers' })
         })
-        .catch(response => this.apiError = response.statusText)
+        .catch(response => {
+          this.apiError = response.statusText
+        })
     }
   }
 }

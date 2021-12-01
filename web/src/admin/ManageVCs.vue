@@ -45,7 +45,7 @@ export default {
           console.log('fetch failed: ', reason)
           this.fetchError = reason
         })
-        .finally(() => this.loading = false)
+        .finally(() => { this.loading = false })
     },
     toggleTrust (type, issuer) {
       console.log('toggle', type, issuer)

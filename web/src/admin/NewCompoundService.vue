@@ -38,7 +38,9 @@ export default {
             this.allEndpoints[el.id] = el
           })
         })
-        .catch(reason => this.apiError = reason)
+        .catch(reason => {
+          this.apiError = reason
+        })
     },
     registerService (service) {
       return this.$api.post('web/private/service-provider/services', service)
@@ -46,7 +48,9 @@ export default {
           this.$emit('statusUpdate', 'Service registered')
           this.$router.push({ name: 'admin.serviceProvider' })
         })
-        .catch(response => this.apiError = response)
+        .catch(response => {
+          this.apiError = response
+        })
     }
   }
 }

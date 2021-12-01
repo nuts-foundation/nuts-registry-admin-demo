@@ -47,7 +47,9 @@ export default {
             this.allEndpoints[el.id] = el
           })
         )
-        .catch(reason => this.apiError = reason)
+        .catch(reason => {
+          this.apiError = reason
+        })
     },
     updateService (service) {
       // To the reader: since the delete-then-add below is not transactional, dataloss might occur when delete succeeds but register fails.
@@ -58,7 +60,9 @@ export default {
           this.$emit('statusUpdate', 'Service updated')
           this.$router.push({ name: 'admin.serviceProvider' })
         })
-        .catch(response => this.apiError = response)
+        .catch(response => {
+          this.apiError = response
+        })
     }
   }
 }

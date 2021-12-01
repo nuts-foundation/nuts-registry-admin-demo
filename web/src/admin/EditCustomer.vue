@@ -16,7 +16,7 @@
     <div class="pt-3 space-y-1">
       <p>Service configuration:</p>
       <p class="text-sm" v-if="!this.availableServices.length">No services provided by the Service Provider.</p>
-      <label class="flex justify-start items-start" v-for="service in availableServices">
+      <label class="flex justify-start items-start" v-for="service in availableServices" :key="service.id">
         <div
             class="bg-white border rounded-md border-gray-300 w-6 h-6 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-blue-500">
           <input class="opacity-0 absolute" type="checkbox"

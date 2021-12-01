@@ -30,7 +30,7 @@
         </thead>
         <tbody class="tbody">
         <tr class="hover:bg-gray-100 cursor-pointer"
-            @click="$router.push({name: 'admin.editCustomer', params: {id: customer.id} })"
+            @click="$router.push({name: 'admin.editCustomer', params: {id} })"
             v-for="{id, name, city, active} in customers" :key="id">
           <td class="tcell">{{ id }}</td>
           <td class="tcell">{{ name }}</td>
@@ -76,7 +76,9 @@ export default {
     },
     fetchData () {
       this.$api.get('web/private/customers')
-        .then(data => this.customers = data)
+        .then(data => {
+          this.customers = data
+        })
         .catch(response => {
           console.error('failure', response)
           if (response.status === 403) {
@@ -85,7 +87,9 @@ export default {
           }
           this.fetchError = response
         })
-        .finally(() => this.loading = false)
+        .finally(() => {
+          this.loading = false
+        })
     }
   }
 }

@@ -17,7 +17,9 @@ export default {
   },
   methods: {
     load () {
-      fetch('branding/logo').then((response) => this.show = response.ok)
+      fetch('branding/logo').then((response) => {
+        this.show = response.ok
+      })
     }
   },
   mounted () {
