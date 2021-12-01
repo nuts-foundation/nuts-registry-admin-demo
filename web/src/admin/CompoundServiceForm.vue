@@ -1,7 +1,9 @@
 <template>
-  <modal-window :cancelRoute="{name: 'admin.serviceProvider'}" :confirmFn="checkForm" :confirmText="confirmText"
-                :title="title" :type="mode">
-
+  <modal-window :cancelRoute="{name: 'admin.serviceProvider'}"
+                :confirmFn="checkForm"
+                :confirmText="confirmText"
+                :title="title" :type="mode"
+  >
     <p class="mb-3 text-sm">
       {{ description }}
     </p>
@@ -15,7 +17,7 @@
       </ul>
     </div>
 
-    <form class="space-y-3" @submit.prevent novalidate>
+    <form class="space-y-3" @submit.prevent novalidate v-if="service">
       <div>
         <label for="endpointTypeInput">Name</label>
         <input type="text" v-model="service.name" id="endpointTypeInput" required>
@@ -26,7 +28,7 @@
           <th>Type</th>
           <th colspan="2">Endpoint name</th>
         </tr>
-        <tr v-for="(endpointRef, name) in service.serviceEndpoint">
+        <tr v-for="(endpointRef, name) in service.serviceEndpoint" :key="endpointRef">
           <td>{{ name }}</td>
           <td>{{ endpointRef.split('=')[1] }}</td>
           <td>
@@ -46,7 +48,7 @@
             <select :disabled="Object.keys(availableEndpoints).length === 0" name="" id="" class="form-select"
                     v-model="selectedEndpoint">
               <option selected value="">Select an endpoint</option>
-              <option v-for="(endpoint, endpointId) in availableEndpoints" :value="endpointId">
+              <option v-for="(endpoint, endpointId) in availableEndpoints" :value="endpointId" :key="endpoint">
                 {{ endpoint.type }}
               </option>
             </select>
@@ -73,7 +75,16 @@ export default {
     title: String,
     error: String,
     endpoints: Object,
-    existingService: Object,
+    existingService: {
+      type: Object,
+      default () {
+        return {
+          name: '',
+          serviceEndpoint: {}
+        }
+      },
+      required: false
+    },
     mode: String // add | edit
   },
   data () {
@@ -81,21 +92,26 @@ export default {
       formErrors: [],
       selectedEndpoint: '',
       newEndpointType: '',
-      availableEndpoints: [],
-      service: this.existingService ?? {
-        name: '',
-        serviceEndpoint: {}
+      service: this.existingService
+    }
+  },
+  computed: {
+    availableEndpoints () {
+      const calculatedAvailableEndpoints = {}
+      if (!this.endpoints) {
+        return calculatedAvailableEndpoints
       }
+      Object.entries(this.endpoints).forEach(([key, endpoint]) => {
+        const hasEndpoint = Object.values(this.service.serviceEndpoint).some((existingEndpoint) => {
+          const type = existingEndpoint.split('?type=')[1]
+          return type === endpoint.type
+        })
+        if (!hasEndpoint) {
+          calculatedAvailableEndpoints[key] = endpoint
+        }
+      })
+      return calculatedAvailableEndpoints
     }
-  },
-  watch: {
-    existingService: function (service) {
-      this.service = service
-    }
-  },
-  emits: ['input'],
-  mounted () {
-    this.availableEndpoints = this.endpoints
   },
   methods: {
     addEndpoint (type, endpointID) {
@@ -111,7 +127,6 @@ export default {
       this.service.serviceEndpoint[type] = `${did}/serviceEndpoint?type=${endpoint.type}`
       this.selectedEndpoint = ''
       this.newEndpointType = ''
-      delete this.availableEndpoints[endpointID]
     },
     deleteEndpoint (name, ref) {
       const type = ref.split('=')[1]
@@ -120,7 +135,6 @@ export default {
         return
       }
       delete this.service.serviceEndpoint[name]
-      this.availableEndpoints[endpoint.id] = endpoint
     },
     checkForm (e) {
       this.formErrors.length = 0

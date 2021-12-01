@@ -1,5 +1,6 @@
 <template>
-  <compound-service-form :confirm-fn="updateService"
+  <compound-service-form v-if="service"
+                         :confirm-fn="updateService"
                          confirm-text="Edit"
                          description="Here you can update an existing service."
                          mode="edit"
