@@ -48,7 +48,6 @@ export default {
         .finally(() => { this.loading = false })
     },
     toggleTrust (type, issuer) {
-      console.log('toggle', type, issuer)
       this.$api.put(`web/private/credential/${type}/issuer/${encodeURIComponent(issuer.serviceProvider.id)}`, { trusted: issuer.trusted })
         .then((response) => {
         }).catch(reason => console.log('update status failed:', reason))
