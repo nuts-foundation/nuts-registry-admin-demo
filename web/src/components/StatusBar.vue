@@ -15,8 +15,8 @@
 <script>
 export default {
   name: 'status-bar',
-  props: {statusMessage: String},
-  data() {
+  props: { statusMessage: String },
+  data () {
     return {
       timeout: null,
       show: false
@@ -24,7 +24,7 @@ export default {
   },
   watch: {
     statusMessage: {
-      handler() {
+      handler () {
         this.show = true
         if (this.timeout) {
           clearTimeout(this.timeout)
@@ -34,6 +34,6 @@ export default {
         }, 5000)
       }
     }
-  },
+  }
 }
 </script>

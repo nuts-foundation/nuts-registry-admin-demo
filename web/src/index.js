@@ -1,5 +1,5 @@
-import {createApp} from 'vue'
-import {createRouter, createWebHashHistory} from 'vue-router'
+import { createApp } from 'vue'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import './style.css'
 import App from './App.vue'
 import AdminApp from './admin/AdminApp.vue'
@@ -18,7 +18,7 @@ import NewCompoundService from './admin/NewCompoundService.vue'
 import EditCompoundService from './admin/EditCompoundService.vue'
 
 const routes = [
-  {path: '/', component: Login},
+  { path: '/', component: Login },
   {
     name: 'login',
     path: '/login',
@@ -32,7 +32,7 @@ const routes = [
   {
     path: '/admin',
     components: {
-      default: AdminApp,
+      default: AdminApp
     },
     children: [
       {
@@ -58,7 +58,7 @@ const routes = [
             components: {
               modal: EditCustomer
             }
-          },
+          }
         ]
       },
       {
@@ -86,23 +86,23 @@ const routes = [
             components: {
               modal: EditCompoundService
             }
-          },
+          }
         ]
       },
       {
-        path:'manage-vcs',
+        path: 'manage-vcs',
         name: 'admin.manageVCs',
         component: ManageVCs
       },
       {
-        path:'organization-registry',
+        path: 'organization-registry',
         name: 'admin.organizationRegistry',
         component: OrganizationRegistry
       }
     ],
-    meta: {requiresAuth: true}
+    meta: { requiresAuth: true }
   },
-  {path: '/:pathMatch*', name: 'NotFound', component: NotFound}
+  { path: '/:pathMatch*', name: 'NotFound', component: NotFound }
 ]
 
 const router = createRouter({
@@ -113,7 +113,7 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
   if (to.meta.requiresAuth) {
-    if (localStorage.getItem("session")) {
+    if (localStorage.getItem('session')) {
       return true
     }
     return '/login'
@@ -123,5 +123,5 @@ router.beforeEach((to, from) => {
 const app = createApp(App)
 
 app.use(router)
-app.use(Api, {forbiddenRoute: {name: 'logout'}})
+app.use(Api, { forbiddenRoute: { name: 'logout' } })
 app.mount('#app')

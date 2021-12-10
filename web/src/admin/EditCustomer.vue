@@ -16,7 +16,7 @@
     <div class="pt-3 space-y-1">
       <p>Service configuration:</p>
       <p class="text-sm" v-if="!this.availableServices.length">No services provided by the Service Provider.</p>
-      <label class="flex justify-start items-start" v-for="service in availableServices">
+      <label class="flex justify-start items-start" v-for="service in availableServices" :key="service.id">
         <div
             class="bg-white border rounded-md border-gray-300 w-6 h-6 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-blue-500">
           <input class="opacity-0 absolute" type="checkbox"
@@ -38,12 +38,12 @@ input:checked + svg {
 </style>
 
 <script>
-import ModalWindow from "../components/ModalWindow.vue";
-import CustomerForm from "./CustomerForm.vue";
+import ModalWindow from '../components/ModalWindow.vue'
+import CustomerForm from './CustomerForm.vue'
 
 export default {
-  components: {ModalWindow, CustomerForm},
-  data() {
+  components: { ModalWindow, CustomerForm },
+  data () {
     return {
       customer: {
         name: '',
@@ -57,13 +57,13 @@ export default {
       apiError: '',
       loading: true,
       servicesToAdd: [],
-      servicesToRemove: [],
+      servicesToRemove: []
     }
   },
-  emits: ["statusUpdate"],
+  emits: ['statusUpdate'],
   watch: {
-    "$route.params": {
-      handler(toParams, previousParams) {
+    '$route.params': {
+      handler (toParams, previousParams) {
         if (toParams && 'id' in toParams) {
           this.fetchCustomer(toParams.id)
           this.fetchServices()
@@ -73,7 +73,7 @@ export default {
     }
   },
   methods: {
-    checkForm() {
+    checkForm () {
       // reset the errors
       this.formErrors.length = 0
       this.apiError = ''
@@ -83,28 +83,28 @@ export default {
       }
 
       if (this.active && !this.customer.city) {
-        this.formErrors.push("To be active a city is required")
+        this.formErrors.push('To be active a city is required')
       }
 
       if (!this.customer.name) {
-        this.formErrors.push("Name required")
+        this.formErrors.push('Name required')
       }
     },
-    toggleService(id, event) {
-      let newState = event.target.checked
-      let service = this.availableServices.find(v => v.id == id)
+    toggleService (id, event) {
+      const newState = event.target.checked
+      const service = this.availableServices.find(v => v.id === id)
       if (!service) {
         return
       }
       if (newState) {
-        let idx = this.servicesToRemove.map(v => v.id).indexOf(service.id)
+        const idx = this.servicesToRemove.map(v => v.id).indexOf(service.id)
         if (idx > -1) {
           this.servicesToRemove.splice(idx, 1)
         } else {
           this.servicesToAdd.push(service)
         }
       } else {
-        let idx = this.servicesToAdd.map(v => v.id).indexOf(service.id)
+        const idx = this.servicesToAdd.map(v => v.id).indexOf(service.id)
         if (idx > -1) {
           this.servicesToAdd.splice(idx, 1)
         } else {
@@ -112,58 +112,58 @@ export default {
         }
       }
     },
-    fetchCustomer(id) {
+    fetchCustomer (id) {
       this.$api.get(`web/private/customers/${id}`)
-          .then((customer) => {
-            this.customer = {
-              ...customer
-            }
-            this.loading = false
-          })
-          .catch((reason) => {
-            this.apiError = reason.statusText
-            console.log("failed:", reason)
-          })
+        .then((customer) => {
+          this.customer = {
+            ...customer
+          }
+          this.loading = false
+        })
+        .catch((reason) => {
+          this.apiError = reason.statusText
+          console.log('failed:', reason)
+        })
       this.$api.get(`web/private/customers/${id}/services`)
-          .then((services) => {
-            this.enabledServices = services
-          })
-          .catch((reason) => {
-            this.apiError = reason.statusText
-            console.log("failed:", reason)
-          })
+        .then((services) => {
+          this.enabledServices = services
+        })
+        .catch((reason) => {
+          this.apiError = reason.statusText
+          console.log('failed:', reason)
+        })
     },
-    fetchServices() {
-      this.$api.get("web/private/service-provider/services")
-          .then(responseData => {
-            this.availableServices = responseData
-          })
-          .catch(reason => {
-            this.apiError = reason.statusText
-            console.log("error while fetching services: ", reason)
-          })
+    fetchServices () {
+      this.$api.get('web/private/service-provider/services')
+        .then(responseData => {
+          this.availableServices = responseData
+        })
+        .catch(reason => {
+          this.apiError = reason.statusText
+          console.log('error while fetching services: ', reason)
+        })
     },
-    saveCustomer() {
+    saveCustomer () {
       this.$api.put(`web/private/customers/${this.customer.id}`, this.customer)
-          .then((customer) => {
-            this.customer = customer
-            this.$emit("statusUpdate", "Customer saved")
-            this.saveServices().then(() => {
-              this.$router.push({name: 'admin.customers'})
-            })
+        .then((customer) => {
+          this.customer = customer
+          this.$emit('statusUpdate', 'Customer saved')
+          this.saveServices().then(() => {
+            this.$router.push({ name: 'admin.customers' })
           })
-          .catch((reason) => {
-            this.apiError = reason
-            console.log("failed:", reason)
-          })
+        })
+        .catch((reason) => {
+          this.apiError = reason
+          console.log('failed:', reason)
+        })
     },
-    saveServices() {
-      let removePromises = this.servicesToRemove.map(v=> {
+    saveServices () {
+      const removePromises = this.servicesToRemove.map(v => {
         return this.$api.delete(`web/private/customers/${this.customer.id}/services/${v.name}`)
       })
 
-      let addPromises = this.servicesToAdd.map(v=>{
-        return this.$api.post(`web/private/customers/${this.customer.id}/services`, {did: v.id, type: v.name} )
+      const addPromises = this.servicesToAdd.map(v => {
+        return this.$api.post(`web/private/customers/${this.customer.id}/services`, { did: v.id, type: v.name })
       })
 
       return Promise.all(addPromises.concat(removePromises))

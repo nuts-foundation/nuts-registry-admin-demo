@@ -1,7 +1,9 @@
 <template>
-  <modal-window :cancelRoute="{name: 'admin.serviceProvider'}" :confirmFn="checkForm" :confirmText="confirmText"
-                :title="title" :type="mode">
-
+  <modal-window :cancelRoute="{name: 'admin.serviceProvider'}"
+                :confirmFn="checkForm"
+                :confirmText="confirmText"
+                :title="title" :type="mode"
+  >
     <p class="mb-3 text-sm">
       {{ description }}
     </p>
@@ -11,11 +13,11 @@
     <div class="p-3 bg-red-100 rounded-md" v-if="formErrors.length">
       <b>Please correct the following error(s):</b>
       <ul>
-        <li v-for="error in formErrors">* {{ error }}</li>
+        <li v-for="(error, idx) in formErrors" :key="`err-${idx}`">* {{ error }}</li>
       </ul>
     </div>
 
-    <form class="space-y-3" @submit.prevent novalidate>
+    <form class="space-y-3" @submit.prevent novalidate v-if="service">
       <div>
         <label for="endpointTypeInput">Name</label>
         <input type="text" v-model="service.name" id="endpointTypeInput" required>
@@ -26,7 +28,7 @@
           <th>Type</th>
           <th colspan="2">Endpoint name</th>
         </tr>
-        <tr v-for="(endpointRef, name) in service.serviceEndpoint">
+        <tr v-for="(endpointRef, name) in service.serviceEndpoint" :key="endpointRef">
           <td>{{ name }}</td>
           <td>{{ endpointRef.split('=')[1] }}</td>
           <td>
@@ -46,7 +48,7 @@
             <select :disabled="Object.keys(availableEndpoints).length === 0" name="" id="" class="form-select"
                     v-model="selectedEndpoint">
               <option selected value="">Select an endpoint</option>
-              <option v-for="(endpoint, endpointId) in availableEndpoints" :value="endpointId">
+              <option v-for="(endpoint, endpointId) in availableEndpoints" :value="endpointId" :key="endpoint">
                 {{ endpoint.type }}
               </option>
             </select>
@@ -62,69 +64,86 @@
 </template>
 
 <script>
-import ModalWindow from "../components/ModalWindow.vue";
+import ModalWindow from '../components/ModalWindow.vue'
 
 export default {
-  components: {ModalWindow},
+  components: { ModalWindow },
   props: {
     confirmText: String,
     confirmFn: Function,
     description: String,
     title: String,
     error: String,
-    allEndpoints: Object,
-    availableEndpoints: Object,
-    existingService: Object,
-    mode: String, // add | edit
+    endpoints: Object,
+    existingService: {
+      type: Object,
+      default () {
+        return {
+          name: '',
+          serviceEndpoint: {}
+        }
+      },
+      required: false
+    },
+    mode: String // add | edit
   },
-  data() {
+  data () {
     return {
       formErrors: [],
-      selectedEndpoint: "",
-      newEndpointType: "",
-      service: this.existingService ?? {
-        name: '',
-        serviceEndpoint: {}
-      },
+      selectedEndpoint: '',
+      newEndpointType: '',
+      service: this.existingService
     }
   },
-  watch: {
-    existingService: function(service) { this.service = service },
+  computed: {
+    availableEndpoints () {
+      const calculatedAvailableEndpoints = {}
+      if (!this.endpoints) {
+        return calculatedAvailableEndpoints
+      }
+      Object.entries(this.endpoints).forEach(([key, endpoint]) => {
+        const hasEndpoint = Object.values(this.service.serviceEndpoint).some((existingEndpoint) => {
+          const type = existingEndpoint.split('?type=')[1]
+          return type === endpoint.type
+        })
+        if (!hasEndpoint) {
+          calculatedAvailableEndpoints[key] = endpoint
+        }
+      })
+      return calculatedAvailableEndpoints
+    }
   },
-  emits: ['input'],
   methods: {
-    addEndpoint(type, endpointID) {
+    addEndpoint (type, endpointID) {
       if (!type) {
         return
       }
-      let endpoint = this.allEndpoints[endpointID]
+      const endpoint = this.endpoints[endpointID]
       if (!endpoint) {
         return
       }
-      let did = endpointID.split("#")[0]
+      const did = endpointID.split('#')[0]
 
       this.service.serviceEndpoint[type] = `${did}/serviceEndpoint?type=${endpoint.type}`
-      this.selectedEndpoint = ""
-      this.newEndpointType = ""
-      delete this.availableEndpoints[endpointID]
+      this.selectedEndpoint = ''
+      this.newEndpointType = ''
     },
-    deleteEndpoint(name, ref) {
-      let type = ref.split("=")[1]
-      let endpoint = Object.values(this.allEndpoints).find((el) => el.type == type)
+    deleteEndpoint (name, ref) {
+      const type = ref.split('=')[1]
+      const endpoint = Object.values(this.endpoints).find((el) => el.type === type)
       if (!endpoint) {
         return
       }
       delete this.service.serviceEndpoint[name]
-      this.availableEndpoints[endpoint.id] = endpoint
     },
-    checkForm(e) {
+    checkForm (e) {
       this.formErrors.length = 0
 
       if (!this.service.name) {
-        this.formErrors.push("Name required")
+        this.formErrors.push('Name required')
       }
       if (!Object.keys(this.service.serviceEndpoint).length > 0) {
-        this.formErrors.push("At least one endpoint required")
+        this.formErrors.push('At least one endpoint required')
       }
 
       if (this.formErrors.length === 0) {
@@ -132,7 +151,7 @@ export default {
       } else {
         e.preventDefault()
       }
-    },
+    }
   }
 }
 </script>

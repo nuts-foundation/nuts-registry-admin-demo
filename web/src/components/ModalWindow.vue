@@ -113,17 +113,17 @@ export default {
     },
     title: String
   },
-  created() {
+  created () {
     document.addEventListener('keydown', this.keyHandler)
   },
-  beforeUnmount() {
+  beforeUnmount () {
     document.removeEventListener('keydown', this.keyHandler)
   },
   methods: {
-    cancel() {
+    cancel () {
       this.$router.push(this.cancelRoute)
     },
-    keyHandler(e) {
+    keyHandler (e) {
       if (e.keyCode === 27) {
         this.cancel()
       }

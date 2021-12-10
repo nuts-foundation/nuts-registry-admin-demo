@@ -83,7 +83,8 @@
                 active-class="menu-link-active"
                 class="menu-link">
               <div class="w-5 h-5 mr-3">
-                <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" viewBox="0 0 24 24" fill="currentColor">
+                <svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" viewBox="0 0 24 24"
+                     fill="currentColor">
                   <g>
                     <path d="M0,0h24v24H0V0z" fill="none"/>
                   </g>
@@ -135,18 +136,17 @@
 </template>
 
 <script>
-import StatusBar from "../components/StatusBar.vue";
-import Logo from "../components/Logo.vue";
+import StatusBar from '../components/StatusBar.vue'
 
 export default {
-  components: {StatusBar, Logo},
-  data() {
+  components: { StatusBar },
+  data () {
     return {
       eventMessage: ''
     }
   },
   methods: {
-    updateStatus(status) {
+    updateStatus (status) {
       this.eventMessage = status
     }
   }

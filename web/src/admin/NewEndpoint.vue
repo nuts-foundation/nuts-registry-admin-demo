@@ -12,7 +12,7 @@
     <div class="p-3 bg-red-100 rounded-md" v-if="formErrors.length">
       <b>Please correct the following error(s):</b>
       <ul>
-        <li v-for="error in formErrors">* {{ error }}</li>
+        <li v-for="(error, idx) in formErrors" :key="`err-${idx}`">* {{ error }}</li>
       </ul>
     </div>
 
@@ -32,24 +32,24 @@
 </template>
 
 <script>
-import ModalWindow from "../components/ModalWindow.vue";
+import ModalWindow from '../components/ModalWindow.vue'
 
 export default {
-  components: {ModalWindow},
-  data() {
+  components: { ModalWindow },
+  data () {
     return {
       apiError: '',
       formErrors: [],
       endpoint: {
         id: '',
         type: '',
-        url: '',
+        url: ''
       }
     }
   },
-  emits: ["statusUpdate"],
+  emits: ['statusUpdate'],
   methods: {
-    checkForm(e) {
+    checkForm (e) {
       // reset the errors
       this.formErrors.length = 0
       this.apiError = ''
@@ -59,24 +59,24 @@ export default {
       }
 
       if (!this.endpoint.type) {
-        this.formErrors.push("Type required")
+        this.formErrors.push('Type required')
       }
 
       if (!this.endpoint.url) {
-        this.formErrors.push("URL required")
+        this.formErrors.push('URL required')
       }
 
       e.preventDefault()
     },
-    confirm() {
+    confirm () {
       this.$api.post('web/private/service-provider/endpoints', this.endpoint)
-          .then(() => {
-            this.$emit("statusUpdate", "Endpoint registered")
-            this.$router.push({name: 'admin.serviceProvider'})
-          })
-          .catch(response => {
-            this.apiError = response
-          })
+        .then(() => {
+          this.$emit('statusUpdate', 'Endpoint registered')
+          this.$router.push({ name: 'admin.serviceProvider' })
+        })
+        .catch(response => {
+          this.apiError = response
+        })
     }
   }
 }
