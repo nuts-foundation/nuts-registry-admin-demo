@@ -28,3 +28,5 @@ type Organization struct {
 	Name string `json:"name"`
 	City string `json:"city"`
 }
+
+const NutsCommService = "NutsComm"

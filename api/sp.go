@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -28,6 +29,20 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	res, err := w.SPService.CreateOrUpdate(serviceProvider)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	// Make sure NutsComm service is registered on customers' DID documents
+	customers, err := w.CustomerService.Repository.All()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
+	for _, customer := range customers {
+		if customer.Did == nil {
+			continue
+		}
+		err := w.CustomerService.RegisterNutsCommService(customer.Id, serviceProvider.Id)
+		if err != nil {
+			log.Printf("Couldn't register NutsComm endpoint on customer DID (did=%s): %v", *customer.Did, err)
+		}
 	}
 	return ctx.JSON(http.StatusOK, res)
 }

@@ -92,6 +92,11 @@ func (w Wrapper) ConnectCustomer(ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+	// Make sure new customers refer to their vendor's NutsComm service
+	err = w.CustomerService.RegisterNutsCommService(customer.Id, spID.String())
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+	}
 	return ctx.JSON(http.StatusOK, customer)
 }
 

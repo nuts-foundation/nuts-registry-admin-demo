@@ -44,6 +44,15 @@
             <label for="website-input">Service Provider website</label>
             <input id="website-input" v-model="serviceProvider.website" type="text">
           </div>
+
+          <div>
+            <label for="endpoint-input">Nuts node endpoint of the Service Provider</label>
+            <input id="endpoint-input" v-model="serviceProvider.endpoint" type="text" placeholder="grpc://nuts.nl:5555">
+            <div class="text-sm">
+              Public address of the Nuts Node endpoint which other nodes connect to, e.g. <pre class="inline">grpc://nuts.nl:5555</pre>.
+              See <a href="https://nuts-node.readthedocs.io/en/latest/pages/getting-started/3-configure-your-node.html#configure-node" target="_blank">the documentation</a> for more information.
+            </div>
+          </div>
         </div>
       </div>
 
