@@ -399,6 +399,7 @@ components:
         - phone
         - email
         - website
+        - endpoint
       properties:
         id:
           description: The DID of the service provider
@@ -415,6 +416,9 @@ components:
           type: string
         website:
           description: Publicly reachable website address of the service provider
+          type: string
+        endpoint:
+          description: Address of the Nuts Node endpoint which other nodes connect to, e.g. grpc://nuts.nl:5555
           type: string
     EndpointProperties:
       type: object

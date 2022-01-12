@@ -3,6 +3,7 @@ package sp
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	ssi "github.com/nuts-foundation/go-did"
 	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
@@ -30,10 +31,18 @@ func (svc Service) Get() (*domain.ServiceProvider, error) {
 	if err = svc.enrichWithContactInfo(sp); err != nil {
 		return nil, err
 	}
+	if err = svc.enrichWithEndpoint(sp); err != nil {
+		return nil, err
+	}
 	return sp, nil
 }
 
 func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServiceProvider, error) {
+	// Do some basic validation
+	if len(sp.Endpoint) > 0 && !strings.HasPrefix(sp.Endpoint, "grpc://") {
+		return nil, errors.New("node endpoint must start with grpc://")
+	}
+
 	if len(sp.Id) == 0 {
 		// Service Provider not registered yet, so create a DID
 		didDoc, err := svc.VDRClient.Create(vdrAPI.DIDCreateRequest{})
@@ -45,6 +54,8 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 			return nil, err
 		}
 	}
+
+	// Update contact info
 	err := svc.DIDManClient.UpdateContactInformation(sp.Id, didmanAPI.ContactInformation{
 		Name:    sp.Name,
 		Email:   sp.Email,
@@ -54,6 +65,16 @@ func (svc Service) CreateOrUpdate(sp domain.ServiceProvider) (*domain.ServicePro
 	if err != nil {
 		return nil, fmt.Errorf("unable to update DID contact info: %w", domain.UnwrapAPIError(err))
 	}
+
+	// Update Nuts endpoint (NutsComm service)
+	_ = svc.DIDManClient.DeleteEndpointsByType(sp.Id, domain.NutsCommService)
+	if len(sp.Endpoint) > 0 {
+		_, err := svc.DIDManClient.AddEndpoint(sp.Id, domain.NutsCommService, sp.Endpoint)
+		if err != nil {
+			return nil, fmt.Errorf("unable to update Nuts Node endpoint: %w", domain.UnwrapAPIError(err))
+		}
+	}
+
 	return &sp, nil
 }
 
@@ -83,6 +104,21 @@ func (svc Service) enrichWithContactInfo(sp *domain.ServiceProvider) error {
 		sp.Name = contactInformation.Name
 		sp.Phone = contactInformation.Phone
 		sp.Website = contactInformation.Website
+	}
+	return nil
+}
+
+func (svc Service) enrichWithEndpoint(sp *domain.ServiceProvider) error {
+	if sp.Id == "" {
+		return nil
+	}
+	didDocument, _, err := svc.VDRClient.Get(sp.Id)
+	if err != nil {
+		return domain.UnwrapAPIError(err)
+	}
+	_, endpointURL, err := didDocument.ResolveEndpointURL(domain.NutsCommService)
+	if err == nil {
+		sp.Endpoint = endpointURL
 	}
 	return nil
 }
@@ -123,11 +159,11 @@ func (svc Service) GetServices() (domain.Services, error) {
 	}
 	compoundServices := domain.Services{}
 	for _, service := range services {
-		compoundServices = append(compoundServices,  domain.Service{
-			ServiceID:         domain.ServiceID{Id: service.Id},
+		compoundServices = append(compoundServices, domain.Service{
+			ServiceID: domain.ServiceID{Id: service.Id},
 			ServiceProperties: domain.ServiceProperties{
 				ServiceEndpoint: service.ServiceEndpoint,
-				Name:      service.Type,
+				Name:            service.Type,
 			},
 		})
 	}
@@ -149,11 +185,10 @@ func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service
 	}
 
 	return &domain.Service{
-		ServiceID:         domain.ServiceID{Id: cs.Id},
+		ServiceID: domain.ServiceID{Id: cs.Id},
 		ServiceProperties: domain.ServiceProperties{
 			ServiceEndpoint: cs.ServiceEndpoint,
-			Name:      cs.Type,
+			Name:            cs.Type,
 		},
 	}, nil
 }
-
