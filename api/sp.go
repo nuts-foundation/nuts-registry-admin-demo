@@ -11,6 +11,30 @@ import (
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 )
 
+func (w Wrapper) syncRegisterNutsCommService(spID string) error {
+	customers, err := w.CustomerService.Repository.All()
+	if err != nil {
+		return err
+	}
+
+	wc := sync.WaitGroup{}
+	wc.Add(len(customers))
+
+	for _, customer := range customers {
+		go func(id int) {
+			defer wc.Done()
+
+			if err := w.CustomerService.RegisterNutsCommService(id, spID); err != nil {
+				log.Printf("Couldn't register NutsComm endpoint on customer DID (id=%d): %v", id, err.Error())
+			}
+		}(customer.Id)
+	}
+
+	wc.Wait()
+
+	return nil
+}
+
 func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
 	serviceProvider, err := w.SPService.Get()
 	if err != nil {
@@ -24,27 +48,21 @@ func (w Wrapper) GetServiceProvider(ctx echo.Context) error {
 
 func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 	serviceProvider := domain.ServiceProvider{}
+
 	if err := ctx.Bind(&serviceProvider); err != nil {
 		return err
 	}
+
 	res, err := w.SPService.CreateOrUpdate(serviceProvider)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+
 	// Make sure NutsComm service is registered on customers' DID documents
-	customers, err := w.CustomerService.Repository.All()
-	if err != nil {
+	if err := w.syncRegisterNutsCommService(serviceProvider.Id); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	for _, customer := range customers {
-		if customer.Did == nil {
-			continue
-		}
-		err := w.CustomerService.RegisterNutsCommService(customer.Id, serviceProvider.Id)
-		if err != nil {
-			log.Printf("Couldn't register NutsComm endpoint on customer DID (did=%s): %v", *customer.Did, err)
-		}
-	}
+
 	return ctx.JSON(http.StatusOK, res)
 }
 
@@ -66,25 +84,9 @@ func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
 
-		customers, err := w.CustomerService.Repository.All()
-		if err != nil {
+		if err := w.syncRegisterNutsCommService(sp.Id); err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
-
-		wc := sync.WaitGroup{}
-		wc.Add(len(customers))
-
-		for _, customer := range customers {
-			go func(id int) {
-				defer wc.Done()
-
-				if err := w.CustomerService.RegisterNutsCommService(id, sp.Id); err != nil {
-					log.Printf("Couldn't register NutsComm endpoint on customer DID (did=%s): %v", *customer.Did, err)
-				}
-			}(customer.Id)
-		}
-
-		wc.Wait()
 	}
 
 	return ctx.NoContent(http.StatusCreated)
