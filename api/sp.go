@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/labstack/echo/v4"
 	ssi "github.com/nuts-foundation/go-did"
@@ -49,13 +50,43 @@ func (w Wrapper) UpdateServiceProvider(ctx echo.Context) error {
 
 func (w Wrapper) RegisterEndpoint(ctx echo.Context) error {
 	ep := domain.EndpointProperties{}
+
 	if err := ctx.Bind(&ep); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
-	err := w.SPService.RegisterEndpoint(ep)
-	if err != nil {
+
+	if err := w.SPService.RegisterEndpoint(ep); err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
+
+	// Automatically set NutsComm endpoints for customers
+	if ep.Type == domain.NutsCommService {
+		sp, err := w.SPService.Get()
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+
+		customers, err := w.CustomerService.Repository.All()
+		if err != nil {
+			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
+		}
+
+		wc := sync.WaitGroup{}
+		wc.Add(len(customers))
+
+		for _, customer := range customers {
+			go func(id int) {
+				defer wc.Done()
+
+				if err := w.CustomerService.RegisterNutsCommService(id, sp.Id); err != nil {
+					log.Printf("Couldn't register NutsComm endpoint on customer DID (did=%s): %v", *customer.Did, err)
+				}
+			}(customer.Id)
+		}
+
+		wc.Wait()
+	}
+
 	return ctx.NoContent(http.StatusCreated)
 }
 
