@@ -102,6 +102,9 @@ func loadConfig() Config {
 		log.Printf("Using default config because no file was found at: %s", configFilePath)
 	}
 
+	// load env flags, can't return error
+	_ = k.Load(envProvider(), nil)
+
 	config := defaultConfig()
 	var err error
 	sessionKey, err := generateSessionKey()
@@ -137,17 +140,19 @@ func resolveConfigFile(flagset *pflag.FlagSet) string {
 
 	k := koanf.New(defaultDelimiter)
 
-	// load env flags
-	e := env.Provider(defaultPrefix, defaultDelimiter, func(s string) string {
-		return strings.Replace(strings.ToLower(
-			strings.TrimPrefix(s, defaultPrefix)), "_", defaultDelimiter, -1)
-	})
-	// can't return error
-	_ = k.Load(e, nil)
+	// load env flags, can't return error
+	_ = k.Load(envProvider(), nil)
 
 	// load cmd flags, without a parser, no error can be returned
 	_ = k.Load(posflag.Provider(flagset, defaultDelimiter, k), nil)
 
 	configFile := k.String(configFileFlag)
 	return configFile
+}
+
+func envProvider() *env.Env {
+	return env.Provider(defaultPrefix, defaultDelimiter, func(s string) string {
+		return strings.Replace(strings.ToLower(
+			strings.TrimPrefix(s, defaultPrefix)), "_", defaultDelimiter, -1)
+	})
 }
