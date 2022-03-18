@@ -108,9 +108,11 @@ func (s Service) search(searchBody vcrApi.SearchJSONRequestBody) ([]domain.Organ
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
+	untrusted := false
 	response, err := s.client().Search(
 		ctx,
 		"organization",
+		&vcrApi.SearchParams{Untrusted: &untrusted},
 		searchBody,
 	)
 	if err != nil {
