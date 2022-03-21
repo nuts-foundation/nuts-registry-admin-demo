@@ -73,7 +73,7 @@ func (db *flatFileRepo) FindByID(id int) (*domain.Customer, error) {
 		}
 	}
 
-	return nil, fmt.Errorf("could not FindCustomerByID with id: %s, reason: %w", id, ErrNotFound)
+	return nil, fmt.Errorf("could not FindCustomerByID with id: %d, reason: %w", id, ErrNotFound)
 }
 
 func (db *flatFileRepo) Update(id int, updateFn func(c domain.Customer) (*domain.Customer, error)) (*domain.Customer, error) {
@@ -102,7 +102,7 @@ func (db *flatFileRepo) Update(id int, updateFn func(c domain.Customer) (*domain
 		}
 	}
 
-	return nil, fmt.Errorf("could update customer with id: %s, reason: %w", id, ErrNotFound)
+	return nil, fmt.Errorf("could update customer with id: %d, reason: %w", id, ErrNotFound)
 }
 
 // WriteAll writes all records to the file, truncating the file if it exists
