@@ -8,7 +8,7 @@ require (
 	github.com/labstack/echo/v4 v4.7.2
 	github.com/lestrrat-go/jwx v1.2.20
 	github.com/nuts-foundation/go-did v0.3.0
-	github.com/nuts-foundation/nuts-node v0.0.0-20220318102343-c46e2e61a3f7
+	github.com/nuts-foundation/nuts-node v0.0.0-20220321115404-5167f22716b6
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/pflag v1.0.5
@@ -71,6 +71,7 @@ require (
 	github.com/nuts-foundation/go-leia/v2 v2.0.1 // indirect
 	github.com/ockam-network/did v0.1.4-0.20210103172416-02ae01ce06d8 // indirect
 	github.com/oklog/run v1.0.0 // indirect
+	github.com/pelletier/go-toml v1.9.4 // indirect
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
 	github.com/piprate/json-gold v0.4.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
