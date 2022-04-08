@@ -3,7 +3,7 @@
                          :endpoints="allEndpoints"
                          :error="apiError"
                          confirm-text="Register"
-                         description="Here you can compose a new Service from endpoints. A service can than be enabled per customer."
+                         description="Here you can compose a new Service from endpoints. A service can than be enabled per care organization."
                          mode="new"
                          title="Register new service">
   </compound-service-form>

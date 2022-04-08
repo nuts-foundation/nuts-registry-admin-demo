@@ -1,8 +1,8 @@
 <template>
   <modal-window :cancelRoute="{name: 'admin.customers'}" :confirmFn="checkForm" confirmText="Connect Customer"
-                title="Connect existing customer" type="add">
+                title="Connect existing care organization" type="add">
 
-    <p class="mb-3 text-sm">Here you can link an existing customer to the Nuts network by creating a new Nuts DID.</p>
+    <p class="mb-3 text-sm">Here you can link an existing care organization to the Nuts network by creating a new Nuts DID.</p>
 
     <p v-if="apiError" class="p-3 bg-red-100 rounded-md">Could not connect customer: {{ apiError }}</p>
 

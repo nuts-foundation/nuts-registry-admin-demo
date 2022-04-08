@@ -3,7 +3,7 @@
 
     <h1 class="mb-4">Service Provider Configuration</h1>
 
-    <p>A Service Provider offers (Nuts) services to its customers.</p>
+    <p>A Service Provider offers (Nuts) services to its care organizations.</p>
     <p>Here you can update the contact information of your Service Provider.</p>
 
     <form @submit.stop.prevent="updateServiceProvider">
@@ -112,7 +112,7 @@
     <div class="flex justify-between mt-14" v-if="serviceProvider.id">
       <h2>Services</h2>
 
-      <p class="pl-8 w-9/12">A service is set of endpoints which can be offered to customers.</p>
+      <p class="pl-8 w-9/12">A service is set of endpoints which can be offered to care organizations.</p>
 
       <button
           @click="$router.push({name: 'admin.newCompoundService'})"
