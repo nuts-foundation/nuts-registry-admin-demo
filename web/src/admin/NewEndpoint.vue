@@ -4,7 +4,7 @@
 
     <p class="mb-4 text-sm">
       Here you can register an endpoint URL of your XIS on your Service Provider's DID,
-      which can be used when enabling services for your customers.
+      which can be used when enabling services for your care organizations.
     </p>
 
     <p v-if="apiError" class="p-3 bg-red-100 rounded-md">Could not register endpoint: {{ apiError }}</p>

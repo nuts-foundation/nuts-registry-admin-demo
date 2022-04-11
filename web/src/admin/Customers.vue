@@ -16,9 +16,9 @@
     </div>
 
     <div class="mt-8 bg-white p-5 shadow-lg rounded-lg">
-      <p v-if="fetchError" class="m-4">Could not fetch customers: {{ fetchError }}</p>
+      <p v-if="fetchError" class="m-4">Could not fetch care organizations: {{ fetchError }}</p>
       <div class="m-4" v-if="loading">Loading...</div>
-      <div class="m-4" v-if="!loading && customers.length == 0 && !fetchError">No customers yet, add one!</div>
+      <div class="m-4" v-if="!loading && customers.length == 0 && !fetchError">No care organizations yet, add one!</div>
       <table v-if="customers.length > 0" class="min-w-full divide-y divide-gray-200">
         <thead>
         <tr>
