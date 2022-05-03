@@ -107,25 +107,23 @@ func (s Service) search(credential vc.VerifiableCredential) ([]domain.Organizati
 	if err != nil {
 		return nil, domain.UnwrapAPIError(err)
 	}
-
-	body, _ := io.ReadAll(response.Body)
 	if response.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("expected status 200: %s", response.Status)
 	}
-	var credentials = make([]vc.VerifiableCredential, 0)
-	if err = json.Unmarshal(body, &credentials); err != nil {
+	searchResponse, err := vcrApi.ParseSearchVCsResponse(response)
+	if err != nil {
 		return nil, err
 	}
 	var results []domain.OrganizationConceptCredential
-	for _, curr := range credentials {
+	for _, curr := range searchResponse.JSON200.VerifiableCredentials {
 		var subjects []domain.NutsOrganizationCredentialSubject
-		err = curr.UnmarshalCredentialSubject(&subjects)
+		err = curr.VerifiableCredential.UnmarshalCredentialSubject(&subjects)
 		if err != nil {
 			return nil, err
 		}
 		results = append(results, domain.OrganizationConceptCredential{
-			ID:           curr.ID.String(),
-			Issuer:       curr.Issuer.String(),
+			ID:           curr.VerifiableCredential.ID.String(),
+			Issuer:       curr.VerifiableCredential.Issuer.String(),
 			Organization: subjects[0].Organization,
 			Subject:      subjects[0].ID,
 		})
