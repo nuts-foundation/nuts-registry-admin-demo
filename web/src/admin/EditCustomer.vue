@@ -19,7 +19,8 @@
       <label class="flex justify-start items-start" v-for="service in availableServices" :key="service.id">
         <div
             class="bg-white border rounded-md border-gray-300 w-6 h-6 flex flex-shrink-0 justify-center items-center mr-2 focus-within:border-blue-500">
-          <input class="opacity-0 absolute" type="checkbox"
+          <input :data-service-name="service.name"
+                 class="opacity-0 absolute" type="checkbox"
                  :checked="enabledServices.map(v=>v.type).includes(service.name)"
                  @input="toggleService(service.id, $event)">
           <svg class="fill-current hidden w-4 h-4 text-green-500 pointer-events-none" viewBox="0 0 20 20">

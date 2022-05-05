@@ -57,7 +57,7 @@
       </div>
 
       <div class="mt-4">
-        <button class="btn btn-primary">
+        <button id="create-update-button" class="btn btn-primary">
           {{ !serviceProvider.id ? 'Create' : 'Update' }} Service Provider
         </button>
       </div>
@@ -70,6 +70,7 @@
         block for Services.</p>
 
       <button
+          id="create-endpoint-button"
           @click="$router.push({name: 'admin.newEndpoint'})"
           class="float-right inline-flex items-center bg-nuts w-10 h-10 rounded-lg justify-center shadow-md"
       >
@@ -115,6 +116,7 @@
       <p class="pl-8 w-9/12">A service is set of endpoints which can be offered to care organizations.</p>
 
       <button
+          id="create-service-button"
           @click="$router.push({name: 'admin.newCompoundService'})"
           class="float-right inline-flex items-center bg-nuts w-10 h-10 rounded-lg justify-center shadow-md"
       >

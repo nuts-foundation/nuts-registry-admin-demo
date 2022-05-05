@@ -26,6 +26,7 @@
         <div class="px-3 mt-6">
           <div class="grid grid-cols-1">
             <router-link
+                id="vendor-menu-link"
                 :to="{name: 'admin.serviceProvider'}"
                 active-class="menu-link-active"
                 class="menu-link">
@@ -48,6 +49,7 @@
               You as a Service Provider
             </router-link>
             <router-link
+                id="careorganizations-menu-link"
                 :to="{name: 'admin.customers'}"
                 active-class="menu-link-active"
                 class="menu-link">

@@ -5,6 +5,7 @@
       <h1>Your care organizations</h1>
 
       <button
+          id="new-customer-button"
           @click="$router.push({name: 'admin.newCustomer'})"
           class="float-right inline-flex items-center bg-nuts w-10 h-10 rounded-lg justify-center shadow-md"
       >

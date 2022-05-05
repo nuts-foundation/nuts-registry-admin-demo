@@ -18,12 +18,12 @@
 
     <form class="space-y-3">
       <div>
-        <label for="endpointTypeInput">Type</label>
-        <input type="text" v-model="endpoint.type" id="endpointTypeInput" required>
+        <label for="endpoint-type-input">Type</label>
+        <input type="text" v-model="endpoint.type" id="endpoint-type-input" required>
       </div>
       <div>
-        <label for="endpointURLInput">URL</label>
-        <input type="text" v-model="endpoint.url" id="endpointURLInput" required
+        <label for="endpoint-url-input">URL</label>
+        <input type="text" v-model="endpoint.url" id="endpoint-url-input" required
                placeholder="https://example.com">
       </div>
     </form>
