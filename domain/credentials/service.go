@@ -172,6 +172,7 @@ func (s Service) getIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
 	contactInformation, err := s.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
 		// ignore so we can still see the DID
+		logrus.Warnf("Unable to get contactinfo (did=%s)", id.String())
 		return sp, nil
 		//return nil, domain.UnwrapAPIError(err)
 	}
