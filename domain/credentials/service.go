@@ -79,8 +79,9 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 }
 
 func (s Service) GetCredentials(customer domain.Customer) ([]domain.OrganizationConceptCredential, error) {
-	return s.search(vc.VerifiableCredential{
-		Type: []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType)},
+	return s.search(vcrApi.SearchVCQuery{
+		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
+		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsContext)},
 		CredentialSubject: []interface{}{domain.NutsOrganizationCredentialSubject{
 			ID: *customer.Did,
 		}},
@@ -88,8 +89,9 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 }
 
 func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationConceptCredential, error) {
-	return s.search(vc.VerifiableCredential{
-		Type: []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType)},
+	return s.search(vcrApi.SearchVCQuery{
+		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
+		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsContext)},
 		CredentialSubject: []interface{}{domain.NutsOrganizationCredentialSubject{
 			Organization: domain.Organization{
 				Name: name,
@@ -99,7 +101,7 @@ func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationCo
 	})
 }
 
-func (s Service) search(credential vc.VerifiableCredential) ([]domain.OrganizationConceptCredential, error) {
+func (s Service) search(credential vcrApi.SearchVCQuery) ([]domain.OrganizationConceptCredential, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

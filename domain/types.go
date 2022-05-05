@@ -19,14 +19,14 @@ type OrganizationConceptCredential struct {
 
 // NutsOrganizationCredentialSubject models the subject for a Verifiable Credential of type NutsOrganizationCredential
 type NutsOrganizationCredentialSubject struct {
-	ID           string       `json:"id"`
-	Organization Organization `json:"organization"`
+	ID           string       `json:"id,omitempty"`
+	Organization Organization `json:"organization,omitempty"`
 }
 
 // Organization models the properties for a legally registered organization.
 type Organization struct {
-	Name string `json:"name"`
-	City string `json:"city"`
+	Name string `json:"name,omitempty"`
+	City string `json:"city,omitempty"`
 }
 
 const NutsCommService = "NutsComm"
