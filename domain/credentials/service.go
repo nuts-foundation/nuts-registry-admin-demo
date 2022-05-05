@@ -103,8 +103,6 @@ func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationCo
 
 func (s Service) search(credential vcrApi.SearchVCQuery) ([]domain.OrganizationConceptCredential, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	queryAsjson, _ := json.MarshalIndent(credential, "", "  ")
-	logrus.Warn(string(queryAsjson))
 	defer cancel()
 
 	response, err := s.client().SearchVCs(ctx, vcrApi.SearchVCsJSONRequestBody{Query: credential})
