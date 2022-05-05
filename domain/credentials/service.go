@@ -117,7 +117,7 @@ func (s Service) search(credential vcrApi.SearchVCQuery) ([]domain.OrganizationC
 	if err != nil {
 		return nil, err
 	}
-	var results []domain.OrganizationConceptCredential
+	results := []domain.OrganizationConceptCredential{}
 	for _, curr := range searchResponse.JSON200.VerifiableCredentials {
 		var subjects []domain.NutsOrganizationCredentialSubject
 		err = curr.VerifiableCredential.UnmarshalCredentialSubject(&subjects)
