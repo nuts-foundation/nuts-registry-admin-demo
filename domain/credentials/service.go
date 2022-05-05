@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/nuts-foundation/go-did/vc"
-	"github.com/nuts-foundation/nuts-node/vcr/credential"
-	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"net/url"
 	"time"
+
+	"github.com/nuts-foundation/go-did/vc"
+	"github.com/nuts-foundation/nuts-node/vcr/credential"
+	"github.com/sirupsen/logrus"
 
 	didmanAPI "github.com/nuts-foundation/nuts-node/didman/api/v1"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
@@ -170,7 +171,10 @@ func (s Service) getIssuer(id ssi.URI) (*domain.ServiceProvider, error) {
 	}
 	contactInformation, err := s.DIDManClient.GetContactInformation(sp.Id)
 	if err != nil {
-		return nil, domain.UnwrapAPIError(err)
+		// ignore so we can still see the DID
+		logrus.Warnf("Unable to get contactinfo (did=%s)", id.String())
+		return sp, nil
+		//return nil, domain.UnwrapAPIError(err)
 	}
 	if contactInformation != nil {
 		sp.Email = contactInformation.Email
