@@ -19,8 +19,8 @@
 
     <form class="space-y-3" @submit.prevent novalidate v-if="service">
       <div>
-        <label for="endpointTypeInput">Name</label>
-        <input type="text" v-model="service.name" id="endpointTypeInput" required>
+        <label for="service-name-input">Name</label>
+        <input type="text" v-model="service.name" id="service-name-input" required>
       </div>
       <label>Endpoints</label>
       <table>
@@ -42,10 +42,10 @@
         </tr>
         <tr v-if="Object.keys(availableEndpoints).length">
           <td>
-            <input type="text" placeholder="type" v-model="newEndpointType">
+            <input type="text" id="endpoint-type-input" placeholder="type" v-model="newEndpointType">
           </td>
           <td>
-            <select :disabled="Object.keys(availableEndpoints).length === 0" name="" id="" class="form-select"
+            <select :disabled="Object.keys(availableEndpoints).length === 0" name="" id="endpoint-reference-input" class="form-select"
                     v-model="selectedEndpoint">
               <option selected value="">Select an endpoint</option>
               <option v-for="(endpoint, endpointId) in availableEndpoints" :value="endpointId" :key="endpoint">
@@ -54,7 +54,7 @@
             </select>
           </td>
           <td>
-            <button class="btn btn-primary btn-sm" @click="addEndpoint(newEndpointType, selectedEndpoint)">Add</button>
+            <button class="btn btn-primary btn-sm" id="add-endpoint-button" @click="addEndpoint(newEndpointType, selectedEndpoint)">Add</button>
           </td>
         </tr>
       </table>
