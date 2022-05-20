@@ -25,15 +25,14 @@
           <label for="template-select">Choose a template</label>
           <select id="template-select" v-on:change="chooseTemplate">
             <option value="">Choose a template</option>
-            <option :value="template.type" v-for="template in templates" :key="template.type">{{
-                template.type
-              }}
-            </option>
+            <option :value="template.type" v-for="template in templates" :key="template.type">{{ template.type }}</option>
           </select>
         </div>
         <div>
-          <label for="issuerdid-input">Issuer</label>
-          <input id="issuerdid-input" v-model="vcToIssue.issuerDID" type="text">
+          <label for="issuerdid-select">Issuer</label>
+          <select id="issuerdid-select" v-model="vcToIssue.issuerDID">
+            <option :value="issuer.did" v-for="issuer in availableIssuers" :key="issuer.did">{{issuer.name}}: {{issuer.did}}</option>
+          </select>
         </div>
         <div>
           <label for="subjectDID-input">Issue VC to DID</label>
@@ -82,6 +81,7 @@ export default {
       responseState: '',
       feedbackMsg: '',
       templates: [],
+      availableIssuers: [],
       vcToIssue: {
         credentialSubjectDID: null,
         credentialSubject: null,
@@ -95,8 +95,36 @@ export default {
   },
   mounted() {
     this.fetchTemplates()
+    this.fetchIssuerDIDs()
   },
   methods: {
+    fetchIssuerDIDs() {
+      this.availableIssuers = []
+      this.$api.get('web/private/service-provider')
+          .then(responseData => {
+            this.responseState = 'success'
+            this.availableIssuers.push({did: responseData.id, name: "Service Provider"})
+          })
+          .catch(reason => {
+            console.error('failure', reason)
+            this.responseState = 'error'
+            this.feedbackMsg = reason
+          })
+      this.$api.get('web/private/customers')
+          .then(customers => {
+            customers.forEach((customer) => {
+              if (customer.active !== true) {
+                return
+              }
+              this.availableIssuers.push({did: customer.did, name: customer.name})
+            })
+          })
+          .catch(reason => {
+            console.error('failure', reason)
+            this.responseState = 'error'
+            this.feedbackMsg = reason
+          })
+    },
     fetchTemplates() {
       this.feedbackMsg = ''
 
@@ -122,25 +150,6 @@ export default {
       this.vcToIssue.credentialSubject = JSON.stringify(template.credentialSubject, null, 2)
     },
     issueVC() {
-      /*
-
-
-      {
-    "@context":"https://kik-v.nl/context/v1.json",
-    "issuer": "did:nuts:<authority DID>",
-    "type": "ValidatedQueryCredential",
-    "credentialSubject": {
-        "id": "did:nuts:<data consumer DID>",
-        "validatedQuery": {
-            "profile": "https://kik-v2.gitlab.io/uitwisselprofielen/uitwisselprofiel-odb/",
-            "ontology": "http://ontology.ontotext.com/publishing",
-            "sparql": "PREFIX%20pub%3A%20%3Chttp%3A%2F%2Fontology.ontotext.com%2Ftaxonomy%2F%3E%0APREFIX%20publishing%3A%20%3Chttp%3A%2F%2Fontology.ontotext.com%2Fpublishing%23%3E%0ASELECT%20DISTINCT%20%3Fp%20%3FobjectLabel%20WHERE%20%7B%0A%20%20%20%20%3Chttp%3A%2F%2Fontology.ontotext.com%2Fresource%2Ftsk78dfdet4w%3E%20%3Fp%20%3Fo%20.%0A%20%20%20%20%7B%0A%20%20%20%20%20%20%20%20%3Fo%20pub%3AhasValue%20%3Fvalue%20.%0A%20%20%20%20%20%20%20%20%3Fvalue%20pub%3ApreferredLabel%20%3FobjectLabel%20.%0A%20%20%20%20%7D%20UNION%20%7B%0A%20%20%20%20%20%20%20%20%3Fo%20pub%3AhasValue%20%3FobjectLabel%20.%0A%20%20%20%20%20%20%20%20filter%20(isLiteral(%3FobjectLabel))%20.%0A%20%20%20%20%20%7D%0A%7D"
-        }
-    },
-    "publishToNetwork": true,
-    "visibility": "public"
-}
-       */
       let inputCredentialSubject = JSON.parse(this.vcToIssue.credentialSubject)
       console.log(inputCredentialSubject)
       let credentialSubject = Object.assign({}, inputCredentialSubject) // copy
