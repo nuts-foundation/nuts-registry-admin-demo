@@ -34,6 +34,10 @@
             <option :value="issuer.did" v-for="issuer in availableIssuers" :key="issuer.did">{{issuer.name}}: {{issuer.did}}</option>
           </select>
         </div>
+<!--        <div>-->
+<!--          <label for="search-subject-input">Search for VC subject</label>-->
+<!--          <input type="input" v-model="subjectSearchQuery" id="search-subject-input" v-on:input="searchSubject" v-on:focusout="searchSubject">-->
+<!--        </div>-->
         <div>
           <label for="subjectDID-input">Issue VC to DID</label>
           <input id="subjectDID-input" v-model="vcToIssue.credentialSubjectDID" type="text">
@@ -82,6 +86,7 @@ export default {
       feedbackMsg: '',
       templates: [],
       availableIssuers: [],
+      subjectSearchQuery: null,
       vcToIssue: {
         credentialSubjectDID: null,
         credentialSubject: null,
@@ -98,6 +103,20 @@ export default {
     this.fetchIssuerDIDs()
   },
   methods: {
+    search () {
+      if (this.query.name === '') {
+        this.results = []
+        return
+      }
+      this.$api.post('web/private/organizations', this.query)
+          .then(data => {
+            this.results = data
+          })
+          .catch(response => {
+            this.fetchError = response.statusText
+            this.results = []
+          })
+    },
     fetchIssuerDIDs() {
       this.availableIssuers = []
       this.$api.get('web/private/service-provider')
