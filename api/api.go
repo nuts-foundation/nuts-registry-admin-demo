@@ -21,6 +21,47 @@ type Wrapper struct {
 	CredentialService credentials.Service
 }
 
+func (w Wrapper) IssueVC(ctx echo.Context) error {
+	request := domain.IssueVCRequest{}
+	if err := ctx.Bind(&request); err != nil {
+		return err
+	}
+
+	issuedVC, err := w.CredentialService.Issue(request)
+	if err != nil {
+		return err
+	}
+	return ctx.JSON(http.StatusOK, *issuedVC)
+}
+
+func (w Wrapper) GetVCTemplates(ctx echo.Context) error {
+	result := []domain.VCTemplate{
+		{
+			Context: "https://nuts.nl/credentials/v1",
+			Type:    "NutsOrganizationCredential",
+			CredentialSubject: map[string]interface{}{
+				"organization": map[string]interface{}{
+					"name": "<Name of the organization>",
+					"city": "<Locality of the organization>",
+				},
+			},
+		},
+		// TODO: NutsAuthorizationCredential
+		{
+			Context: "https://kik-v.nl/context/v1.json",
+			Type:    "ValidatedQueryCredential",
+			CredentialSubject: map[string]interface{}{
+				"validatedQuery": map[string]interface{}{
+					"profile":  "https://kik-v2.gitlab.io/uitwisselprofielen/uitwisselprofiel-odb/",
+					"ontology": "http://ontology.ontotext.com/publishing",
+					"sparql":   "<SPARQL query to be performed>",
+				},
+			},
+		},
+	}
+	return ctx.JSON(http.StatusOK, result)
+}
+
 func (w Wrapper) CheckSession(ctx echo.Context) error {
 	// If this function is reached, it means the session is still valid
 	return ctx.NoContent(http.StatusNoContent)

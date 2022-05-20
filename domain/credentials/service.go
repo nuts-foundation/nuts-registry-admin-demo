@@ -1,6 +1,7 @@
 package credentials
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -309,4 +310,23 @@ func (s Service) ManageIssuerTrust(credentialType string, issuerID ssi.URI, trus
 		ServiceProvider: *sp,
 		Trusted:         trusted,
 	}, nil
+}
+
+func (s Service) Issue(request domain.IssueVCRequest) (*vc.VerifiableCredential, error) {
+	data, _ := json.Marshal(request)
+	requestBody := bytes.NewReader(data)
+	response, err := s.client().IssueVCWithBody(context.Background(), "application/json", requestBody)
+	if err != nil {
+		return nil, err
+	}
+	responseBody, _ := io.ReadAll(response.Body)
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("http status response != %d: %w", http.StatusOK, err)
+	}
+	var result vc.VerifiableCredential
+	err = json.Unmarshal(responseBody, &result)
+	if err != nil {
+		return nil, fmt.Errorf("unable to unmarshal VC issue response body: %w", err)
+	}
+	return &result, nil
 }

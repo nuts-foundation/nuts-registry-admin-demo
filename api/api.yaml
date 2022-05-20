@@ -337,6 +337,37 @@ paths:
         200:
           description: When the change is accepted
 
+  /web/private/vc:
+    post:
+      operationId: issueVC
+      description: Issue a Verifiable Credential.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/IssueVCRequest"
+      responses:
+        200:
+          description: VC successfully issued.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredential'
+  /web/private/vc/templates:
+    get:
+      operationId: getVCTemplates
+      description: Retrieves the template for VCs that can be issued
+      responses:
+        200:
+          description: VC templates returned.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VCTemplate'
+
 components:
   schemas:
     CreateSessionRequest:
@@ -492,3 +523,70 @@ components:
       allOf:
         - $ref: "#/components/schemas/ServiceID"
         - $ref: "#/components/schemas/ServiceProperties"
+    VerifiableCredential:
+      type: object
+      description: A credential according to the W3C and Nuts specs.
+    CredentialSubject:
+      type: object
+      description: Subject of a Verifiable Credential identifying the holder and expressing claims.
+    VCTemplate:
+      type: object
+      description: A template for a VC to be issued
+      required:
+        - type
+        - context
+        - credentialSubject
+      properties:
+        type:
+          type: string
+          description: Verifiable Credential type of the template
+        context:
+          type: string
+          description: JSON-LD context of the Verifiable Credential
+        credentialSubject:
+          type: object
+          description: Example credential subject for the Verifiable Credential
+    IssueVCRequest:
+      type: object
+      description: A request for issuing a new Verifiable Credential.
+      required:
+        - type
+        - issuer
+        - credentialSubject
+      properties:
+        "@context":
+          description: |
+            The resolvable context of the credentialSubject as URI. If omitted, the "https://nuts.nl/credentials/v1" context is used.
+            Note: it is not needed to provide the "https://www.w3.org/2018/credentials/v1" context here.
+          type: string
+          example: "http://schema.org"
+          default: "https://nuts.nl/credentials/v1"
+        type:
+          description: Type definition for the credential.
+          type: string
+          example: "NutsOrganizationCredential"
+        issuer:
+          description: DID according to Nuts specification.
+          type: string
+          example: "did:nuts:B8PUHs2AUHbFF1xLLK4eZjgErEcMXHxs68FteY7NDtCY"
+        expirationDate:
+          description: rfc3339 time string until when the credential is valid.
+          type: string
+          example: "2012-01-02T12:00:00Z"
+        publishToNetwork:
+          description: |
+            If set, the node publishes this credential to the network. This is the default behaviour.
+            When set to false, the caller is responsible for distributing the VC to a holder. When the issuer is
+            also the holder, it then can be used to directly create a presentation (self issued).
+            Note: a not published credential can still be publicaly revoked.
+          type: boolean
+          default: true
+        visibility:
+          description: |
+            When publishToNetwork is true, the credential can be published publicly or privately to the holder.
+            This field is mandatory if publishToNetwork is true to prevent accidents. It defaults to "private".
+          type: string
+          enum: [ public, private ]
+          default: private
+        credentialSubject:
+          $ref: '#/components/schemas/CredentialSubject'
