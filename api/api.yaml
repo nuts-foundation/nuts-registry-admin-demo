@@ -536,6 +536,8 @@ components:
         - type
         - context
         - credentialSubject
+        - publishToNetwork
+        - visibility
       properties:
         type:
           type: string
@@ -546,6 +548,13 @@ components:
         credentialSubject:
           type: object
           description: Example credential subject for the Verifiable Credential
+        publishToNetwork:
+          type: boolean
+          description: Whether to publish the VC on the Nuts network after issuance.
+        visibility:
+          type: string
+          enum: [ public, private ]
+          description: Visibility of the VC when publishing on the network.
     IssueVCRequest:
       type: object
       description: A request for issuing a new Verifiable Credential.
