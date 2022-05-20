@@ -38,13 +38,15 @@ func (w Wrapper) GetVCTemplates(ctx echo.Context) error {
 	result := []domain.VCTemplate{
 		{
 			Context: "https://nuts.nl/credentials/v1",
-			Type:    "NutsOrganizationCredential",
+			Type:             "NutsOrganizationCredential",
 			CredentialSubject: map[string]interface{}{
 				"organization": map[string]interface{}{
 					"name": "<Name of the organization>",
 					"city": "<Locality of the organization>",
 				},
 			},
+			PublishToNetwork: true,
+			Visibility: "public",
 		},
 		// TODO: NutsAuthorizationCredential
 		{
@@ -57,6 +59,8 @@ func (w Wrapper) GetVCTemplates(ctx echo.Context) error {
 					"sparql":   "<SPARQL query to be performed>",
 				},
 			},
+			PublishToNetwork: true,
+			Visibility: "private",
 		},
 	}
 	return ctx.JSON(http.StatusOK, result)

@@ -65,7 +65,6 @@ export default {
     login () {
       this.$api.post('web/auth', this.credentials)
         .then(responseData => {
-          console.log('success!')
           localStorage.setItem('session', responseData.token)
           this.redirectAfterLogin()
         })

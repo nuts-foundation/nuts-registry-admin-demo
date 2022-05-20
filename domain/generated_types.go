@@ -15,6 +15,13 @@ const (
 	IssueVCRequestVisibilityPublic IssueVCRequestVisibility = "public"
 )
 
+// Defines values for VCTemplateVisibility.
+const (
+	VCTemplateVisibilityPrivate VCTemplateVisibility = "private"
+
+	VCTemplateVisibilityPublic VCTemplateVisibility = "public"
+)
+
 // CreateSessionRequest defines model for CreateSessionRequest.
 type CreateSessionRequest struct {
 	Password string `json:"password"`
@@ -177,9 +184,18 @@ type VCTemplate struct {
 	// Example credential subject for the Verifiable Credential
 	CredentialSubject map[string]interface{} `json:"credentialSubject"`
 
+	// Whether to publish the VC on the Nuts network after issuance.
+	PublishToNetwork bool `json:"publishToNetwork"`
+
 	// Verifiable Credential type of the template
 	Type string `json:"type"`
+
+	// Visibility of the VC when publishing on the network.
+	Visibility VCTemplateVisibility `json:"visibility"`
 }
+
+// Visibility of the VC when publishing on the network.
+type VCTemplateVisibility string
 
 // A credential according to the W3C and Nuts specs.
 type VerifiableCredential map[string]interface{}

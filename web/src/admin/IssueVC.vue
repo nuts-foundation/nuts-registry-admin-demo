@@ -20,56 +20,72 @@
           {{ feedbackMsg }}
         </div>
 
-        <!-- Form -->
-        <div>
-          <label for="template-select">Choose a template</label>
-          <select id="template-select" v-on:change="chooseTemplate">
-            <option value="">Choose a template</option>
-            <option :value="template.type" v-for="template in templates" :key="template.type">{{ template.type }}</option>
-          </select>
-        </div>
-        <div>
-          <label for="issuerdid-select">Issuer</label>
-          <select id="issuerdid-select" v-model="vcToIssue.issuerDID">
-            <option :value="issuer.did" v-for="issuer in availableIssuers" :key="issuer.did">{{issuer.name}}: {{issuer.did}}</option>
-          </select>
-        </div>
-<!--        <div>-->
-<!--          <label for="search-subject-input">Search for VC subject</label>-->
-<!--          <input type="input" v-model="subjectSearchQuery" id="search-subject-input" v-on:input="searchSubject" v-on:focusout="searchSubject">-->
-<!--        </div>-->
-        <div>
-          <label for="subjectDID-input">Issue VC to DID</label>
-          <input id="subjectDID-input" v-model="vcToIssue.credentialSubjectDID" type="text">
-        </div>
+        <!-- VC to issue -->
+        <div v-if="!issuedVC">
+          <div>
+            <label for="template-select">Choose a template</label>
+            <select id="template-select" v-on:change="chooseTemplate">
+              <option value="">Choose a template</option>
+              <option :value="template.type" v-for="template in templates" :key="template.type">{{
+                  template.type
+                }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label for="issuerdid-select">Issuer</label>
+            <select id="issuerdid-select" v-model="vcToIssue.issuerDID">
+              <option :value="issuer.did" v-for="issuer in availableIssuers" :key="issuer.did">{{ issuer.name }}:
+                {{ issuer.did }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label for="search-subject-input">Search for VC subject</label>
+            <input type="text" v-model="subjectSearchQuery" autocomplete="false" id="search-subject-input"
+                   v-on:input="searchSubjects" v-on:focusout="searchSubjects">
+          </div>
+          <div v-if="subjectSearchResults.length > 0" class="subject-search-results">
+            <div v-for="(result, idx) in subjectSearchResults" :key="`result-${idx}`"
+                 @click="selectSubject(result)">{{ result.organization.name }}
+            </div>
+          </div>
+          <div>
+            <label for="subjectDID-input">Issue VC to DID</label>
+            <input id="subjectDID-input" v-model="vcToIssue.credentialSubjectDID" type="text">
+          </div>
 
-        <div>
-          <label for="subject-textarea">Subject</label>
-          <textarea id="subject-textarea" v-model="vcToIssue.credentialSubject"></textarea>
-        </div>
+          <div>
+            <label for="subject-textarea">Subject</label>
+            <textarea id="subject-textarea" v-model="vcToIssue.credentialSubject"></textarea>
+          </div>
 
-        <div>
-          <label for="publish-checkbox">Publish</label>
-          <input id="publish-checkbox" v-model="vcToIssue.publishToNetwork" type="checkbox">
-        </div>
-        <div>
-          <label for="visibility-select">Visibility</label>
-          <select id="visibility-select" v-model="vcToIssue.visibility">
-            <option>private</option>
-            <option>public</option>
-          </select>
-        </div>
-        <div>
-          <label for="vccontext-input">Credential Context</label>
-          <input id="vccontext-input" v-model="vcToIssue.vcContext" type="text">
-        </div>
-        <div>
-          <label for="vctype-input">Credential Type</label>
-          <input id="vctype-input" v-model="vcToIssue.vcType" type="text">
-        </div>
+          <div>
+            <label for="publish-checkbox">Publish</label>
+            <input id="publish-checkbox" v-model="vcToIssue.publishToNetwork" type="checkbox">
+          </div>
+          <div>
+            <label for="visibility-select">Visibility</label>
+            <select id="visibility-select" v-model="vcToIssue.visibility">
+              <option>private</option>
+              <option>public</option>
+            </select>
+          </div>
+          <div>
+            <label for="vccontext-input">Credential Context</label>
+            <input id="vccontext-input" v-model="vcToIssue.vcContext" type="text">
+          </div>
+          <div>
+            <label for="vctype-input">Credential Type</label>
+            <input id="vctype-input" v-model="vcToIssue.vcType" type="text">
+          </div>
 
-        <div class="mt-4">
-          <button id="issue-button" class="btn btn-primary" v-on:click="issueVC">Issue</button>
+          <div class="mt-4">
+            <button id="issue-button" class="btn btn-primary" v-on:click="issueVC">Issue</button>
+          </div>
+        </div>
+        <div v-if="issuedVC">
+          <pre>{{JSON.stringify(issuedVC, null, 2)}}</pre>
         </div>
       </div>
     </div>
@@ -86,6 +102,8 @@ export default {
       feedbackMsg: '',
       templates: [],
       availableIssuers: [],
+      subjectSearchResults: [],
+      issuedVC: null,
       subjectSearchQuery: null,
       vcToIssue: {
         credentialSubjectDID: null,
@@ -103,18 +121,23 @@ export default {
     this.fetchIssuerDIDs()
   },
   methods: {
-    search () {
-      if (this.query.name === '') {
-        this.results = []
+    selectSubject(vc) {
+      this.vcToIssue.credentialSubjectDID = vc.subject
+      this.subjectSearchQuery = ''
+      this.subjectSearchResults = []
+    },
+    searchSubjects() {
+      if (this.subjectSearchQuery === '') {
+        this.subjectSearchResults = []
         return
       }
-      this.$api.post('web/private/organizations', this.query)
+      this.$api.post('web/private/organizations', {name: this.subjectSearchQuery})
           .then(data => {
-            this.results = data
+            this.subjectSearchResults = data
           })
           .catch(response => {
             this.fetchError = response.statusText
-            this.results = []
+            this.subjectSearchResults = []
           })
     },
     fetchIssuerDIDs() {
@@ -149,7 +172,6 @@ export default {
 
       this.$api.get('web/private/vc/templates')
           .then(responseData => {
-            console.log(responseData)
             this.templates = responseData
           })
           .catch(reason => {
@@ -166,11 +188,12 @@ export default {
       const template = this.templates.filter((curr) => curr.type === templateType)[0]
       this.vcToIssue.vcType = template.type
       this.vcToIssue.vcContext = template.context
+      this.vcToIssue.visibility = template.visibility
+      this.vcToIssue.publishToNetwork = template.publishToNetwork
       this.vcToIssue.credentialSubject = JSON.stringify(template.credentialSubject, null, 2)
     },
     issueVC() {
       let inputCredentialSubject = JSON.parse(this.vcToIssue.credentialSubject)
-      console.log(inputCredentialSubject)
       let credentialSubject = Object.assign({}, inputCredentialSubject) // copy
       credentialSubject.id = this.vcToIssue.credentialSubjectDID
       let request = {
@@ -186,8 +209,8 @@ export default {
           .then(responseData => {
             this.responseState = 'success'
             this.$emit('statusUpdate', 'Verifiable Credential Issued')
-            // TODO: Show response data
             this.feedbackMsg = ''
+            this.issuedVC = responseData;
           })
           .catch(reason => {
             console.error('failure', reason)
@@ -202,5 +225,20 @@ export default {
 <style>
 textarea {
   height: 300px;
+}
+
+.subject-search-results {
+  border-radius: 6px;
+  border: 1px solid lightgray;
+  padding: 5px;
+  margin-top: 0;
+}
+
+.subject-search-results div {
+  cursor: pointer;
+}
+
+.subject-search-results div:hover {
+  background-color: #f1f1f1;
 }
 </style>
