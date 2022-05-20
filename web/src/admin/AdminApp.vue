@@ -99,6 +99,19 @@
 
               Care Organization Registry
             </router-link>
+            <router-link
+                :to="{name: 'admin.issueVC'}"
+                active-class="menu-link-active"
+                class="menu-link">
+              <div class="w-5 h-5 mr-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+              </div>
+
+              Issue Verifiable Credential
+            </router-link>
           </div>
         </div>
       </div>
@@ -141,14 +154,14 @@
 import StatusBar from '../components/StatusBar.vue'
 
 export default {
-  components: { StatusBar },
-  data () {
+  components: {StatusBar},
+  data() {
     return {
       eventMessage: ''
     }
   },
   methods: {
-    updateStatus (status) {
+    updateStatus(status) {
       this.eventMessage = status
     }
   }

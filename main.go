@@ -109,8 +109,8 @@ func main() {
 
 	// Initialize services
 	customerService := customers.Service{
-		VDRClient:  vdrClient,
-		Repository: customers.NewFlatFileRepository(config.CustomersFile),
+		VDRClient:    vdrClient,
+		Repository:   customers.NewFlatFileRepository(config.CustomersFile),
 		DIDManClient: didmanClient,
 	}
 	credentialService := credentials.Service{

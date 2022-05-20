@@ -13,6 +13,7 @@ import NewCustomer from './admin/NewCustomer.vue'
 import EditCustomer from './admin/EditCustomer.vue'
 import OrganizationRegistry from './admin/OrganizationRegistry.vue'
 import ManageVCs from './admin/ManageVCs.vue'
+import IssueVC from './admin/IssueVC.vue'
 import Api from './plugins/api'
 import NewCompoundService from './admin/NewCompoundService.vue'
 import EditCompoundService from './admin/EditCompoundService.vue'
@@ -98,7 +99,12 @@ const routes = [
         path: 'organization-registry',
         name: 'admin.organizationRegistry',
         component: OrganizationRegistry
-      }
+      },
+      {
+        path: 'issue-vc',
+        name: 'admin.issueVC',
+        component: IssueVC
+      },
     ],
     meta: { requiresAuth: true }
   },
