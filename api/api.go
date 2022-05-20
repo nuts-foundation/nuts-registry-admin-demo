@@ -37,21 +37,45 @@ func (w Wrapper) IssueVC(ctx echo.Context) error {
 func (w Wrapper) GetVCTemplates(ctx echo.Context) error {
 	result := []domain.VCTemplate{
 		{
-			Context: "https://nuts.nl/credentials/v1",
+			Context:          "https://nuts.nl/credentials/v1",
 			Type:             "NutsOrganizationCredential",
+			PublishToNetwork: true,
+			Visibility:       "public",
 			CredentialSubject: map[string]interface{}{
 				"organization": map[string]interface{}{
 					"name": "<Name of the organization>",
 					"city": "<Locality of the organization>",
 				},
 			},
-			PublishToNetwork: true,
-			Visibility: "public",
 		},
-		// TODO: NutsAuthorizationCredential
 		{
-			Context: "https://kik-v.nl/context/v1.json",
-			Type:    "ValidatedQueryCredential",
+			Context:          "https://nuts.nl/credentials/v1",
+			Type:             "NutsAuthorizationCredential",
+			PublishToNetwork: true,
+			Visibility:       "private",
+			CredentialSubject: map[string]interface{}{
+				"legalBase": map[string]interface{}{
+					"consentType": "implied",
+				},
+				"localParameters": map[string]interface{}{
+					"example": "parameter",
+				},
+				"resources": []map[string]interface{}{
+					{
+						"path":        "/DocumentReference/f2aeec97-fc0d-42bf-8ca7-0548192d4231",
+						"operations":  []string{"read"},
+						"userContext": true,
+					},
+				},
+				"purposeOfUse": "eOverdracht",
+				"subject":      "urn:oid:2.16.840.1.113883.2.4.6.3:123456780",
+			},
+		},
+		{
+			Context:          "https://kik-v.nl/context/v1.json",
+			Type:             "ValidatedQueryCredential",
+			PublishToNetwork: true,
+			Visibility:       "private",
 			CredentialSubject: map[string]interface{}{
 				"validatedQuery": map[string]interface{}{
 					"profile":  "https://kik-v2.gitlab.io/uitwisselprofielen/uitwisselprofiel-odb/",
@@ -59,8 +83,6 @@ func (w Wrapper) GetVCTemplates(ctx echo.Context) error {
 					"sparql":   "<SPARQL query to be performed>",
 				},
 			},
-			PublishToNetwork: true,
-			Visibility: "private",
 		},
 	}
 	return ctx.JSON(http.StatusOK, result)
