@@ -90,6 +90,12 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 }
 
 func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationConceptCredential, error) {
+	if len(name) > 0 {
+		name += "*"
+	}
+	if len(city) > 0 {
+		city += "*"
+	}
 	return s.search(vcrApi.SearchVCQuery{
 		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
 		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsContext)},
