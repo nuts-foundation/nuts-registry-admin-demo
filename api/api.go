@@ -54,12 +54,6 @@ func (w Wrapper) GetVCTemplates(ctx echo.Context) error {
 			PublishToNetwork: true,
 			Visibility:       "private",
 			CredentialSubject: map[string]interface{}{
-				"legalBase": map[string]interface{}{
-					"consentType": "implied",
-				},
-				"localParameters": map[string]interface{}{
-					"example": "parameter",
-				},
 				"resources": []map[string]interface{}{
 					{
 						"path":        "/DocumentReference/f2aeec97-fc0d-42bf-8ca7-0548192d4231",
