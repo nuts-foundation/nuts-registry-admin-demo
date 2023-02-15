@@ -1,11 +1,20 @@
 package main
 
 import (
+	"crypto"
+	"crypto/ecdsa"
 	"crypto/elliptic"
+	"crypto/rsa"
 	"crypto/sha1"
 	"embed"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"github.com/google/uuid"
+	"github.com/lestrrat-go/jwx/jwk"
+	"github.com/lestrrat-go/jwx/jwt"
+	"github.com/nuts-foundation/nuts-node/core"
+	"golang.org/x/crypto/ssh"
 	"io/fs"
 	"log"
 	"net/http"
@@ -92,14 +101,30 @@ func main() {
 	}
 	auth := api.NewAuth(config.sessionKey, []api.UserAccount{account})
 
+	// API security
+	tokenGenerator := func() (string, error) {
+		return "", nil
+	}
+	if config.apiKey != nil {
+		// debug
+		_, _ = jwkKey(config.apiKey)
+		tokenGenerator = createTokenGenerator(config)
+	}
+
 	// Initialize repos
 	vdrClient := vdrAPI.HTTPClient{
-		ServerAddress: config.NutsNodeAddress,
-		Timeout:       apiTimeout,
+		ClientConfig: core.ClientConfig{
+			Address: config.NutsNodeAddress,
+			Timeout: apiTimeout,
+		},
+		TokenGenerator: tokenGenerator,
 	}
 	didmanClient := didmanAPI.HTTPClient{
-		ServerAddress: config.NutsNodeAddress,
-		Timeout:       apiTimeout,
+		ClientConfig: core.ClientConfig{
+			Address: config.NutsNodeAddress,
+			Timeout: apiTimeout,
+		},
+		TokenGenerator: tokenGenerator,
 	}
 	spService := sp.Service{
 		Repository:   sp.NewBBoltRepository(db),
@@ -180,4 +205,94 @@ func httpErrorHandler(err error, c echo.Context) {
 
 func requestsStatusEndpoint(context echo.Context) bool {
 	return context.Request().RequestURI == "/status"
+}
+
+// createTokenGenerator generates valid API tokens for the Nuts node and signs them with the private key
+// * The iss field must be present
+// * The sub field must be present
+// * The iat field must be present
+// * The nbf field must be present
+// * The exp field must be present
+// * The iat value must occur before the nbf value
+// * The exp value must occur no more than 24 hours after the iat value
+// * The jti field must be present and contain a UUID string
+// * The aud field must be present
+// * The aud field must contain the configured auth.audience parameter (hostname by default) on the nuts node
+// * The JWT must be signed by a known ECDSA, Ed25519, or RSA (>=2048-bit) key as configured in auth.authorizedkeyspath
+// * Signatures based on RSA keys may use the RS512 or PS512 algorithms only
+// * The kid field must contain the SSH SHA256 fingerprint (e.g. SHA256:G5hwd24Zl7dyTsAGVxqyZk6z+oJ5UxWcIRL3fWGj7wk) of the corresponding public key
+// * The JWT must not be encrypted
+func createTokenGenerator(config Config) core.AuthorizationTokenGenerator {
+	return func() (string, error) {
+		key, err := jwkKey(config.apiKey)
+		if err != nil {
+			return "", err
+		}
+
+		issuedAt := time.Now()
+		notBefore := issuedAt
+		expires := notBefore.Add(time.Second * time.Duration(5))
+		token, err := jwt.NewBuilder().
+			Issuer("test@test.local").
+			Subject("test@test.local").
+			Audience([]string{config.NutsNodeAddress}).
+			IssuedAt(issuedAt).
+			NotBefore(notBefore).
+			Expiration(expires).
+			JwtID(uuid.New().String()).
+			Build()
+
+		bytes, err := jwt.Sign(token, jwa.SignatureAlgorithm(key.Algorithm()), key)
+		if err != nil {
+			return "", err
+		}
+		return string(bytes), nil
+	}
+}
+
+func jwkKey(signer crypto.Signer) (key jwk.Key, err error) {
+	// ssh key format
+	key, err = jwk.New(signer)
+	if err != nil {
+		return nil, err
+	}
+
+	var pub ssh.PublicKey
+	pub, err = ssh.NewPublicKey(signer.Public())
+	if err != nil {
+		return
+	}
+	b64 := ssh.FingerprintSHA256(pub)
+	key.Set(jwk.KeyIDKey, b64)
+
+	switch k := signer.(type) {
+	case *rsa.PrivateKey:
+		key.Set(jwk.AlgorithmKey, jwa.PS512)
+	case *ecdsa.PrivateKey:
+		var alg jwa.SignatureAlgorithm
+		alg, err = ecAlg(k)
+		key.Set(jwk.AlgorithmKey, alg)
+	default:
+		err = errors.New("unsupported signing private key")
+	}
+	return
+}
+
+func ecAlg(key *ecdsa.PrivateKey) (alg jwa.SignatureAlgorithm, err error) {
+	alg, err = ecAlgUsingPublicKey(key.PublicKey)
+	return
+}
+
+func ecAlgUsingPublicKey(key ecdsa.PublicKey) (alg jwa.SignatureAlgorithm, err error) {
+	switch key.Params().BitSize {
+	case 256:
+		alg = jwa.ES256
+	case 384:
+		alg = jwa.ES384
+	case 521:
+		alg = jwa.ES512
+	default:
+		err = errors.New("unsupported key")
+	}
+	return
 }
