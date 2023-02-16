@@ -14,7 +14,6 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/nuts-foundation/nuts-node/core"
-	"golang.org/x/crypto/ssh"
 	"io/fs"
 	"log"
 	"net/http"
@@ -233,8 +232,8 @@ func createTokenGenerator(config Config) core.AuthorizationTokenGenerator {
 		notBefore := issuedAt
 		expires := notBefore.Add(time.Second * time.Duration(5))
 		token, err := jwt.NewBuilder().
-			Issuer("test@test.local").
-			Subject("test@test.local").
+			Issuer("registry admin").
+			Subject("admin").
 			Audience([]string{config.NutsNodeAddress}).
 			IssuedAt(issuedAt).
 			NotBefore(notBefore).
@@ -257,14 +256,6 @@ func jwkKey(signer crypto.Signer) (key jwk.Key, err error) {
 		return nil, err
 	}
 
-	var pub ssh.PublicKey
-	pub, err = ssh.NewPublicKey(signer.Public())
-	if err != nil {
-		return
-	}
-	b64 := ssh.FingerprintSHA256(pub)
-	key.Set(jwk.KeyIDKey, b64)
-
 	switch k := signer.(type) {
 	case *rsa.PrivateKey:
 		key.Set(jwk.AlgorithmKey, jwa.PS512)
@@ -274,7 +265,11 @@ func jwkKey(signer crypto.Signer) (key jwk.Key, err error) {
 		key.Set(jwk.AlgorithmKey, alg)
 	default:
 		err = errors.New("unsupported signing private key")
+		return
 	}
+
+	err = jwk.AssignKeyID(key)
+
 	return
 }
 
