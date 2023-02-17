@@ -207,20 +207,6 @@ func requestsStatusEndpoint(context echo.Context) bool {
 }
 
 // createTokenGenerator generates valid API tokens for the Nuts node and signs them with the private key
-// * The iss field must be present
-// * The sub field must be present
-// * The iat field must be present
-// * The nbf field must be present
-// * The exp field must be present
-// * The iat value must occur before the nbf value
-// * The exp value must occur no more than 24 hours after the iat value
-// * The jti field must be present and contain a UUID string
-// * The aud field must be present
-// * The aud field must contain the configured auth.audience parameter (hostname by default) on the nuts node
-// * The JWT must be signed by a known ECDSA, Ed25519, or RSA (>=2048-bit) key as configured in auth.authorizedkeyspath
-// * Signatures based on RSA keys may use the RS512 or PS512 algorithms only
-// * The kid field must contain the SSH SHA256 fingerprint (e.g. SHA256:G5hwd24Zl7dyTsAGVxqyZk6z+oJ5UxWcIRL3fWGj7wk) of the corresponding public key
-// * The JWT must not be encrypted
 func createTokenGenerator(config Config) core.AuthorizationTokenGenerator {
 	return func() (string, error) {
 		key, err := jwkKey(config.apiKey)
@@ -232,8 +218,8 @@ func createTokenGenerator(config Config) core.AuthorizationTokenGenerator {
 		notBefore := issuedAt
 		expires := notBefore.Add(time.Second * time.Duration(5))
 		token, err := jwt.NewBuilder().
-			Issuer("registry admin").
-			Subject("admin").
+			Issuer(config.NutsNodeAPIUser).
+			Subject(config.Credentials.Username).
 			Audience([]string{config.NutsNodeAddress}).
 			IssuedAt(issuedAt).
 			NotBefore(notBefore).

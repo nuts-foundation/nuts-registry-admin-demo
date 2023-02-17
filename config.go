@@ -45,8 +45,12 @@ type Config struct {
 	Credentials        Credentials `koanf:"credentials"`
 	DBFile             string      `koanf:"dbfile"`
 	HTTPPort           int         `koanf:"port"`
+	// NutsNodeAddress contains the address of the Nuts node. It's also used in the aud field when API security is enabled
 	NutsNodeAddress    string      `koanf:"nutsnodeaddr"`
+	// NutsNodeAPIKeyFile points to the private key used to sign JWTs. If empty Nuts node API security is not enabled
 	NutsNodeAPIKeyFile string      `koanf:"nutsnodeapikeyfile"`
+	// NutsNodeAPIUser contains the API key user that will go into the iss field. It must match the user with the public key from the authorized_keys file in the Nuts node
+	NutsNodeAPIUser    string      `koanf:"nutsnodeapiuser"`
 	CustomersFile      string      `koanf:"customersfile"`
 	Branding           Branding    `koanf:"branding"`
 	sessionKey         *ecdsa.PrivateKey
