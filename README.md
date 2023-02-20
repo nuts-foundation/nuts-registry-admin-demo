@@ -38,7 +38,8 @@ $ docker run -p 1303:1303 nutsfoundation/nuts-registry-admin-demo
 When running in Docker without a config file mounted at `/app/server.config.yaml` it will use the default configuration.
 In this case the default username will be `demo@nuts.nl`. The password is generated and printed in the log on startup.
 
-The `nutsnodeapikeyfile` config parameter should point to a PEM encoded private key file. The corresponding public key should be configured on the Nuts node in SSH authorized keys format. 
+The `nutsnodeapikeyfile` config parameter should point to a PEM encoded private key file. The corresponding public key should be configured on the Nuts node in SSH authorized keys format.
+`nutsnodeapiuser` Is required when using Nuts node API token security. It must match the user in the SSH authorized keys file.
 
 ## Technology Stack
 

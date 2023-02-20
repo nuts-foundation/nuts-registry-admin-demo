@@ -3,7 +3,5 @@ credentials:
   password: "demo"
 port: 1303
 nutsnodeaddr: "http://localhost:1323"
-nutsnodeapikeyfile: "./skey.pem"
-nutsnodeapiuser: "demo@woutslakhorst.nl"
 branding:
   logo: "logo.png"

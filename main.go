@@ -105,8 +105,6 @@ func main() {
 		return "", nil
 	}
 	if config.apiKey != nil {
-		// debug
-		_, _ = jwkKey(config.apiKey)
 		tokenGenerator = createTokenGenerator(config)
 	}
 
@@ -250,7 +248,7 @@ func jwkKey(signer crypto.Signer) (key jwk.Key, err error) {
 		alg, err = ecAlg(k)
 		key.Set(jwk.AlgorithmKey, alg)
 	default:
-		err = errors.New("unsupported signing private key")
+		err = fmt.Errorf("unsupported signing private key: %T", k)
 		return
 	}
 
