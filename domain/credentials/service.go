@@ -82,7 +82,7 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 func (s Service) GetCredentials(customer domain.Customer) ([]domain.OrganizationConceptCredential, error) {
 	return s.search(vcrApi.SearchVCQuery{
 		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
-		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsContext)},
+		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsV1Context)},
 		CredentialSubject: []interface{}{domain.NutsOrganizationCredentialSubject{
 			ID: *customer.Did,
 		}},
@@ -98,7 +98,7 @@ func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationCo
 	}
 	return s.search(vcrApi.SearchVCQuery{
 		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
-		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsContext)},
+		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsV1Context)},
 		CredentialSubject: []interface{}{domain.NutsOrganizationCredentialSubject{
 			Organization: domain.Organization{
 				Name: name,
@@ -229,7 +229,7 @@ func (s Service) issueNutsOrgCredential(customer domain.Customer) error {
 		City: *customer.City,
 	}})
 
-	visiblity := vcrApi.IssueVCRequestVisibilityPublic
+	visiblity := vcrApi.Public
 	requestBody := vcrApi.IssueVCJSONRequestBody{
 		Type:              "NutsOrganizationCredential",
 		Issuer:            vendorDID.Id,

@@ -1,11 +1,15 @@
 package main
 
 import (
+	"crypto"
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
+	"crypto/rsa"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"golang.org/x/crypto/ssh"
 	"io"
 	"log"
 	"os"
@@ -38,13 +42,19 @@ func defaultConfig() Config {
 }
 
 type Config struct {
-	Credentials     Credentials `koanf:"credentials"`
-	DBFile          string      `koanf:"dbfile"`
-	HTTPPort        int         `koanf:"port"`
-	NutsNodeAddress string      `koanf:"nutsnodeaddr"`
-	CustomersFile   string      `koanf:"customersfile"`
-	Branding        Branding    `koanf:"branding"`
+	Credentials Credentials `koanf:"credentials"`
+	DBFile      string      `koanf:"dbfile"`
+	HTTPPort    int         `koanf:"port"`
+	// NutsNodeAddress contains the address of the Nuts node. It's also used in the aud field when API security is enabled
+	NutsNodeAddress string `koanf:"nutsnodeaddr"`
+	// NutsNodeAPIKeyFile points to the private key used to sign JWTs. If empty Nuts node API security is not enabled
+	NutsNodeAPIKeyFile string `koanf:"nutsnodeapikeyfile"`
+	// NutsNodeAPIUser contains the API key user that will go into the iss field. It must match the user with the public key from the authorized_keys file in the Nuts node
+	NutsNodeAPIUser string   `koanf:"nutsnodeapiuser"`
+	CustomersFile   string   `koanf:"customersfile"`
+	Branding        Branding `koanf:"branding"`
 	sessionKey      *ecdsa.PrivateKey
+	apiKey          crypto.Signer
 }
 
 type Credentials struct {
@@ -118,6 +128,21 @@ func loadConfig() Config {
 		log.Fatalf("error while unmarshalling config: %v", err)
 	}
 
+	// Load the API key
+	if len(config.NutsNodeAPIKeyFile) > 0 {
+		bytes, err := os.ReadFile(config.NutsNodeAPIKeyFile)
+		if err != nil {
+			log.Fatalf("error while reading private key file: %v", err)
+		}
+		config.apiKey, err = pemToPrivateKey(bytes)
+		if err != nil {
+			log.Fatalf("error while decoding private key file: %v", err)
+		}
+		if len(config.NutsNodeAPIUser) == 0 {
+			log.Fatal("nutsnodeapiuser config is required with nutsnodeapikeyfile")
+		}
+	}
+
 	return config
 }
 
@@ -155,4 +180,24 @@ func envProvider() *env.Env {
 		return strings.Replace(strings.ToLower(
 			strings.TrimPrefix(s, defaultPrefix)), "_", defaultDelimiter, -1)
 	})
+}
+
+// pemToPrivateKey converts a PEM encoded private key to a Signer interface. It supports EC, RSA and PKIX PEM encoded strings
+func pemToPrivateKey(bytes []byte) (signer crypto.Signer, err error) {
+	key, _ := ssh.ParseRawPrivateKey(bytes)
+	if key == nil {
+		err = errors.New("failed to decode PEM file")
+		return
+	}
+
+	switch k := key.(type) {
+	case *rsa.PrivateKey:
+		signer = k
+	case *ecdsa.PrivateKey:
+		signer = k
+	default:
+		err = fmt.Errorf("unsupported private key type: %T", k)
+	}
+
+	return
 }

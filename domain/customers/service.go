@@ -21,9 +21,11 @@ func (s Service) ConnectCustomer(reqCustomer domain.Customer, serviceProviderID 
 	controllers := []string{serviceProviderID.String()}
 
 	didDoc, err := s.VDRClient.Create(nutsApi.DIDCreateRequest{
-		SelfControl:          &selfControl,
-		Controllers:          &controllers,
-		CapabilityInvocation: &capabilityInvocation,
+		SelfControl: &selfControl,
+		Controllers: &controllers,
+		VerificationMethodRelationship: nutsApi.VerificationMethodRelationship{
+			CapabilityInvocation: &capabilityInvocation,
+		},
 	})
 	if err != nil {
 		return nil, domain.UnwrapAPIError(err)
