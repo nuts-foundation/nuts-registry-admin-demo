@@ -196,7 +196,7 @@ func pemToPrivateKey(bytes []byte) (signer crypto.Signer, err error) {
 	case *ecdsa.PrivateKey:
 		signer = k
 	default:
-		err = fmt.Errorf("unknown private key type: %s", k)
+		err = fmt.Errorf("unsupported private key type: %T", k)
 	}
 
 	return
