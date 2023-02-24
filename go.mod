@@ -6,14 +6,14 @@ require (
 	github.com/deepmap/oapi-codegen v1.12.4
 	github.com/google/uuid v1.3.0
 	github.com/knadh/koanf v1.5.0
-	github.com/labstack/echo/v4 v4.10.0
+	github.com/labstack/echo/v4 v4.10.2
 	github.com/lestrrat-go/jwx v1.2.25
 	github.com/nuts-foundation/go-did v0.4.0
 	github.com/nuts-foundation/nuts-node v1.0.1-0.20230215083758-60527f5fff72
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/bbolt v1.3.7
-	golang.org/x/crypto v0.5.0
+	golang.org/x/crypto v0.6.0
 )
 
 require (
@@ -52,7 +52,7 @@ require (
 	github.com/lestrrat-go/iter v1.0.2 // indirect
 	github.com/lestrrat-go/option v1.0.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/minio/highwayhash v1.0.2 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
