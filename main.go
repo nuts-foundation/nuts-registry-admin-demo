@@ -218,7 +218,7 @@ func createTokenGenerator(config Config) core.AuthorizationTokenGenerator {
 		token, err := jwt.NewBuilder().
 			Issuer(config.NutsNodeAPIUser).
 			Subject(config.Credentials.Username).
-			Audience([]string{config.NutsNodeAddress}).
+			Audience([]string{config.NutsNodeAPIAudience}).
 			IssuedAt(issuedAt).
 			NotBefore(notBefore).
 			Expiration(expires).
