@@ -50,13 +50,13 @@ type Config struct {
 	// NutsNodeAPIKeyFile points to the private key used to sign JWTs. If empty Nuts node API security is not enabled
 	NutsNodeAPIKeyFile string `koanf:"nutsnodeapikeyfile"`
 	// NutsNodeAPIUser contains the API key user that will go into the iss field. It must match the user with the public key from the authorized_keys file in the Nuts node
-	NutsNodeAPIUser string   `koanf:"nutsnodeapiuser"`
+	NutsNodeAPIUser string `koanf:"nutsnodeapiuser"`
 	// NutsNodeAPIAudience dictates the aud field of the created JWT
-	NutsNodeAPIAudience string `kaonf:"nutsnodeapiaudience"`
-	CustomersFile   string   `koanf:"customersfile"`
-	Branding        Branding `koanf:"branding"`
-	sessionKey      *ecdsa.PrivateKey
-	apiKey          crypto.Signer
+	NutsNodeAPIAudience string   `kaonf:"nutsnodeapiaudience"`
+	CustomersFile       string   `koanf:"customersfile"`
+	Branding            Branding `koanf:"branding"`
+	sessionKey          *ecdsa.PrivateKey
+	apiKey              crypto.Signer
 }
 
 type Credentials struct {
