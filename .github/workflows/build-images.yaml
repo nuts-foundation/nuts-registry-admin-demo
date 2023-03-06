@@ -35,12 +35,18 @@ jobs:
 
       - name: Docker meta
         id: docker_meta
-        uses: crazy-max/ghaction-docker-meta@v1
+        uses: docker/metadata-action@v4
         with:
-          images: nutsfoundation/nuts-registry-admin-demo
-          tag-semver: |
-            {{version}}
-            {{major}}.{{minor}}
+          images: nutsfoundation/nuts-node
+          tags: |
+            # generate 'master' tag for the master branch
+            type=ref,event=branch,enable={{is_default_branch}}
+            # generate v5.2.1 tag
+            type=semver,pattern=v{{version}}
+            # generate v5 tag
+            type=semver,pattern=v{{major}}
+          flavor: |
+            latest=auto
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
