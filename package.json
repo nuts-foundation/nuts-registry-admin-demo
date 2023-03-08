@@ -19,7 +19,7 @@
     "@fullhuman/postcss-purgecss": "^5.0.0",
     "@vue/compiler-sfc": "^3.2.0",
     "autoprefixer": "^10.4.13",
-    "css-loader": "^5.2.0",
+    "css-loader": "^6.7.3",
     "eslint": "^7.32.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.27.5",
