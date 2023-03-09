@@ -3,7 +3,6 @@ const glob = require('glob')
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require("webpack");
 const {VueLoaderPlugin} = require('vue-loader')
-const PurgeCSSPlugin = require('purgecss-webpack-plugin')
 
 module.exports = {
   plugins: [
@@ -15,22 +14,7 @@ module.exports = {
     new webpack.DefinePlugin({
       __VUE_OPTIONS_API__: true,
       __VUE_PROD_DEVTOOLS__: false,
-    }),
-    // Purging unused CSS styles from tailwind
-    new PurgeCSSPlugin({
-      paths: glob.sync("./web/src/**/*"),
-      extractors: [
-        {
-          extractor: class TailwindExtractor {
-            static extract(content) {
-              return content.match(/[A-z0-9-_:\/]+/g) || [];
-            }
-          },
-          styleExtensions: ['.css'],
-          extensions: ['html', 'vue', 'js'],
-        },
-      ],
-    }),
+    })
   ],
   optimization: {
     splitChunks: {
