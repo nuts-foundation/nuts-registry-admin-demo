@@ -52,13 +52,18 @@ module.exports = {
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
-        type: 'asset/resource',
+        type: 'asset/resource'
       },
       {
         test: /\.css$/,
         use: [
           'vue-style-loader',
-          'style-loader',
+          {
+            loader: "style-loader",
+            options: {
+              esModule: false
+            }
+          },
           'css-loader',
           'postcss-loader'
         ]
