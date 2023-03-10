@@ -80,12 +80,12 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 }
 
 func (s Service) GetCredentials(customer domain.Customer) ([]domain.OrganizationConceptCredential, error) {
-	return s.search(vcrApi.SearchVCQuery{
+	return s.search(SearchVCQuery{
 		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
 		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsV1Context)},
-		CredentialSubject: []interface{}{domain.NutsOrganizationCredentialSubject{
+		CredentialSubject: domain.NutsOrganizationCredentialSubject{
 			ID: *customer.Did,
-		}},
+		},
 	})
 }
 
@@ -96,23 +96,24 @@ func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationCo
 	if len(city) > 0 {
 		city += "*"
 	}
-	return s.search(vcrApi.SearchVCQuery{
+	return s.search(SearchVCQuery{
 		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
 		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsV1Context)},
-		CredentialSubject: []interface{}{domain.NutsOrganizationCredentialSubject{
+		CredentialSubject: domain.NutsOrganizationCredentialSubject{
 			Organization: domain.Organization{
 				Name: name,
 				City: city,
 			},
-		}},
+		},
 	})
 }
 
-func (s Service) search(credential vcrApi.SearchVCQuery) ([]domain.OrganizationConceptCredential, error) {
+func (s Service) search(credential SearchVCQuery) ([]domain.OrganizationConceptCredential, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	response, err := s.client().SearchVCs(ctx, vcrApi.SearchVCsJSONRequestBody{Query: credential})
+	requestData, _ := json.Marshal(credential)
+	response, err := s.client().SearchVCsWithBody(ctx, "application/json", bytes.NewReader(requestData))
 
 	if err != nil {
 		return nil, domain.UnwrapAPIError(err)
