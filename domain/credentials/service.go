@@ -83,9 +83,9 @@ func (s Service) GetCredentials(customer domain.Customer) ([]domain.Organization
 	return s.search(SearchVCQuery{
 		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
 		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsV1Context)},
-		CredentialSubject: []interface{}{domain.NutsOrganizationCredentialSubject{
+		CredentialSubject: domain.NutsOrganizationCredentialSubject{
 			ID: *customer.Did,
-		}},
+		},
 	})
 }
 
@@ -99,12 +99,12 @@ func (s Service) SearchOrganizations(name, city string) ([]domain.OrganizationCo
 	return s.search(SearchVCQuery{
 		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
 		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsV1Context)},
-		CredentialSubject: []interface{}{domain.NutsOrganizationCredentialSubject{
+		CredentialSubject: domain.NutsOrganizationCredentialSubject{
 			Organization: domain.Organization{
 				Name: name,
 				City: city,
 			},
-		}},
+		},
 	})
 }
 

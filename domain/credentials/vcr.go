@@ -19,5 +19,5 @@ type SearchVCQuery struct {
 	// Type holds multiple types for a credential. A credential must always have the 'VerifiableCredential' type.
 	Type []ssi.URI `json:"type,omitempty"`
 	// CredentialSubject holds the actual data for the credential. It must be extracted using the UnmarshalCredentialSubject method and a custom type.
-	CredentialSubject []interface{} `json:"credentialSubject,omitempty"`
+	CredentialSubject interface{} `json:"credentialSubject,omitempty"`
 }
