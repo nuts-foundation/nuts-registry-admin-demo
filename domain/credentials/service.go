@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/nuts-foundation/nuts-node/core"
 	"io"
 	"net/http"
 	"net/url"
@@ -24,15 +25,16 @@ import (
 )
 
 type Service struct {
-	NutsNodeAddr string
-	SPService    sp.Service
-	DIDManClient didmanAPI.HTTPClient
+	NutsNodeAddr   string
+	SPService      sp.Service
+	DIDManClient   didmanAPI.HTTPClient
+	VCRClient      vcrApi.HTTPClient
 }
 
 func (s Service) client() vcrApi.ClientInterface {
 	url := s.NutsNodeAddr
 
-	response, err := vcrApi.NewClientWithResponses(url)
+	response, err := vcrApi.NewClientWithResponses(url, vcrApi.WithHTTPClient(core.MustCreateHTTPClient(s.VCRClient.ClientConfig, s.VCRClient.TokenGenerator)))
 	if err != nil {
 		panic(err)
 	}

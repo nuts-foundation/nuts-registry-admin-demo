@@ -14,6 +14,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/nuts-foundation/nuts-node/core"
+	vcrApi "github.com/nuts-foundation/nuts-node/vcr/api/v2"
 	"io/fs"
 	"log"
 	"net/http"
@@ -123,6 +124,13 @@ func main() {
 		},
 		TokenGenerator: tokenGenerator,
 	}
+	vcrClient := vcrApi.HTTPClient{
+		ClientConfig: core.ClientConfig{
+			Address: config.NutsNodeAddress,
+			Timeout: apiTimeout,
+		},
+		TokenGenerator: tokenGenerator,
+	}
 	spService := sp.Service{
 		Repository:   sp.NewBBoltRepository(db),
 		VDRClient:    vdrClient,
@@ -139,6 +147,7 @@ func main() {
 		NutsNodeAddr: config.NutsNodeAddress,
 		SPService:    spService,
 		DIDManClient: didmanClient,
+		VCRClient:    vcrClient,
 	}
 
 	// Initialize wrapper
