@@ -6,3 +6,6 @@ registry-admin.db
 nuts-registry-admin-demo
 customers.json
 logo.png
+
+# mac
+.DS_Store

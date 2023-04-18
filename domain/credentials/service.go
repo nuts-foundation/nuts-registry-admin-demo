@@ -25,10 +25,10 @@ import (
 )
 
 type Service struct {
-	NutsNodeAddr   string
-	SPService      sp.Service
-	DIDManClient   didmanAPI.HTTPClient
-	VCRClient      vcrApi.HTTPClient
+	NutsNodeAddr string
+	SPService    sp.Service
+	DIDManClient didmanAPI.HTTPClient
+	VCRClient    vcrApi.HTTPClient
 }
 
 func (s Service) client() vcrApi.ClientInterface {
@@ -42,7 +42,7 @@ func (s Service) client() vcrApi.ClientInterface {
 }
 
 func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCredential bool) error {
-	credentials, err := s.GetCredentials(customer)
+	credentials, err := s.GetOrganizationCredentials(customer)
 	if err != nil {
 		return err
 	}
@@ -81,12 +81,16 @@ func (s Service) ManageNutsOrgCredential(customer domain.Customer, shouldHaveCre
 	return nil
 }
 
-func (s Service) GetCredentials(customer domain.Customer) ([]domain.OrganizationConceptCredential, error) {
+func (s Service) GetOrganizationCredentials(customer domain.Customer) ([]domain.OrganizationConceptCredential, error) {
 	return s.search(SearchVCQuery{
 		Type:    []ssi.URI{ssi.MustParseURI(credential.NutsOrganizationCredentialType), ssi.MustParseURI(vc.VerifiableCredentialType)},
 		Context: []ssi.URI{ssi.MustParseURI(vc.VCContextV1), ssi.MustParseURI(credential.NutsV1Context)},
 		CredentialSubject: domain.NutsOrganizationCredentialSubject{
 			ID: *customer.Did,
+			Organization: domain.Organization{
+				Name: "*",
+				City: "*",
+			},
 		},
 	})
 }
