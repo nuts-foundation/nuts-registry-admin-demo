@@ -8,7 +8,7 @@ require (
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.10.2
 	github.com/lestrrat-go/jwx v1.2.25
-	github.com/nuts-foundation/go-did v0.4.0
+	github.com/nuts-foundation/go-did v0.5.0
 	github.com/nuts-foundation/nuts-node v1.0.1-0.20230215083758-60527f5fff72
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/pflag v1.0.5
@@ -65,9 +65,9 @@ require (
 	github.com/nats-io/nkeys v0.3.0 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
 	github.com/nuts-foundation/crypto-ecies v0.0.0-20211207143025-5b84f9efce2b // indirect
+	github.com/nuts-foundation/did-ockam v0.0.0-20230313074753-fafd938c948c // indirect
 	github.com/nuts-foundation/go-leia/v3 v3.3.0 // indirect
 	github.com/nuts-foundation/go-stoabs v1.6.0 // indirect
-	github.com/ockam-network/did v0.1.4-0.20210103172416-02ae01ce06d8 // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f // indirect
 	github.com/pkg/errors v0.9.1 // indirect
@@ -80,7 +80,7 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/shengdoushi/base58 v1.0.0 // indirect
 	github.com/spf13/cobra v1.6.1 // indirect
-	github.com/stretchr/testify v1.8.1 // indirect
+	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/tidwall/gjson v1.14.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
