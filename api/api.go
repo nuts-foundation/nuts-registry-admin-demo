@@ -112,7 +112,7 @@ func (w Wrapper) GetCustomers(ctx echo.Context) error {
 	}
 
 	for i, c := range allCustomers {
-		credentialsForCustomer, err := w.CredentialService.GetCredentials(c)
+		credentialsForCustomer, err := w.CredentialService.GetOrganizationCredentials(c)
 		if err != nil {
 			return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 		}
@@ -195,7 +195,7 @@ func (w Wrapper) GetCustomer(ctx echo.Context, id int) error {
 		return ctx.NoContent(http.StatusNotFound)
 	}
 
-	credentialsForCustomer, err := w.CredentialService.GetCredentials(*customer)
+	credentialsForCustomer, err := w.CredentialService.GetOrganizationCredentials(*customer)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
