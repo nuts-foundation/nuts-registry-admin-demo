@@ -5,7 +5,7 @@
       <input type="text" disabled v-model="localValue.did" id="customer-did-input">
     </div>
     <div>
-      <label for="customer-id-input">Internal ID:</label>
+      <label for="customer-id-input">Local customer ID</label>
       <input type="number" :disabled="mode==='edit'" v-model.number="localValue.id" id="customer-id-input" min="1">
     </div>
     <div>
@@ -17,7 +17,7 @@
       <input type="text" v-model="localValue.city" id="customer-city-input">
     </div>
     <div>
-      <label for="customer-domain-input">Domain</label>
+      <label for="customer-domain-input">Domain (optional)</label>
       <input type="text" v-model="localValue.domain" id="customer-domain-input">
     </div>
     <div v-if="mode==='edit'">

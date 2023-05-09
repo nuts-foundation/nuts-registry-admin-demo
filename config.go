@@ -57,6 +57,7 @@ type Config struct {
 	Branding            Branding `koanf:"branding"`
 	sessionKey          *ecdsa.PrivateKey
 	apiKey              crypto.Signer
+	VendorDID           string `koanf:"vendordid"`
 }
 
 type Credentials struct {

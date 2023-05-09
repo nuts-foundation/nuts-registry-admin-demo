@@ -13,6 +13,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/lestrrat-go/jwx/jwk"
 	"github.com/lestrrat-go/jwx/jwt"
+	"github.com/nuts-foundation/go-did/did"
 	"github.com/nuts-foundation/nuts-node/core"
 	vcrApi "github.com/nuts-foundation/nuts-node/vcr/api/v2"
 	"io/fs"
@@ -66,6 +67,14 @@ func main() {
 		log.Fatal(err)
 	}
 	defer db.Close()
+
+	var vendorDID *did.DID
+	if config.VendorDID != "" {
+		vendorDID, err = did.ParseDID(config.VendorDID)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 
 	e := echo.New()
 	e.HideBanner = true
@@ -135,6 +144,7 @@ func main() {
 		Repository:   sp.NewBBoltRepository(db),
 		VDRClient:    vdrClient,
 		DIDManClient: didmanClient,
+		VendorDID:    vendorDID,
 	}
 
 	// Initialize services
