@@ -3,6 +3,7 @@ package sp
 import (
 	"errors"
 	"fmt"
+	"github.com/nuts-foundation/go-did/did"
 	"strings"
 
 	ssi "github.com/nuts-foundation/go-did"
@@ -15,23 +16,28 @@ type Service struct {
 	Repository   Repository
 	VDRClient    vdrAPI.HTTPClient
 	DIDManClient didmanAPI.HTTPClient
+	VendorDID    *did.DID
 }
 
 // Get tries to find the default service provider from the database.
 // Returns nil when no default service provider was found
 func (svc Service) Get() (*domain.ServiceProvider, error) {
-	spDID, err := svc.Repository.Get()
-	if err != nil {
+	if svc.VendorDID == nil {
+		spDID, err := svc.Repository.Get()
+		if err != nil {
+			return nil, err
+		}
+		if spDID == nil {
+			return nil, nil
+		}
+		svc.VendorDID = spDID
+	}
+	svc.Repository.Set(svc.VendorDID.String())
+	sp := &domain.ServiceProvider{Id: svc.VendorDID.String()}
+	if err := svc.enrichWithContactInfo(sp); err != nil {
 		return nil, err
 	}
-	if spDID == nil {
-		return nil, nil
-	}
-	sp := &domain.ServiceProvider{Id: spDID.String()}
-	if err = svc.enrichWithContactInfo(sp); err != nil {
-		return nil, err
-	}
-	if err = svc.enrichWithEndpoint(sp); err != nil {
+	if err := svc.enrichWithEndpoint(sp); err != nil {
 		return nil, err
 	}
 	return sp, nil
