@@ -7,7 +7,7 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.10.2
-	github.com/lestrrat-go/jwx v1.2.25
+	github.com/lestrrat-go/jwx v1.2.26
 	github.com/nuts-foundation/go-did v0.5.1
 	github.com/nuts-foundation/nuts-node v1.0.1-0.20230215083758-60527f5fff72
 	github.com/sirupsen/logrus v1.9.3
@@ -25,7 +25,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.0.1 // indirect
+	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.2 // indirect
@@ -61,7 +61,7 @@ require (
 	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
-	github.com/lestrrat-go/option v1.0.0 // indirect
+	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.19 // indirect
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
@@ -94,7 +94,7 @@ require (
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/shengdoushi/base58 v1.0.0 // indirect
 	github.com/spf13/cobra v1.6.1 // indirect
-	github.com/stretchr/testify v1.8.3 // indirect
+	github.com/stretchr/testify v1.8.4 // indirect
 	github.com/tidwall/gjson v1.14.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
