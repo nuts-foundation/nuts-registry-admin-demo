@@ -15,7 +15,7 @@ import (
 	"github.com/lestrrat-go/jwx/jwt"
 	"github.com/nuts-foundation/go-did/did"
 	"github.com/nuts-foundation/nuts-node/core"
-	vcrApi "github.com/nuts-foundation/nuts-node/vcr/api/v2"
+	vcrApi "github.com/nuts-foundation/nuts-node/vcr/api/vcr/v2"
 	"io/fs"
 	"log"
 	"net/http"

@@ -166,9 +166,9 @@ func (svc Service) GetServices() (domain.Services, error) {
 	compoundServices := domain.Services{}
 	for _, service := range services {
 		compoundServices = append(compoundServices, domain.Service{
-			ServiceID: domain.ServiceID{Id: service.Id},
+			ServiceID: domain.ServiceID{Id: service.ID.String()},
 			ServiceProperties: domain.ServiceProperties{
-				ServiceEndpoint: service.ServiceEndpoint,
+				ServiceEndpoint: service.ServiceEndpoint.(map[string]interface{}),
 				Name:            service.Type,
 			},
 		})
@@ -191,9 +191,9 @@ func (svc Service) AddService(service domain.ServiceProperties) (*domain.Service
 	}
 
 	return &domain.Service{
-		ServiceID: domain.ServiceID{Id: cs.Id},
+		ServiceID: domain.ServiceID{Id: cs.ID.String()},
 		ServiceProperties: domain.ServiceProperties{
-			ServiceEndpoint: cs.ServiceEndpoint,
+			ServiceEndpoint: cs.ServiceEndpoint.(map[string]interface{}),
 			Name:            cs.Type,
 		},
 	}, nil

@@ -20,7 +20,7 @@ import (
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain/sp"
 
 	ssi "github.com/nuts-foundation/go-did"
-	vcrApi "github.com/nuts-foundation/nuts-node/vcr/api/v2"
+	vcrApi "github.com/nuts-foundation/nuts-node/vcr/api/vcr/v2"
 	"github.com/nuts-foundation/nuts-registry-admin-demo/domain"
 )
 
