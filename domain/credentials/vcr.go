@@ -2,7 +2,7 @@ package credentials
 
 import (
 	ssi "github.com/nuts-foundation/go-did"
-	v2 "github.com/nuts-foundation/nuts-node/vcr/api/v2"
+	v2 "github.com/nuts-foundation/nuts-node/vcr/api/vcr/v2"
 )
 
 // SearchVCRequest is the request body for searching VCs
