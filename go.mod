@@ -8,7 +8,7 @@ require (
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.11.1
 	github.com/lestrrat-go/jwx v1.2.26
-	github.com/nuts-foundation/go-did v0.6.4
+	github.com/nuts-foundation/go-did v0.6.5
 	github.com/nuts-foundation/nuts-node v1.0.1-0.20230809121706-4d8854384f5e
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
