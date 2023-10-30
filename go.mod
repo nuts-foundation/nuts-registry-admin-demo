@@ -12,7 +12,7 @@ require (
 	github.com/nuts-foundation/nuts-node v1.0.1-0.20230809121706-4d8854384f5e
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
-	go.etcd.io/bbolt v1.3.7
+	go.etcd.io/bbolt v1.3.8
 	golang.org/x/crypto v0.14.0
 )
 
