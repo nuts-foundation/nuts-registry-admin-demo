@@ -7,7 +7,7 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.11.2
-	github.com/lestrrat-go/jwx v1.2.26
+	github.com/lestrrat-go/jwx v1.2.27
 	github.com/nuts-foundation/go-did v0.7.1
 	github.com/nuts-foundation/nuts-node v1.0.1-0.20230809121706-4d8854384f5e
 	github.com/sirupsen/logrus v1.9.3
@@ -78,7 +78,7 @@ require (
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
-	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
+	github.com/lestrrat-go/blackmagic v1.0.2 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
