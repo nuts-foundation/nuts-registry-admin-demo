@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/deepmap/oapi-codegen v1.16.2
-	github.com/google/uuid v1.4.0
+	github.com/google/uuid v1.5.0
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.11.2
 	github.com/lestrrat-go/jwx v1.2.26
