@@ -7,13 +7,13 @@ require (
 	github.com/google/uuid v1.4.0
 	github.com/knadh/koanf v1.5.0
 	github.com/labstack/echo/v4 v4.11.2
-	github.com/lestrrat-go/jwx v1.2.26
+	github.com/lestrrat-go/jwx v1.2.29
 	github.com/nuts-foundation/go-did v0.7.1
 	github.com/nuts-foundation/nuts-node v1.0.1-0.20230809121706-4d8854384f5e
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/pflag v1.0.5
 	go.etcd.io/bbolt v1.3.8
-	golang.org/x/crypto v0.17.0
+	golang.org/x/crypto v0.21.0
 )
 
 require (
@@ -78,7 +78,7 @@ require (
 	github.com/labstack/gommon v0.4.0 // indirect
 	github.com/leodido/go-urn v1.2.4 // indirect
 	github.com/lestrrat-go/backoff/v2 v2.0.8 // indirect
-	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
+	github.com/lestrrat-go/blackmagic v1.0.2 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
@@ -124,7 +124,7 @@ require (
 	github.com/schollz/closestmatch v2.1.0+incompatible // indirect
 	github.com/shengdoushi/base58 v1.0.0 // indirect
 	github.com/spf13/cobra v1.7.0 // indirect
-	github.com/stretchr/testify v1.8.4 // indirect
+	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/tdewolff/minify/v2 v2.12.9 // indirect
 	github.com/tdewolff/parse/v2 v2.6.8 // indirect
 	github.com/tidwall/gjson v1.14.1 // indirect
@@ -140,8 +140,8 @@ require (
 	github.com/yosssi/ace v0.0.5 // indirect
 	go.uber.org/mock v0.2.0 // indirect
 	golang.org/x/arch v0.4.0 // indirect
-	golang.org/x/net v0.17.0 // indirect
-	golang.org/x/sys v0.15.0 // indirect
+	golang.org/x/net v0.21.0 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230525234030-28d5490b6b19 // indirect
