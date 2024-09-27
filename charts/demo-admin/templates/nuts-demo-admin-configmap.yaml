@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nuts-registry-admin-demo-config
+data:
+  server.config.yaml: |
+  {{- toYaml .Values.admin.config | nindent 4 }}
